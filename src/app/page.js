@@ -5,8 +5,8 @@ export default function HomePage() {
     <div>
       <h1>Welcome to the Home Page</h1>
       <p>This is the main landing page.</p>
-      {/* Link to the Admin page */}
-      <Link href="/routers/login/mainpage">
+      {/* Link to the login page */}
+      <Link href="/routers/login">
         <p>Go to login</p>
       </Link>
     </div>
