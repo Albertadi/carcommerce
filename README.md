@@ -1,5 +1,5 @@
 <h1>Car Commerce</h1>
-Next.js, with Tailwind CSS and some ESLint rules
+Built with Next.js, with Tailwind CSS, Flask, SQLite and some ESLint rules
 
 ## Getting Started
 
