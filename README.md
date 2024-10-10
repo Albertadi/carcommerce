@@ -30,5 +30,5 @@ cd src
 cd controller
 ```
 ```
-python application.py
+python app.py
 ```
