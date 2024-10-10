@@ -11,24 +11,15 @@ git clone https://github.com/Albertadi/carcommerce.git
 ```
 pip install -r requirements.txt
 ```
-
 3. Install NPM Packages
 ```
 npm install
 ```
-
-4. Start frontend
-```
-npm run dev
-```
-
-5. Start backend
-```
-cd src
-```
-```
-cd controller
-```
+4. Start backend
 ```
 python app.py
+```
+5. Start frontend
+```
+npm run dev
 ```
