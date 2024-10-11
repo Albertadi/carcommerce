@@ -18,6 +18,9 @@ CORS(flask_app)  # Enable CORS for cross-origin requests from Next.js
 # SQLAlchemy
 db.init_app(flask_app)
 
+with flask_app.app_context():
+    db.create_all()
+
 @flask_app.route('/api/hello', methods=['GET'])
 def hello():
     return {'message': 'Hello from Flask!'}, 200
