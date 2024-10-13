@@ -6,16 +6,35 @@ import axios from 'axios';
 
 export default function HomePage() {
   const [message, setMessage] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch user data from the API
   useEffect(() => {
-    axios.get('http://localhost:5000/api/hello')
-      .then(response => {
-        setMessage(response.data.message);
-      })
-      .catch(error => {
-        console.error('Error fetching message from flask:', error)
-      });
+    const fetchUser = async () => {
+      try {
+        const userResponse = await axios.get('http://localhost:5000/api/users/1');
+        setUser(userResponse.data); 
+
+        const messageResponse = await axios.get('http://localhost:5000/api/hello');
+        setMessage(messageResponse.data.message);
+
+        setLoading(false);
+      } catch (error) {
+        setError('Error fetching user data');
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
+
+  // Show loading message while data is being fetched
+  if (loading) return <p>Loading user data...</p>;
+
+  // Show error message if there's an error
+  if (error) return <p>{error}</p>;
 
   return (
     <div>
@@ -27,6 +46,9 @@ export default function HomePage() {
       </Link>
       {/* Sample axios fetch from flask */}
       <h1>{message}</h1>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Date of Birth:</strong> {user.dob}</p>
+      <p><strong>User Profile:</strong> {user.user_profile}</p>
     </div>
   );
 }
