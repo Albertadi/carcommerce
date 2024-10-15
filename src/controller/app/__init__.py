@@ -2,8 +2,6 @@
 from flask import Flask
 from sqlalchemy import event
 from flask_cors import CORS
-from flask_migrate import Migrate
-
 
 # Local dependencies
 from src.entity import db
