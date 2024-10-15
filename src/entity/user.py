@@ -8,7 +8,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     email = db.Column(db.String(100), nullable=False, primary_key=True)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
     dob = db.Column(db.Date, nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -16,11 +16,11 @@ class User(db.Model):
 
     def set_password(self, password):
         """Hash the password before storing it."""
-        self.password_hash = generate_password_hash(password)
+        self.password = generate_password_hash(password)
 
     def check_password(self, password):
         """Verify the password hash."""
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password, password)
 
     def to_dict(self):
         """Return a dictionary representation of the user."""
