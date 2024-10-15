@@ -54,3 +54,19 @@ class UserProfile(db.Model):
             db.session.commit()
 
         return True
+    
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'has_buy_permission': self.has_buy_permission,
+            'has_sell_permission': self.has_sell_permission,
+            'has_listing_permission': self.has_listing_permission
+        }
+    
+    @classmethod
+    def updateUserProfile(cls, name, description,
+                          has_buy_permission,
+                          has_sell_permission,
+                          has_listing_permission):
+        hapus_ini = 0 #ToDo
