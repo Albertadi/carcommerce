@@ -38,17 +38,37 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1>Welcome to the Home Page</h1>
-      <p>This is the main landing page.</p>
-      {/* Link to the login page */}
-      <Link href="/pages/login">
-        <p>Go to login</p>
-      </Link>
+      <h1>Welcome to the CarCommerce Home Page</h1>
+      <p>This is the main landing page for our used car sales platform.</p>
+      
       {/* Sample axios fetch from flask */}
       <h1>{message}</h1>
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Date of Birth:</strong> {user.dob}</p>
       <p><strong>User Profile:</strong> {user.user_profile}</p>
+
+      <h2>Explore User Roles:</h2>
+      
+      {/* Links to the respective pages */}
+      <Link href="/pages/admin">
+        <p>Admin Portal</p>
+      </Link>
+      
+      <Link href="/pages/agent">
+        <p>Agent Portal</p>
+      </Link>
+
+      <Link href="/pages/buyer">
+        <p>Buyer Portal</p>
+      </Link>
+
+      <Link href="/pages/seller">
+        <p>Seller Portal</p>
+      </Link>
+
+      <Link href="/pages/login">
+        <p>Go to Login</p>
+      </Link>
     </div>
   );
 }
