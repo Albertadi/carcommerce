@@ -5,8 +5,8 @@ from typing_extensions import Self
 # Local dependencies
 from .sqlalchemy import db
 
-class UserProfile(db.Model):
-    __tablename__ = "UserProfile"
+class Profile(db.Model):
+    __tablename__ = "profiles"
 
     # Attributes
     name = db.Column(db.String(100), nullable=False, primary_key=True)

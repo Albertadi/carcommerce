@@ -1,7 +1,7 @@
 from .sqlalchemy import db
 from .user import User
-from .profile import UserProfile
+from .profile import Profile
 
 __all__ = [
-    "db", "User", "UserProfile"
+    "db", "User", "Profile"
 ]
