@@ -1,25 +1,20 @@
 from functools import wraps
-from flask import jsonify, request
-from src.entity.user import User
+from flask import jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 def admin_required(f):
     @wraps(f)
+    @jwt_required()  # This ensures that a valid JWT token is present
     def decorated_function(*args, **kwargs):
-        # Get the user ID from the request
-        # This assumes you're sending the user ID in a header or token
-        user_id = get_user_id_from_request(request)
+        # Get the user's identity from the JWT token
+        current_user = get_jwt_identity()
         
-        if not user_id:
+        if not current_user:
             return jsonify({'error': 'Authentication required'}), 401
         
-        user = User.query.get(user_id)
-        if not user or user.user_profile != 'admin':
+        # Directly check if the user_profile in the token is 'admin'
+        if current_user.get('user_profile') != 'admin':
             return jsonify({'error': 'Admin access required'}), 403
         
         return f(*args, **kwargs)
     return decorated_function
-
-def get_user_id_from_request(request):
-    # Implement your logic to extract the user ID from the request
-    # This could involve decoding a JWT token, checking session data, etc.
-    pass
