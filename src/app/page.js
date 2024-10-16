@@ -48,25 +48,27 @@ export default function HomePage() {
       <p><strong>User Profile:</strong> {user.user_profile}</p>
 
       <h2>Explore User Roles:</h2>
+
+      <br></br>
       
       {/* Links to the respective pages */}
-      <Link href="/pages/admin">
+      <Link href="\pages\admin\crudsprofile">
         <p>Admin Portal</p>
       </Link>
       
-      <Link href="/pages/agent">
+      <Link href="\pages\agent">
         <p>Agent Portal</p>
       </Link>
 
-      <Link href="/pages/buyer">
+      <Link href="\pages\buyer">
         <p>Buyer Portal</p>
       </Link>
 
-      <Link href="/pages/seller">
+      <Link href="\pages\seller">
         <p>Seller Portal</p>
       </Link>
 
-      <Link href="/pages/login">
+      <Link href="\pages\login">
         <p>Go to Login</p>
       </Link>
     </div>
