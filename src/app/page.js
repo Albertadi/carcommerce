@@ -44,6 +44,10 @@ export default function HomePage() {
       <Link href="/pages/login">
         <p>Go to login</p>
       </Link>
+
+      <Link href="/pages/admin/crudsaccount">
+      <p> Go to crudsaccount </p>
+      </Link>
       {/* Sample axios fetch from flask */}
       <h1>{message}</h1>
       <p><strong>Name:</strong> {user.name}</p>
