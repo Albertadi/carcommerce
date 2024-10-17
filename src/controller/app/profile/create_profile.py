@@ -1,34 +1,32 @@
 from flask import Blueprint, request, jsonify
-# Blueprint for creating a blueprint (a way to organize a group of related routes)
-# request to handle incoming HTTP requests
-# jsonify to convert Python dictionaries to JSON Responses
+from src.entity.user import Profile, db
+from src.controller.app.profile.auth_admin import admin_required
 
-from src.entity.user import User, db
-# used to import the user model and database object 
+create_profile_blueprint = Blueprint('create_profile', __name__)
 
-from src.profile.auth_admin import admin_required
-# implement this so that the only one who can change role is only the user
-
-admin_blueprint = Blueprint('admin', __name__)
-
-@admin_blueprint.route('/api/admin/assign-role', methods=['POST'])
-@admin_required  # This decorator ensures only admins can access this route
-def assign_role():
+@create_profile_blueprint.route('/api/profile', methods=['POST'])
+@admin_required
+def create_profiling():
     data = request.get_json()
-    user_id = data.get('user_id')
-    role = data.get('role')
 
-    if not user_id or not role:
-        return jsonify({'error': 'Missing user_id or role'}), 400
+    required_fields = ['name', 'description', 'has_buy_permission', 'has_sell_permission', 'has_listing_permission']
+    if not all(field in data for field in required_fields):
+        return jsonify({'error': 'Missing required fields'}), 400
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+    try:
+        new_profile = Profile(
+            name=data['name'],
+            description=data['description'],
+            has_buy_permission=bool(data['has_buy_permission']),
+            has_sell_permission=bool(data['has_sell_permission']),
+            has_listing_permission=bool(data['has_listing_permission'])
+        )
+        
+        db.session.add(new_profile)
+        db.session.commit()
 
-    if role not in ['buyer', 'seller', 'used_car_agent', 'admin']:
-        return jsonify({'error': 'Invalid role'}), 400
+        return jsonify({'message': 'Profile created successfully', 'profile': new_profile.to_dict()}), 201
 
-    user.user_profile = role
-    db.session.commit()
-
-    return jsonify({'message': 'Role assigned successfully', 'user_id': user.id, 'role': role}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to create profile: {str(e)}'}), 500
