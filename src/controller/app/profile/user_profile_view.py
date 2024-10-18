@@ -15,9 +15,16 @@ def get_own_profile():
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify({
+<<<<<<< HEAD
         'name':user.name,
         'email': user.email,
         'user_profile': user.user_profile
+=======
+        'id': user.id,
+        'email': user.email,
+        'user_profile': user.user_profile,
+        'name': user.name,
+>>>>>>> 2fef6b889d4d7f3b55a903fc113b30c8ddd359bc
         # Add any other non-sensitive fields yang kita mau include
     }), 200
 
@@ -31,9 +38,16 @@ def get_user_profile(user_id):
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify({
+<<<<<<< HEAD
         'name':user.name,
         'email': user.email,
         'user_profile': user.user_profile
+=======
+        'id': user.id,
+        'email': user.email,
+        'user_profile': user.user_profile,
+        'name': user.name,
+>>>>>>> 2fef6b889d4d7f3b55a903fc113b30c8ddd359bc
         # Add any other non-sensitive fields yang kita mau include
     }), 200
 
