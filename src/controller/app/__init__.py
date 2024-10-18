@@ -3,9 +3,11 @@ from flask import Flask
 from sqlalchemy import event
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 # Local dependencies
-from src.entity import db
+from src.entity import db, User, Profile
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .authentication.login import login_blueprint
@@ -17,7 +19,8 @@ flask_app = Flask(__name__)
 flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
 flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 flask_app.config['SQLALCHEMY_ECHO'] = True
-flask_app.config['JWT_SECRET_KEY'] = 'secret_key' # CHANGE THIS LATER
+flask_app.config['JWT_SECRET_KEY'] = 'secret_key' # In an actual project, use os.environ.get('SECRET_KEY')
+
 CORS(flask_app)  # Enable CORS for cross-origin requests from Next.js
 
 # JWT
@@ -28,6 +31,27 @@ db.init_app(flask_app)
 
 with flask_app.app_context():
     db.create_all()
+    if not Profile.query.filter_by(name="admin").one_or_none():
+        adminProfile = Profile(
+            name="admin",
+            description="Admin Profile",
+            has_admin_permission=True
+        )
+        db.session.add(adminProfile)
+    
+    if not User.query.filter_by(email="admin@admin.com").one_or_none():
+        adminAccount = User(
+            email="admin@admin.com",
+            password=generate_password_hash("admin"),
+            first_name="Ad",
+            last_name="Min",
+            dob= datetime.strptime("2000-01-01", "%Y-%m-%d").date(),
+            user_profile="Admin"
+        )
+        db.session.add(adminAccount)
+
+    db.session.commit()
+    
 
 @flask_app.route('/api/hello', methods=['GET'])
 def hello():
