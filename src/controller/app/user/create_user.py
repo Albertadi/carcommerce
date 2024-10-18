@@ -18,6 +18,10 @@ def create_user():
     # Validate fields
     if not email or not password or not dob or not user_profile:
         return jsonify({'error': 'Missing required fields'}), 400
+    
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'error': 'Account already exists'}), 409
 
     # Convert 'dob' string to a datetime.date object
     try:
