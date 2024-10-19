@@ -8,6 +8,7 @@ export default function HomePage() {
   const { user, logout } = useContext(AuthContext); // Access user and logout from context
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-center flex-col text-center min-h-screen bg-[#f0f0f7] font-rajdhaniSemiBold">
       <h1 className='text-[#f75049] font-rajdhaniBold text-2xl'>WELCOME TO THE HOME PAGE</h1>
       <hr className='mt-4 border-[#f0f0f7]'/>
@@ -36,6 +37,24 @@ export default function HomePage() {
         </Link>
       )}
       <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
+=======
+    <div>
+      <h1>Welcome to the Home Page</h1>
+      <p>This is the main landing page.</p>
+      {/* Link to the login page */}
+      <Link href="/pages/login">
+        <p>Go to login</p>
+      </Link>
+
+      <Link href="/pages/admin/crudsaccount">
+      <p> Go to crudsaccount </p>
+      </Link>
+      {/* Sample axios fetch from flask */}
+      <h1>{message}</h1>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Date of Birth:</strong> {user.dob}</p>
+      <p><strong>User Profile:</strong> {user.user_profile}</p>
+>>>>>>> 5079504 (commit rico)
     </div>
   );
 }
