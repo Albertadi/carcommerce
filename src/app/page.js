@@ -12,6 +12,7 @@ export default function HomePage() {
       <h1 className='text-[#f75049] font-rajdhaniBold text-2xl'>WELCOME TO THE HOME PAGE</h1>
       <hr className='mt-4 border-[#f0f0f7]'/>
 
+<<<<<<< HEAD
       {/* Conditionally render user data or a login prompt */}
       {user ? (
         <div>
@@ -36,6 +37,32 @@ export default function HomePage() {
         </Link>
       )}
       <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
+=======
+      <h2>Explore User Roles:</h2>
+
+      <br></br>
+      
+      {/* Links to the respective pages */}
+      <Link href="\pages\admin\crudsprofile">
+        <p>Admin Portal</p>
+      </Link>
+      
+      <Link href="\pages\agent">
+        <p>Agent Portal</p>
+      </Link>
+
+      <Link href="\pages\buyer">
+        <p>Buyer Portal</p>
+      </Link>
+
+      <Link href="\pages\seller">
+        <p>Seller Portal</p>
+      </Link>
+
+      <Link href="\pages\login">
+        <p>Go to Login</p>
+      </Link>
+>>>>>>> 9ceb5d8 (commit16/10)
     </div>
   );
 }
