@@ -41,6 +41,7 @@ export default function HomePage() {
 >>>>>>> 7e9e313 (dashboard and user profile)
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-center flex-col text-center min-h-screen bg-[#f0f0f7] font-rajdhaniSemiBold">
       <h1 className='text-[#f75049] font-rajdhaniBold text-2xl'>WELCOME TO THE HOME PAGE</h1>
       <hr className='mt-4 border-[#f0f0f7]'/>
@@ -71,6 +72,18 @@ export default function HomePage() {
       )}
       <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
 =======
+=======
+    <div>
+      <h1>Welcome to the CarCommerce Home Page</h1>
+      <p>This is the main landing page for our used car sales platform.</p>
+      
+      {/* Sample axios fetch from flask */}
+      <h1>{message}</h1>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Date of Birth:</strong> {user.dob}</p>
+      <p><strong>User Profile:</strong> {user.user_profile}</p>
+
+>>>>>>> 6055b1bdd2893d0ef302316a19b50a258f9ad75a
       <h2>Explore User Roles:</h2>
 
       <br></br>
@@ -95,7 +108,10 @@ export default function HomePage() {
       <Link href="\pages\login">
         <p>Go to Login</p>
       </Link>
+<<<<<<< HEAD
 >>>>>>> 9ceb5d8 (commit16/10)
+=======
+>>>>>>> 6055b1bdd2893d0ef302316a19b50a258f9ad75a
     </div>
   );
 }
