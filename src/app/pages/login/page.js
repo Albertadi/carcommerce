@@ -1,36 +1,32 @@
-"use client"; // Mark this component as a Client Component
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { useState, useContext } from 'react';
+import { useRouter } from 'next/navigation'; 
 import axios from 'axios';
+import { AuthContext } from '../authorization/AuthContext'; // Adjust path as needed
 
-export default function AdminPage() {
-  const [email, setEmail] = useState('');       // State for email input
-  const [password, setPassword] = useState(''); // State for password input
-  const [error, setError] = useState('');       // State for error messages
-  const router = useRouter();                   // Hook for routing
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext); // Access login from AuthContext
+  const router = useRouter();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
 
     try {
-      // Send POST request to login endpoint
-      const response = await axios.post('http://localhost:5000/api/login', {
-        email,
-        password
+      const response = await axios.post('http://localhost:5000/api/login', { email, password });
+      const { access_token } = response.data;
+
+      // Fetch user data using the email to set in context
+      const userResponse = await axios.get(`http://localhost:5000/api/users?email=${email}`, {
+        headers: { Authorization: `Bearer ${access_token}` },
       });
 
-      const { access_token } = response.data; // Extract access token from response
-
-      // Store the access token in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', access_token);
-      }
-
-      // Redirect to home page after successful login
-      router.push('/'); 
+      login(access_token, userResponse.data); // Call login from context
+      router.push('/'); // Redirect to home page after successful login
     } catch (error) {
-      // Set error message if login fails
       setError('Invalid email or password');
     }
   };
@@ -47,10 +43,10 @@ export default function AdminPage() {
                 type="email"
                 id="email"
                 placeholder="enter email"
-                className='border px-2 py-1 focus:outline-none focus:ring-0 bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3 autofill:bg-[#5EF6FF] autofill:text-[#f0f0f7]'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required // Make this field required
+                required
+                className='border px-2 py-1 focus:outline-none bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3'
               />
             </div>
             <div className='flex justify-between items-center mb-4'>
@@ -59,10 +55,10 @@ export default function AdminPage() {
                 type="password"
                 id="password"
                 placeholder="enter password"
-                className='border px-2 py-1 focus:outline-none focus:ring-0 bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required // Make this field required
+                required
+                className='border px-2 py-1 focus:outline-none bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3'
               />
             </div>
             <button type="submit" className='bg-[#f75049]/60 text-[#f75049] py-1 px-2 hover:bg-[#f75049] hover:text-[#f0f0f7] border-solid border-2 border-[#f75049]'>Login</button>
