@@ -10,11 +10,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
+
   // Fetch user data from the API
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userResponse = await axios.get('http://localhost:5000/api/users/1');
+        const userResponse = await axios.get('http://localhost:5000/api/users/?email=john@doe.com');
         setUser(userResponse.data); 
 
         const messageResponse = await axios.get('http://localhost:5000/api/hello');
@@ -52,7 +54,7 @@ export default function HomePage() {
       <br></br>
       
       {/* Links to the respective pages */}
-      <Link href="\pages\admin\crudsprofile">
+      <Link href="\pages\admin\dashboard">
         <p>Admin Portal</p>
       </Link>
       
