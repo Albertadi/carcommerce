@@ -14,9 +14,6 @@ export default function HomePage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userResponse = await axios.get('http://localhost:5000/api/users/1');
-        setUser(userResponse.data); 
-
         const messageResponse = await axios.get('http://localhost:5000/api/hello');
         setMessage(messageResponse.data.message);
 
@@ -48,11 +45,10 @@ export default function HomePage() {
       <Link href="/pages/admin/crudsaccount">
       <p> Go to crudsaccount </p>
       </Link>
+
       {/* Sample axios fetch from flask */}
       <h1>{message}</h1>
-      <p><strong>Name:</strong> {user.name}</p>
-      <p><strong>Date of Birth:</strong> {user.dob}</p>
-      <p><strong>User Profile:</strong> {user.user_profile}</p>
+      
     </div>
   );
 }
