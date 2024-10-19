@@ -11,6 +11,7 @@ from src.entity import db, User, Profile
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .authentication.login import login_blueprint
+from .profile.create_profile import create_profile_blueprint
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -66,6 +67,7 @@ flask_app.register_blueprint(create_user_blueprint)
 flask_app.register_blueprint(search_user_blueprint)
 
 # Profile
+flask_app.register_blueprint(create_profile_blueprint)
 
 # Buyer
 
