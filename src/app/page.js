@@ -5,7 +5,42 @@ import { AuthContext } from './pages/authorization/AuthContext'; // Adjust path 
 import Link from 'next/link';
 
 export default function HomePage() {
+<<<<<<< HEAD
   const { user, logout } = useContext(AuthContext); // Access user and logout from context
+=======
+  const [message, setMessage] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  
+
+  // Fetch user data from the API
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userResponse = await axios.get('http://localhost:5000/api/users/?email=john@doe.com');
+        setUser(userResponse.data); 
+
+        const messageResponse = await axios.get('http://localhost:5000/api/hello');
+        setMessage(messageResponse.data.message);
+
+        setLoading(false);
+      } catch (error) {
+        setError('Error fetching user data');
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Show loading message while data is being fetched
+  if (loading) return <p>Loading user data...</p>;
+
+  // Show error message if there's an error
+  if (error) return <p>{error}</p>;
+>>>>>>> 7e9e313 (dashboard and user profile)
 
   return (
     <div className="flex items-center justify-center flex-col text-center min-h-screen bg-[#f0f0f7] font-rajdhaniSemiBold">
@@ -43,7 +78,7 @@ export default function HomePage() {
       <br></br>
       
       {/* Links to the respective pages */}
-      <Link href="\pages\admin\crudsprofile">
+      <Link href="\pages\admin\dashboard">
         <p>Admin Portal</p>
       </Link>
       
