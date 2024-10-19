@@ -13,8 +13,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  
-
   // Fetch user data from the API
   useEffect(() => {
     const fetchUser = async () => {
