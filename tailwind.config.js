@@ -11,7 +11,18 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily:{
+        rajdhaniBold: ["var(--font-rajdhani-bold)"],
+        rajdhaniLight: ["var(--font-rajdhani-light)"],
+        rajdhaniMedium: ["var(--font-rajdhani-medium)"],
+        rajdhaniRegular: ["var(--font-rajdhani-regular)"],
+        rajdhaniSemiBold: ["var(--font-rajdhani-semi-bold)"]
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addVariant }) {
+      addVariant('autofill', '&:-webkit-autofill');
+    },
+  ],
 };
