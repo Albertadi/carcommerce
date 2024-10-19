@@ -1,4 +1,5 @@
 # Libraries
+from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Local dependencies
@@ -31,3 +32,28 @@ class User(db.Model):
             'dob': self.dob.isoformat(),
             'user_profile': self.user_profile
         }
+
+    @classmethod
+    def updateUserAccount(cls, email, password, first_name, last_name, dob, user_profile):
+        try:
+            with current_app.app_context():
+                user = cls.query.filter_by(email=email).one_or_none()
+                if not user:
+                    return {"error": "User not found"}, 404
+                
+                if password is not None:
+                    user.password = generate_password_hash(password)
+                if first_name is not None:
+                    user.first_name = first_name
+                if last_name is not None:
+                    user.last_name = last_name
+                if dob is not None:
+                    user.dob = dob
+                if user_profile is not None:
+                    user.user_profile = user_profile
+
+                db.session.commit()
+                return{"message": "User account updated successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
