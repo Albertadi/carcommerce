@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Mark as Client Component
 
 import { useContext } from 'react';
 import { AuthContext } from './pages/authorization/AuthContext'; // Adjust path as needed
@@ -35,7 +35,6 @@ export default function HomePage() {
           <p className='text-[#f75049] text-lg absolute top-0 right-0 p-4'>LOGIN</p>
         </Link>
       )}
-
       <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
     </div>
   );
