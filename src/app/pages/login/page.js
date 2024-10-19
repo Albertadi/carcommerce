@@ -20,7 +20,7 @@ export default function LoginPage() {
       const { access_token } = response.data;
 
       // Fetch user data using the email to set in context
-      const userResponse = await axios.get(`http://localhost:5000/api/users?email=${email}`, {
+      const userResponse = await axios.get(`http://localhost:5000/api/users/view_user?email=${email}`, {
         headers: { Authorization: `Bearer ${access_token}` },
       });
 

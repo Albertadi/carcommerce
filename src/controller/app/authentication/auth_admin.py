@@ -14,7 +14,7 @@ def admin_required(f):
         
         # Directly check if the user_profile in the token is 'admin'
         if current_user.get('user_profile') != 'admin':
-            return jsonify({'error': 'Admin access required'}), 403
+            return jsonify({'error': 'Admin access required', 'current_profile': current_user.get('user_profile')}), 403
         
         return f(*args, **kwargs)
     return decorated_function

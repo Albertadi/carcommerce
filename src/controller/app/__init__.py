@@ -10,6 +10,8 @@ from datetime import datetime
 from src.entity import db, User, Profile
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
+from .user.search_agent import search_agent_blueprint
+from .user.view_user import view_user_blueprint
 from .authentication.login import login_blueprint
 from .profile.create_profile import create_profile_blueprint
 
@@ -47,7 +49,7 @@ with flask_app.app_context():
             first_name="Ad",
             last_name="Min",
             dob= datetime.strptime("2000-01-01", "%Y-%m-%d").date(),
-            user_profile="Admin"
+            user_profile="admin"
         )
         db.session.add(adminAccount)
 
@@ -65,13 +67,14 @@ flask_app.register_blueprint(login_blueprint)
 # User
 flask_app.register_blueprint(create_user_blueprint)
 flask_app.register_blueprint(search_user_blueprint)
+flask_app.register_blueprint(search_agent_blueprint)
+flask_app.register_blueprint(view_user_blueprint)
 
 # Profile
 flask_app.register_blueprint(create_profile_blueprint)
 
-# Buyer
+# Suspension
 
-# Seller
+# ReviewRating
 
-# Agent
 

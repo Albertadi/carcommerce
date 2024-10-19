@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
-from src.controller.app.profile.auth_admin import admin_required
+from src.controller.app.authentication.auth_admin import admin_required
 
 search_user_blueprint = Blueprint('search_user', __name__)
 

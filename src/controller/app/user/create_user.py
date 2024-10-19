@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from src.entity.user import User, db
-from src.controller.app.profile.auth_admin import admin_required
+from src.controller.app.authentication.auth_admin import admin_required
 
 create_user_blueprint = Blueprint('create_user', __name__)
 

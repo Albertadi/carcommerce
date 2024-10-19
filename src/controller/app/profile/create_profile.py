@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.entity import Profile, db
-from src.controller.app.profile.auth_admin import admin_required
+from src.controller.app.authentication.auth_admin import admin_required
 
 create_profile_blueprint = Blueprint('create_profile', __name__)
 

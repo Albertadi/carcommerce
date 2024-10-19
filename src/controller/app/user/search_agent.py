@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
 
-search_user_blueprint = Blueprint('search_agent', __name__)
+search_agent_blueprint = Blueprint('search_agent', __name__)
 
-@search_user_blueprint.route('/api/users/search_agent', methods=['GET'])
+@search_agent_blueprint.route('/api/users/search_agent', methods=['GET'])
 #add permission, either user or seller
 def search_agent():
     account_list = []
