@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import dashboard from "./dashboard";
+import ProfilePage from '../profiles/page'
 
 export default function Dashboard() {
   {
@@ -124,7 +124,7 @@ export default function Dashboard() {
             <div>
               <h2 className="text-2xl font-semibold">Content for Option 2</h2>
               <p>This is the content that shows for Option 2.</p>
-              <dashboard/>
+              <ProfilePage/>
             </div>
           )}
           {selectedOption === "option3" && (
