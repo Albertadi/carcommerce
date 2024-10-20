@@ -11,6 +11,7 @@ from src.controller.app import flask_app
 from src.controller.test.insert_delete_samples import insert_samples, delete_samples
 from src.controller.test.controller.admintoken import getAdminToken
 
+@pytest.mark.test_valid_create
 def test_valid_create():
     # Precondition 100 samples
     insert_samples()
