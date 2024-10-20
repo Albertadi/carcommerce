@@ -5,13 +5,48 @@ import { AuthContext } from './pages/authorization/AuthContext'; // Adjust path 
 import Link from 'next/link';
 
 export default function HomePage() {
+<<<<<<< HEAD
   const { user, logout } = useContext(AuthContext); // Access user and logout from context
+=======
+  const [message, setMessage] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch user data from the API
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userResponse = await axios.get('http://localhost:5000/api/users/?email=john@doe.com');
+        setUser(userResponse.data); 
+
+        const messageResponse = await axios.get('http://localhost:5000/api/hello');
+        setMessage(messageResponse.data.message);
+
+        setLoading(false);
+      } catch (error) {
+        setError('Error fetching user data');
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Show loading message while data is being fetched
+  if (loading) return <p>Loading user data...</p>;
+
+  // Show error message if there's an error
+  if (error) return <p>{error}</p>;
+>>>>>>> 7e9e313 (dashboard and user profile)
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-center flex-col text-center min-h-screen bg-[#f0f0f7] font-rajdhaniSemiBold">
       <h1 className='text-[#f75049] font-rajdhaniBold text-2xl'>WELCOME TO THE HOME PAGE</h1>
       <hr className='mt-4 border-[#f0f0f7]'/>
 
+<<<<<<< HEAD
       {/* Conditionally render user data or a login prompt */}
       {user ? (
         <div>
@@ -36,6 +71,47 @@ export default function HomePage() {
         </Link>
       )}
       <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
+=======
+=======
+    <div>
+      <h1>Welcome to the CarCommerce Home Page</h1>
+      <p>This is the main landing page for our used car sales platform.</p>
+      
+      {/* Sample axios fetch from flask */}
+      <h1>{message}</h1>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Date of Birth:</strong> {user.dob}</p>
+      <p><strong>User Profile:</strong> {user.user_profile}</p>
+
+>>>>>>> 6055b1bdd2893d0ef302316a19b50a258f9ad75a
+      <h2>Explore User Roles:</h2>
+
+      <br></br>
+      
+      {/* Links to the respective pages */}
+      <Link href="\pages\admin\dashboard">
+        <p>Admin Portal</p>
+      </Link>
+      
+      <Link href="\pages\agent">
+        <p>Agent Portal</p>
+      </Link>
+
+      <Link href="\pages\buyer">
+        <p>Buyer Portal</p>
+      </Link>
+
+      <Link href="\pages\seller">
+        <p>Seller Portal</p>
+      </Link>
+
+      <Link href="\pages\login">
+        <p>Go to Login</p>
+      </Link>
+<<<<<<< HEAD
+>>>>>>> 9ceb5d8 (commit16/10)
+=======
+>>>>>>> 6055b1bdd2893d0ef302316a19b50a258f9ad75a
     </div>
   );
 }
