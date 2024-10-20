@@ -48,10 +48,10 @@ class User(db.Model):
     
     @classmethod
     def createUserAccount(cls, email:str, password:str = "Placeholder",
-                          first_name: bool = False,
-                          last_name: bool = False,
+                          first_name:str = False,
+                          last_name:str = False,
                           dob: bool = False,
-                          user_profile: bool = False):
+                          user_profile:str = False):
         
         if cls.queryUserAccount(email):
             return False
@@ -77,7 +77,7 @@ class User(db.Model):
             with current_app.app_context():
                 user = cls.query.filter_by(email=email).one_or_none()
                 if not user:
-                    return {"error": "User not found"}, 404
+                    return False, 404
                 
                 if password is not None:
                     user.password = generate_password_hash(password)
@@ -91,7 +91,8 @@ class User(db.Model):
                     user.user_profile = user_profile
 
                 db.session.commit()
-                return{"message": "User account updated successfully"}, 200
+                return True, 200
+
         except Exception as e:
             db.session.rollback()
-            return {"error": str(e)}, 500
+            return False, 500

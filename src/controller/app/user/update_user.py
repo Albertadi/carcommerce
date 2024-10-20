@@ -31,4 +31,4 @@ def update_user():
         user_profile=new_user_profile
     )
 
-    return jsonify({"Updated user": update_response})
+    return jsonify({"success": update_response, "message": "User updated successfully"})

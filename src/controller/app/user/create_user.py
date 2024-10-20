@@ -37,5 +37,5 @@ def create_user():
 
     create_response = User.createUserAccount(email, password, first_name, last_name, dob, user_profile)
 
-    return jsonify({'User created': create_response}), 201
+    return jsonify({'success': create_response, 'message': 'User created successfully'}), 201
 

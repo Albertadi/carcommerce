@@ -1,5 +1,5 @@
 [
-    {"name": "Used Car Agent", "description": "Used Car Agent Profile", "has_buy_permission": 0, "has_sell_permission": 0, "has_listing_permission": 1},
-    {"name": "Seller", "description": "Seller Profile", "has_buy_permission": 0, "has_sell_permission": 1, "has_listing_permission": 0},
-    {"name": "Buyer", "description": "Buyer Profile", "has_buy_permission": 1, "has_sell_permission": 0, "has_listing_permission": 0}
+    {"name": "used car agent", "description": "Used Car Agent Profile", "has_buy_permission": 0, "has_sell_permission": 0, "has_listing_permission": 1},
+    {"name": "seller", "description": "Seller Profile", "has_buy_permission": 0, "has_sell_permission": 1, "has_listing_permission": 0},
+    {"name": "buyer", "description": "Buyer Profile", "has_buy_permission": 1, "has_sell_permission": 0, "has_listing_permission": 0}
 ]
