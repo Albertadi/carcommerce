@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ProfilePage from '../profiles/page'
+import ProfilePage from '../userProfiles/page'
 
 export default function Dashboard() {
   {
