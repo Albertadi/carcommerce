@@ -35,5 +35,7 @@ def create_user():
     except ValueError:
         return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
 
-    return jsonify({'User created': User.createUserAccount(email, password, first_name, last_name, dob, user_profile)}), 201
+    create_response = User.createUserAccount(email, password, first_name, last_name, dob, user_profile)
+
+    return jsonify({'User created': create_response}), 201
 

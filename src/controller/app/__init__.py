@@ -12,6 +12,7 @@ from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .user.search_agent import search_agent_blueprint
 from .user.view_user import view_user_blueprint
+from .user.update_user import update_user_blueprint
 from .authentication.login import login_blueprint
 from .profile.create_profile import create_profile_blueprint
 
@@ -69,6 +70,7 @@ flask_app.register_blueprint(create_user_blueprint)
 flask_app.register_blueprint(search_user_blueprint)
 flask_app.register_blueprint(search_agent_blueprint)
 flask_app.register_blueprint(view_user_blueprint)
+flask_app.register_blueprint(update_user_blueprint)
 
 # Profile
 flask_app.register_blueprint(create_profile_blueprint)
