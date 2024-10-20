@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from src.entity.user import User, db
+from src.entity import db, User, Profile
 from src.controller.app.authentication.auth_admin import admin_required
 
 create_user_blueprint = Blueprint('create_user', __name__)
@@ -25,6 +25,9 @@ def create_user():
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({'error': 'Account already exists'}), 409
+    
+    if not Profile.queryUserProfile(profile_name=user_profile):
+        return jsonify({'error': 'Profile does not exist'}), 404
 
     # Convert 'dob' string to a datetime.date object
     try:
@@ -32,15 +35,5 @@ def create_user():
     except ValueError:
         return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
 
-    # Create a new User object (without 'password')
-    new_user = User(email=email, dob=dob, first_name=first_name, last_name=last_name, user_profile=user_profile)
-
-    # Set and hash the password using the set_password method
-    new_user.set_password(password)
-
-    # Save the user to the database
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'message': 'User created successfully', 'user': new_user.to_dict()}), 201
+    return jsonify({'User created': User.createUserAccount(email, password, first_name, last_name, dob, user_profile)}), 201
 
