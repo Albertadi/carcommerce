@@ -1,6 +1,5 @@
 # Libraries
 import json
-import datetime
 
 # Local dependencies
 from src.controller.app import flask_app
