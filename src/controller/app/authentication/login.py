@@ -18,8 +18,8 @@ def login():
     password = data['password']
 
     # Query user from database
-    user = User.query.filter_by(email=email).one_or_none()
-
+    user = User.queryUserAccount(email)
+    
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid email or password"}), 401
     

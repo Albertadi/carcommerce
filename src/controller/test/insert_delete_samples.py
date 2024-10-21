@@ -53,6 +53,9 @@ def delete_samples():
     users_path = os.path.join(current_dir, 'USERS_SAMPLE.json')
 
     with flask_app.app_context():
+        # suspensions
+
+
         # users
         with open(users_path, 'r') as f:
             users = json.load(f)
@@ -64,8 +67,5 @@ def delete_samples():
             profiles = json.load(f)
         for profile in profiles:
             Profile.query.filter_by(name=profile["name"]).delete()
-
-        # suspensions
-
 
         db.session.commit()
