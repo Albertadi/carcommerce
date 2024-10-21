@@ -4,7 +4,7 @@ from src.controller.app.authentication.auth_admin import admin_required
 
 create_profile_blueprint = Blueprint('create_profile', __name__)
 
-@create_profile_blueprint.route('/api/create_profile', methods=['POST'])
+@create_profile_blueprint.route('/api/profile/create_profile', methods=['POST'])
 @admin_required
 def create_profiling():
     data = request.get_json()
