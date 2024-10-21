@@ -1,6 +1,7 @@
 # Libraries
 from flask import current_app
 from typing_extensions import Self
+from sqlalchemy.exc import SQLAlchemyError
 
 # Local dependencies
 from .sqlalchemy import db
@@ -65,8 +66,28 @@ class Profile(db.Model):
         }
     
     @classmethod
-    def updateUserProfile(cls, name, description,
-                          has_buy_permission,
-                          has_sell_permission,
-                          has_listing_permission):
-        hapus_ini = 0 #ToDo
+    def updateUserProfile(cls, name, description, has_buy_permission, has_sell_permission, has_listing_permission):
+        try:
+            with current_app.app_context():
+                profile = cls.query.get(name)
+                if not profile:
+                    return False, "Profile not found"
+
+                profile.description = description
+
+                # Ensure only one permission is set to True
+                permissions = [has_buy_permission, has_sell_permission, has_listing_permission]
+                if sum(permissions) > 1:
+                    return False, "A user can only have one type of permission"
+
+                profile.has_buy_permission = has_buy_permission
+                profile.has_sell_permission = has_sell_permission
+                profile.has_listing_permission = has_listing_permission
+
+                db.session.commit()
+                return True, "Profile updated successfully"
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return False, f"Database error: {str(e)}"
+        except Exception as e:
+            return False, f"An error occurred: {str(e)}"
