@@ -5,7 +5,7 @@ from controller.app.authentication.auth_admin import admin_required
 
 user_profile_blueprint = Blueprint('user_profile', __name__)
 
-@user_profile_blueprint.route('/api/user/profile', methods=['GET'])
+@user_profile_blueprint.route('/api/user/user_profile_view', methods=['GET'])
 @jwt_required()
 def get_own_profile():
     current_user = get_jwt_identity()
