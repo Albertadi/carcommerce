@@ -1,40 +1,42 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from src.entity.user import User
-from controller.app.authentication.auth_admin import admin_required
+from src.entity.profile import Profile
+from src.controller.app.authentication.auth_admin import admin_required
 
-user_profile_blueprint = Blueprint('user_profile', __name__)
+view_profile_blueprint = Blueprint('view_profile', __name__)
 
-@user_profile_blueprint.route('/api/user/user_profile_view', methods=['GET'])
+@view_profile_blueprint.route('/api/profile/view_profile', methods=['GET'])
 @jwt_required()
 def get_own_profile():
     current_user = get_jwt_identity()
-    user = User.query.filter_by(email=current_user['email']).first()
+    profile = Profile.query.get(current_user)
     
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+    if not profile:
+        return jsonify({'error': 'Profile not found'}), 404
     
     return jsonify({
-        'name':user.name,
-        'email': user.email,
-        'user_profile': user.user_profile
-        # Add any other non-sensitive fields yang kita mau include
+        'name': profile.name,
+        'description': profile.description,
+        'has_buy_permission': profile.has_buy_permission,
+        'has_sell_permission': profile.has_sell_permission,
+        'has_listing_permission': profile.has_listing_permission,
+        'has_admin_permission': profile.has_admin_permission
     }), 200
 
-@user_profile_blueprint.route('/api/user/profile/<int:user_id>', methods=['GET'])
+@view_profile_blueprint.route('/api/profile/view/<string:profile_name>', methods=['GET'])
 @jwt_required()
 @admin_required
-def get_user_profile(user_id):
-    user = User.query.get(user_id)
+def get_user_profile(profile_name):
+    profile = Profile.query.get(profile_name)
     
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+    if not profile:
+        return jsonify({'error': 'Profile not found'}), 404
     
     return jsonify({
-        'name':user.name,
-        'email': user.email,
-        'user_profile': user.user_profile
-        # Add any other non-sensitive fields yang kita mau include
+        'name': profile.name,
+        'description': profile.description,
+        'has_buy_permission': profile.has_buy_permission,
+        'has_sell_permission': profile.has_sell_permission,
+        'has_listing_permission': profile.has_listing_permission,
+        'has_admin_permission': profile.has_admin_permission
     }), 200
-
-# 

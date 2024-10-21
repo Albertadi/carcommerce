@@ -1,12 +1,14 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.entity.profile import Profile
 from src.controller.app.authentication.auth_admin import admin_required
 
-create_profile_blueprint = Blueprint('create_profile', __name__)
+update_profile_blueprint = Blueprint('update_profile', __name__)
 
-@create_profile_blueprint.route('/api/create_profile', methods=['POST'])
+@update_profile_blueprint.route('/api/profile/update_profile', methods=['PUT'])
+@jwt_required()
 @admin_required
-def create_profiling():
+def update_profile():
     data = request.get_json()
 
     required_fields = ['name', 'description', 'has_buy_permission', 'has_sell_permission', 'has_listing_permission']
@@ -14,7 +16,7 @@ def create_profiling():
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
-        result = Profile.createUserProfile(
+        success = Profile.updateUserProfile(
             name=data['name'],
             description=data['description'],
             has_buy_permission=bool(data['has_buy_permission']),
@@ -22,10 +24,12 @@ def create_profiling():
             has_listing_permission=bool(data['has_listing_permission'])
         )
 
-        if result:
-            return jsonify({'message': 'Profile created successfully'}), 201
+        if success:
+            return jsonify({'message': 'Profile updated successfully'}), 200
         else:
-            return jsonify({'error': 'Failed to create profile. Profile may already exist or has admin permission.'}), 400
+            return jsonify({'error': 'Failed to update profile'}), 400
 
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': f'Failed to create profile: {str(e)}'}), 500
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
