@@ -25,7 +25,11 @@ def create_listing():
     image_url=data.get('image_url')
     seller_email=data.get('seller_email')
 
-    if seller_email is not None:
+    listing = Listing.queryListing(id)
+    if listing is None:
+        return jsonify({'success': False, 'message': 'listing does not exist'})
+
+    if seller_email:
         seller = User.queryUserAccount(seller_email)
         if not seller:
             return jsonify({'success': False, 'message': 'seller does not exist'})
