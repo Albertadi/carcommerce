@@ -144,7 +144,8 @@ class Listing(db.Model):
         """Update an existing listing in the database."""
         try:
             # Query the listing
-            listing = cls.query.filter_by(id=id).one_or_none()
+            listing = cls.queryListing(id)
+            
             if not listing:
                 return False, 404
 
@@ -167,12 +168,8 @@ class Listing(db.Model):
                 listing.fuel_type = FuelType(fuel_type)
             if is_sold is not None:
                 listing.is_sold = is_sold
-            if listing_date:
-                listing.listing_date = datetime.strptime(listing_date, "%Y-%m-%d").date()
             if image_url is not None:
                 listing.image_url = image_url
-            if agent_email is not None:
-                listing.agent_email = agent_email
             if seller_email is not None:
                 listing.seller_email = seller_email
 
@@ -185,3 +182,16 @@ class Listing(db.Model):
         except Exception as e:
             db.session.rollback()
             return False, 500  # Return 500 for any other server errors
+        
+    @classmethod
+    def deleteListing(cls, id):
+        # Ensure listing exists
+        listing = cls.queryListing(id)
+        if not listing:
+            return False
+        
+        # Delete listing by id
+        cls.query.filter_by(id=id).delete()
+        db.session.commit()
+        
+        return True
