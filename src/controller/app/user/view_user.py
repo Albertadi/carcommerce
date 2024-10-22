@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
-from src.controller.app.authentication.auth_admin import admin_required
+from controller.app.authentication.permission_required import permission_required
 
 view_user_blueprint = Blueprint('view_user', __name__)
 
 # View individual user detail
 @view_user_blueprint.route('/api/users/view_user', methods=['GET'])
-@admin_required
+@permission_required('has_admin_permission')
 def view_user():
     user_email = request.args.get('email')
 

@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app
 from src.entity.profile import Profile
-from src.controller.app.authentication.auth_admin import admin_required
+from controller.app.authentication.permission_required import permission_required
 
 create_profile_blueprint = Blueprint('create_profile', __name__)
 
-@create_profile_blueprint.route('/api/profile/create_profile', methods=['POST'])
-@admin_required
+@create_profile_blueprint.route('/api/create_profile', methods=['POST'])
+@permission_required('has_admin_permission')
 def create_profiling():
     data = request.get_json()
 
@@ -26,6 +26,7 @@ def create_profiling():
             return jsonify({'message': 'Profile created successfully'}), 201
         else:
             return jsonify({'error': 'Failed to create profile. Profile may already exist or has admin permission.'}), 400
+
 
     except Exception as e:
         return jsonify({'error': f'Failed to create profile: {str(e)}'}), 500

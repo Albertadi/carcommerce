@@ -1,11 +1,10 @@
-# Libraries
 from flask import current_app
-from typing_extensions import Self
+from typing import Optional
+from datetime import datetime
+from .sqlalchemy import db
 from enum import Enum
 
-# Local dependencies
-from .sqlalchemy import db
-
+# Enums for TransmissionType and FuelType
 class TransmissionType(str, Enum):
     MANUAL = 'MANUAL'
     AUTOMATIC = 'AUTOMATIC'
@@ -16,9 +15,10 @@ class FuelType(str, Enum):
     ELECTRIC = 'ELECTRIC'
     HYBRID = 'HYBRID'
 
-class Listings(db.Model):
+class Listing(db.Model):
     __tablename__ = 'listings'
 
+    # Define attributes
     id = db.Column(db.String(36), primary_key=True)
     vin = db.Column(db.String(17), nullable=False, unique=True)
     make = db.Column(db.String(50), nullable=False)
@@ -32,13 +32,15 @@ class Listings(db.Model):
     listing_date = db.Column(db.Date(), nullable=False)
     image_url = db.Column(db.String(200), nullable=False)
 
-    # Foreign Keys
     agent_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
     agentRelation = db.relationship('User', backref='listings')
 
+    seller_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
+    sellerRelation = db.relationship('User', backref='listings')
+
     # Methods
-    def to_dict(self) -> dict[Self]:
-        """Return a dictionary representation of the user."""
+    def to_dict(self) -> dict:
+        """Return a dictionary representation of the listing."""
         return {
             'id': self.id,
             'vin': self.vin,
@@ -47,45 +49,60 @@ class Listings(db.Model):
             'year': self.year,
             'price': self.price,
             'mileage': self.mileage,
-            'transmission': self.transmission,
-            'fuel_type': self.fuel_type,
+            'transmission': self.transmission.value,  # Access the value of the enum
+            'fuel_type': self.fuel_type.value,  # Access the value of the enum
             'is_sold': self.is_sold,
-            'listing_date': self.listing_date,
+            'listing_date': self.listing_date.isoformat(),  # Convert date to string
             'image_url': self.image_url,
-            'agent_email': self.agent_email
+            'agent_email': self.agent_email,
+            'seller_email': self.seller_email
         }
-    
+
     @classmethod
-    def queryListing(cls, id:str) -> Self | None:
-        # Query a specific user profile based on parameter email
-        # return a User object or None
+    def queryListing(cls, id: str) -> Optional[Self]:
+        """Query a listing by ID."""
         return cls.query.filter_by(id=id).one_or_none()
-    
+
     @classmethod
     def queryAllListing(cls) -> list[Self]:
-        # Query all users
-        # Return list of all User objects
+        """Query all listings."""
         return cls.query.all()
-    
+
     @classmethod
-    def createListing(cls, id,
-                          vin,
-                          make,
-                          model,
-                          year,
-                          price:float = 0.0,
-                          mileage:int = 0,
-                          transmission:str = "",
-                          fuel_type:str = "",
-                          is_sold:bool=False,
-                          listing_date:str="",
-                          image_url:str="",
-                          agent_email:str=""
-                          ):
-        
+    def createListing(cls, id: str,
+                      vin: str,
+                      make: str,
+                      model: str,
+                      year: int,
+                      price: float = 0.0,
+                      mileage: int = 0,
+                      transmission: str = "",
+                      fuel_type: str = "",
+                      is_sold: bool = False,
+                      listing_date: str = "",
+                      image_url: str = "",
+                      agent_email: str = "",
+                      seller_email: str = "") -> bool:
+        """Create a new listing in the database."""
+
+        # Check if the listing already exists
         if cls.queryListing(id):
             return False
 
+        # Validate transmission and fuel_type as Enums
+        try:
+            transmission = TransmissionType(transmission)
+            fuel_type = FuelType(fuel_type)
+        except ValueError:
+            return False  # Invalid Enum value
+
+        # Convert string listing_date to date object
+        try:
+            listing_date = datetime.strptime(listing_date, "%Y-%m-%d").date()
+        except ValueError:
+            return False  # Invalid date format
+
+        # Create new listing
         new_listing = cls(
             id=id,
             vin=vin,
@@ -100,36 +117,71 @@ class Listings(db.Model):
             listing_date=listing_date,
             image_url=image_url,
             agent_email=agent_email,
+            seller_email=seller_email
         )
 
-        with current_app.app_context():
-            db.session.add(new_listing)
-            db.session.commit()
+        # Add the listing to the database
+        db.session.add(new_listing)
+        db.session.commit()
 
         return True
 
     @classmethod
-    def updateListing(cls, email, password, first_name, last_name, dob, user_profile):
+    def updateListing(cls, id: str,
+                      vin: Optional[str],
+                      make: Optional[str],
+                      model: Optional[str],
+                      year: Optional[int],
+                      price: Optional[float] = 0.0,
+                      mileage: Optional[int] = 0,
+                      transmission: Optional[str] = "",
+                      fuel_type: Optional[str] = "",
+                      is_sold: Optional[bool] = False,
+                      listing_date: Optional[str] = "",
+                      image_url: Optional[str] = "",
+                      agent_email: Optional[str] = "",
+                      seller_email: Optional[str] = "") -> tuple[bool, int]:
+        """Update an existing listing in the database."""
         try:
-            with current_app.app_context():
-                user = cls.query.filter_by(email=email).one_or_none()
-                if not user:
-                    return False, 404
-                
-                if password is not None:
-                    user.password = password
-                if first_name is not None:
-                    user.first_name = first_name
-                if last_name is not None:
-                    user.last_name = last_name
-                if dob is not None:
-                    user.dob = dob
-                if user_profile is not None:
-                    user.user_profile = user_profile
+            # Query the listing
+            listing = cls.query.filter_by(id=id).one_or_none()
+            if not listing:
+                return False, 404
 
-                db.session.commit()
-                return True, 200
+            # Update fields if provided
+            if vin is not None:
+                listing.vin = vin
+            if make is not None:
+                listing.make = make
+            if model is not None:
+                listing.model = model
+            if year is not None:
+                listing.year = year
+            if price is not None:
+                listing.price = price
+            if mileage is not None:
+                listing.mileage = mileage
+            if transmission:
+                listing.transmission = TransmissionType(transmission)
+            if fuel_type:
+                listing.fuel_type = FuelType(fuel_type)
+            if is_sold is not None:
+                listing.is_sold = is_sold
+            if listing_date:
+                listing.listing_date = datetime.strptime(listing_date, "%Y-%m-%d").date()
+            if image_url is not None:
+                listing.image_url = image_url
+            if agent_email is not None:
+                listing.agent_email = agent_email
+            if seller_email is not None:
+                listing.seller_email = seller_email
 
+            db.session.commit()
+            return True, 200
+
+        except ValueError:
+            db.session.rollback()
+            return False, 400  # Return 400 for bad input (invalid enums or date)
         except Exception as e:
             db.session.rollback()
-            return False, 500
+            return False, 500  # Return 500 for any other server errors

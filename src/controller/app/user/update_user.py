@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
-from src.controller.app.authentication.auth_admin import admin_required
+from controller.app.authentication.permission_required import permission_required
 
 update_user_blueprint = Blueprint('update_user', __name__)
 
 @update_user_blueprint.route('/api/users/update_user', methods=['POST'])
-@admin_required
+@permission_required('has_admin_permission')
 def update_user():
     updated_details = request.get_json()
 
