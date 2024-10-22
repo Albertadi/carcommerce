@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
-from controller.app.authentication.permission_required import permission_required
+from src.controller.app.authentication.permission_required import permission_required
 
 update_user_blueprint = Blueprint('update_user', __name__)
 

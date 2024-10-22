@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.entity.profile import Profile
-from controller.app.authentication.permission_required import permission_required
+from src.controller.app.authentication.permission_required import permission_required
 
 view_profile_blueprint = Blueprint('view_profile', __name__)
 

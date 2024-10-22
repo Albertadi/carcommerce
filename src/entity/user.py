@@ -14,7 +14,11 @@ class User(db.Model):
     dob = db.Column(db.Date, nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
-    user_profile = db.Column(db.String(100), nullable=False)
+    # Foreign key to the Profile model
+    user_profile = db.Column(db.String(100), db.ForeignKey('profiles.name'), nullable=False)
+
+    # Relationship with Profile model
+    profile = db.relationship('Profile', backref='users')
 
     def set_password(self, password):
         """Hash the password before storing it."""

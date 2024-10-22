@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 
 # Local Dependencies
-from src.entity.user import User, Profile
+from src.entity import User, Profile
 
 login_blueprint = Blueprint("login", __name__)
 

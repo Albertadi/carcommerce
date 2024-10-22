@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.entity.profile import Profile
-from src.controller.app.authentication.auth_admin import admin_required
+from src.controller.app.authentication.permission_required import permission_required
 
 update_profile_blueprint = Blueprint('update_profile', __name__)
 
 @update_profile_blueprint.route('/api/profile/update_profile', methods=['PUT'])
 @jwt_required()
-@admin_required
+@permission_required('has_admin_permission')
 def update_profile():
     data = request.get_json()
 

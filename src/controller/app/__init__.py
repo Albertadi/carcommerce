@@ -7,14 +7,17 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 
 # Local dependencies
-from src.entity import db, User, Profile
+from src.entity import db, User, Profile, Listing
+from .authentication.login import login_blueprint
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .user.search_agent import search_agent_blueprint
 from .user.view_user import view_user_blueprint
 from .user.update_user import update_user_blueprint
-from .authentication.login import login_blueprint
 from .profile.create_profile import create_profile_blueprint
+from .profile.update_profile import update_profile_blueprint
+from .profile.view_profile import view_profile_blueprint
+from .listing.create_listing import create_listing_blueprint
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -74,6 +77,12 @@ flask_app.register_blueprint(update_user_blueprint)
 
 # Profile
 flask_app.register_blueprint(create_profile_blueprint)
+flask_app.register_blueprint(update_profile_blueprint)
+flask_app.register_blueprint(view_profile_blueprint)
+
+# Listing
+flask_app.register_blueprint(create_listing_blueprint)
+
 
 # Suspension
 

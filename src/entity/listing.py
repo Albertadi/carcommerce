@@ -1,5 +1,5 @@
 from flask import current_app
-from typing import Optional
+from typing import Optional, Self
 from datetime import datetime
 from .sqlalchemy import db
 from enum import Enum
@@ -31,12 +31,12 @@ class Listing(db.Model):
     is_sold = db.Column(db.Boolean(), nullable=False, default=False)
     listing_date = db.Column(db.Date(), nullable=False)
     image_url = db.Column(db.String(200), nullable=False)
-
     agent_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
-    agentRelation = db.relationship('User', backref='listings')
-
     seller_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
-    sellerRelation = db.relationship('User', backref='listings')
+
+    # Foreign key relations
+    agentRelation = db.relationship('User', foreign_keys=[agent_email], backref='agent_listings')
+    sellerRelation = db.relationship('User', foreign_keys=[seller_email], backref='seller_listings')
 
     # Methods
     def to_dict(self) -> dict:

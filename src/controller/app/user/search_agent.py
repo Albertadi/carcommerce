@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
-from controller.app.authentication.permission_required import permission_required
+from src.controller.app.authentication.permission_required import permission_required
 
 search_agent_blueprint = Blueprint('search_agent', __name__)
 
