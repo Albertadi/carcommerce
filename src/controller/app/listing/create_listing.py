@@ -1,4 +1,5 @@
 # Libraries
+from uuid import uuid4
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt
 from datetime import datetime
@@ -18,7 +19,7 @@ def create_listing():
 
     current_date = datetime.today().strftime('%Y-%m-%d')
 
-    id=data.get('id')
+    id=str(uuid4())
     vin=data.get('vin')
     make=data.get('make')
     model=data.get('model')
