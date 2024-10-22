@@ -1,4 +1,3 @@
-from flask import current_app
 from typing import Optional, Self
 from datetime import datetime
 from .sqlalchemy import db
@@ -137,15 +136,13 @@ class Listing(db.Model):
                       transmission: Optional[str] = "",
                       fuel_type: Optional[str] = "",
                       is_sold: Optional[bool] = False,
-                      listing_date: Optional[str] = "",
                       image_url: Optional[str] = "",
-                      agent_email: Optional[str] = "",
                       seller_email: Optional[str] = "") -> tuple[bool, int]:
         """Update an existing listing in the database."""
         try:
             # Query the listing
             listing = cls.queryListing(id)
-            
+
             if not listing:
                 return False, 404
 
