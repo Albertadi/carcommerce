@@ -19,16 +19,16 @@ class LoginController:
         password = data['password']
 
         # Query user from database
-        user, status_code = User.checkLogin(email, password)
+        loginValid = User.checkLogin(email, password)
 
-        if status_code != 200:
+        if not loginValid:
             return jsonify({"error": "Invalid email or password"})
         
         # Create or Renew JWT Token
-        success = Token.createAccessToken(user.email)
+        success = Token.createAccessToken(email)
         
         if success:
-            access_token = Token.queryAccessToken(user.email)
+            access_token = Token.queryAccessToken(email)
 
             return jsonify({
                 'success': success,

@@ -25,9 +25,9 @@ def search_listing(make: Optional[str] = None,
 
     # Apply filters dynamically
     if make:
-        query = query.filter_by(make=make)
+        query = query.filter(Listing.make.ilike(f'{make}%')) # Case-insensitive partial search
     if model:
-        query = query.filter_by(model=model)
+        query = query.filter(Listing.model.ilike(f'{model}%')) # Case-insensitive partial search
     if year:
         query = query.filter_by(year=year)
     if min_price is not None:

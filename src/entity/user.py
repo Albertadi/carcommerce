@@ -43,9 +43,9 @@ class User(db.Model):
         user = cls.queryUserAccount(email)
     
         if not user or not user.check_password(password):
-            return None, 401
+            return False
 
-        return user, 200
+        return True
     
     @classmethod
     def queryUserAccount(cls, email:str) -> Self | None:
