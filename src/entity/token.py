@@ -19,7 +19,10 @@ class Token(db.Model):
     @classmethod
     def queryAccessToken(cls, email):
         token = cls.query.filter_by(email=email).one_or_none()
-        return token.access_token
+        if token:
+            return token.access_token
+        else:
+            return None
 
     @classmethod
     def generateAccessToken(cls, user):
@@ -40,8 +43,16 @@ class Token(db.Model):
         if not user:
             return False
         
-        user.access_token = cls.generateAccessToken(user)
-        return True
+        new_token = cls.generateAccessToken(user)
+        token_record = cls.query.filter_by(email=user.email).one_or_none()
+        
+        if token_record:
+            token_record.access_token = new_token
+            db.session.commit()
+            return True
+        
+        return False
+
 
 
     @classmethod
@@ -49,8 +60,8 @@ class Token(db.Model):
 
         user = User.queryUserAccount(email)
 
+        # If token record does not exist for the user, generate a token record 
         if not cls.queryAccessToken(user.email):
-            # If user does not exist in the Token 
             new_token = cls(
                 email = user.email,
                 access_token = cls.generateAccessToken(user)
@@ -60,6 +71,6 @@ class Token(db.Model):
 
             return True
         else:
-            # Renew the token
+            # If a token record exists, renew the token
             return cls.renewAccessToken(user)
         
