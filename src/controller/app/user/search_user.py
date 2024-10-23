@@ -7,9 +7,22 @@ search_user_blueprint = Blueprint('search_user', __name__)
 @search_user_blueprint.route('/api/users/search_user', methods=['GET'])
 @permission_required('has_admin_permission')
 def search_user():
-    account_list = []
-    #add if condition if user not in suspension
-    for user in User.query.all():
-        account_list.append(user.to_dict())
+    email = request.args.get('email')
+    first_name = request.args.get('first_name')
+    user_profile = request.args.get('user_profile')
+
+    query = User.query
+
+    # Apply filters dynamically
+    if email:
+        query = query.filter(User.email.like(f'{email}%')) 
+    if first_name:
+        query = query.filter(User.first_name.like(f'{first_name}%')) 
+    if user_profile:
+        query = query.filter_by(user_profile=user_profile) 
+
+    # Execute the query and return the filtered users
+    users = query.all()
+    account_list = [user.to_dict() for user in users]
 
     return jsonify({"message": "Success", "account_list": account_list})
