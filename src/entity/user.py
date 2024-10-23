@@ -37,6 +37,15 @@ class User(db.Model):
             'dob': self.dob.isoformat(),
             'user_profile': self.user_profile
         }
+
+    @classmethod
+    def checkLogin(cls, email:str, password:str) -> Self:
+        user = cls.queryUserAccount(email)
+    
+        if not user or not user.check_password(password):
+            return None, 401
+
+        return user, 200
     
     @classmethod
     def queryUserAccount(cls, email:str) -> Self | None:
