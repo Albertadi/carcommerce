@@ -1,8 +1,14 @@
-# search_service.py
+# Libraries
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 
 from typing import Optional
 from src.entity.listing import Listing, TransmissionType, FuelType  
 from src.entity import db
+
+
+search_listing_blueprint = Blueprint('search_listing', __name__)
+@search_listing_blueprint.route('/api/listing/search_listing', methods=['GET'])
 
 def search_listing(make: Optional[str] = None,
                    model: Optional[str] = None,
