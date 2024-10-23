@@ -1,44 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
-const initialProfiles = [
-  {
-    name: "Admin",
-    description: "Administrator with full permissions",
-    has_admin_permission: true,
-    has_buy_permission: true,
-    has_sell_permission: true,
-    has_listing_permission: true,
-  },
-  {
-    name: "Buyer",
-    description: "User with permission to buy only",
-    has_admin_permission: false,
-    has_buy_permission: true,
-    has_sell_permission: false,
-    has_listing_permission: false,
-  },
-  {
-    name: "Seller",
-    description: "User with permission to sell",
-    has_admin_permission: false,
-    has_buy_permission: false,
-    has_sell_permission: true,
-    has_listing_permission: true,
-  },
-  {
-    name: "Agent",
-    description: "Used car agent with buy, sell, and listing permissions",
-    has_admin_permission: false,
-    has_buy_permission: true,
-    has_sell_permission: true,
-    has_listing_permission: true,
-  },
-];
+import { useState, useEffect } from "react";
 
 export default function Profiles() {
-  const [profiles, setProfiles] = useState(initialProfiles);
+  const [profiles, setProfiles] = useState([]);
   const [newProfile, setNewProfile] = useState({
     name: "",
     description: "",
@@ -48,6 +13,20 @@ export default function Profiles() {
     has_listing_permission: false,
   });
   const [editingProfile, setEditingProfile] = useState(null);
+
+   // Fetch profiles from the backend API
+   useEffect(() => {
+    async function fetchProfiles() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/user/profile"); // Use Axios to make a GET request
+        setProfiles(response.data); // Set the profiles from the response data
+      } catch (error) {
+        console.error("Error fetching profiles:", error);
+      }
+    }
+
+    fetchProfiles();
+  }, []); // Empty dependency array means this runs once after the component mounts
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -124,26 +103,24 @@ export default function Profiles() {
               </div>
             </div>
           ))}
-          <div
-              className="bg-gray-700 text-white p-4 rounded-lg shadow-lg flex flex-col items-center"
+        <div className="bg-gray-700 text-white p-4 rounded-lg shadow-lg flex flex-col items-center">
+          <h3 className="text-xl font-bold">Add New Profile</h3>
+          <p>Click here to add new profile</p>
+          <div className="flex justify-around mt-4 w-full">
+            <button
+              onClick=""
+              className="bg-yellow-500 text-black px-2 py-1 rounded hover:bg-yellow-600 mr-2"
             >
-              <h3 className="text-xl font-bold">Add New Profile</h3>
-              <p>Click here to add new profile</p>
-              <div className="flex justify-around mt-4 w-full">
-                <button
-                  onClick=""
-                  className="bg-yellow-500 text-black px-2 py-1 rounded hover:bg-yellow-600 mr-2"
-                >
-                  Add
-                </button>
-                <button
-                  onClick=""
-                  className="bg-red-500 text-black px-2 py-1 rounded hover:bg-red-600"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
+              Add
+            </button>
+            <button
+              onClick=""
+              className="bg-red-500 text-black px-2 py-1 rounded hover:bg-red-600"
+            >
+              Add
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

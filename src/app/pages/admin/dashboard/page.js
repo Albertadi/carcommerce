@@ -136,13 +136,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Switch Section */}
-      <div className=""></div>
-
       {/* Footer Section */}
       <div className=""></div>
 
-      {/* Link to page */}
+      {/* Link to page
       <a
         href="https://front.codes/"
         className="logo fixed bottom-0 right-0 p-4"
@@ -153,7 +150,7 @@ export default function Dashboard() {
           alt="Logo"
           className="w-16 h-16"
         />
-      </a>
+      </a> */}
     </body>
   );
 }
