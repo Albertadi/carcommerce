@@ -8,7 +8,9 @@ view_user_blueprint = Blueprint('view_user', __name__)
 @view_user_blueprint.route('/api/users/view_user', methods=['GET'])
 @permission_required('has_admin_permission')
 def view_user():
-    user_email = request.args.get('email')
+    data = request.get_json()
+
+    user_email = data.get('email')
 
     if not user_email:
         return jsonify({"error": "Email parameter not provided"}), 400
