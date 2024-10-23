@@ -9,6 +9,7 @@ from src.entity import db
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .authentication.login import login_blueprint
+from .review.create_reviewRating import create_reviewRating_blueprint
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -48,4 +49,7 @@ flask_app.register_blueprint(search_user_blueprint)
 # Seller
 
 # Agent
+
+# Review Rating
+flask_app.register_blueprint(create_reviewRating_blueprint)
 
