@@ -33,18 +33,6 @@ def create_listing():
     agent_email=agent['email'] # Access the agent's email from the access_token
     seller_email=data.get('seller_email')
 
-    agent_profile = User.queryUserAccount(agent_email).user_profile
-    if not Profile.queryUserProfile(agent_profile).has_listing_permission:
-        return jsonify({'success': False, 'message': 'agent does not have listing permission'})
-
-    seller = User.queryUserAccount(seller_email)
-    if not seller:
-        return jsonify({'success': False, 'message': 'seller does not exist'})
-
-    seller_profile = seller.user_profile
-    if not Profile.queryUserProfile(seller_profile).has_sell_permission:
-        return jsonify({'success': False, 'message': 'seller does not have selling permission'})
-
     create_response = Listing.createListing(id, vin, make, model, year, price, mileage, transmission, fuel_type, is_sold, listing_date,
                                             image_url, agent_email, seller_email)
 

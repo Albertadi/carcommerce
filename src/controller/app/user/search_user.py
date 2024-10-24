@@ -7,9 +7,11 @@ search_user_blueprint = Blueprint('search_user', __name__)
 @search_user_blueprint.route('/api/users/search_user', methods=['GET'])
 @permission_required('has_admin_permission')
 def search_user():
-    email = request.args.get('email')
-    first_name = request.args.get('first_name')
-    user_profile = request.args.get('user_profile')
+    data = request.get_json()
+
+    email = data.get('email')
+    first_name = data.get('first_name')
+    user_profile = data.get('user_profile')
 
     account_list = User.searchUserAccount(email, first_name, user_profile)
 

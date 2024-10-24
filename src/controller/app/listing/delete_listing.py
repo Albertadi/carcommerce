@@ -14,6 +14,6 @@ def delete_listing():
     data = request.get_json()
     listing_id = data["id"]
 
-    delete_response = Listing.deleteListing(listing_id)
+    delete_response, status_code = Listing.deleteListing(listing_id)
 
-    return jsonify({"success": delete_response, "message": "delete_listing API called"})
+    return jsonify({"success": delete_response, "message": "delete_listing API called"}), status_code

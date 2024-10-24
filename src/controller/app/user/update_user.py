@@ -16,13 +16,7 @@ def update_user():
     new_dob = updated_details.get('dob')
     new_user_profile = updated_details.get('user_profile')
 
-    # Fetch the user based on the email
-    user = User.queryUserAccount(email)
-    
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
-
-    update_response = user.updateUserAccount(
+    update_response, status_code = User.updateUserAccount(
         email=email,
         password=new_password,
         first_name=new_first_name,
@@ -31,4 +25,4 @@ def update_user():
         user_profile=new_user_profile
     )
 
-    return jsonify({"success": update_response, "message": "update_user API called"})
+    return jsonify({"success": update_response, "message": "update_user API called"}), status_code

@@ -1,10 +1,12 @@
 # Libraries
 from flask import current_app
+from datetime import datetime
 from typing_extensions import Self
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Local dependencies
 from .sqlalchemy import db
+from .profile import Profile
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -87,6 +89,19 @@ class User(db.Model):
         if cls.queryUserAccount(email):
             return False
 
+        # Validate fields
+        if not email or not password or not dob or not user_profile:
+            return False, 400
+        
+        if not Profile.queryUserProfile(profile_name=user_profile):
+            return False, 404
+
+        # Convert 'dob' string to a datetime.date object
+        try:
+            dob = datetime.strptime(dob, '%Y-%m-%d').date()  # Converts string to a date object
+        except ValueError:
+            return False, 400
+        
         new_user = cls(
             email=email,
             password=generate_password_hash(password),
@@ -105,24 +120,23 @@ class User(db.Model):
     @classmethod
     def updateUserAccount(cls, email, password, first_name, last_name, dob, user_profile):
         try:
-            with current_app.app_context():
-                user = cls.query.filter_by(email=email).one_or_none()
-                if not user:
-                    return False, 404
-                
-                if password is not None:
-                    user.password = generate_password_hash(password)
-                if first_name is not None:
-                    user.first_name = first_name
-                if last_name is not None:
-                    user.last_name = last_name
-                if dob is not None:
-                    user.dob = dob
-                if user_profile is not None:
-                    user.user_profile = user_profile
+            user = cls.query.filter_by(email=email).one_or_none()
+            if not user:
+                return False, 404
+            
+            if password is not None:
+                user.password = generate_password_hash(password)
+            if first_name is not None:
+                user.first_name = first_name
+            if last_name is not None:
+                user.last_name = last_name
+            if dob is not None:
+                user.dob = dob
+            if user_profile is not None:
+                user.user_profile = user_profile
 
-                db.session.commit()
-                return True, 200
+            db.session.commit()
+            return True, 200
 
         except Exception as e:
             db.session.rollback()

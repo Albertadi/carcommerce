@@ -1,7 +1,12 @@
+# Libraries
 from typing import Optional, Self
 from datetime import datetime
 from .sqlalchemy import db
 from enum import Enum
+
+# Local dependencies
+from .profile import Profile
+from .user import User
 
 # Enums for TransmissionType and FuelType
 class TransmissionType(str, Enum):
@@ -66,7 +71,58 @@ class Listing(db.Model):
     def queryAllListing(cls) -> list[Self]:
         """Query all listings."""
         return cls.query.all()
+    
+    @classmethod
+    def searchListing(cls,
+                      make: Optional[str] = None,
+                      model: Optional[str] = None,
+                      year: Optional[int] = None,
+                      min_price: Optional[float] = None,
+                      max_price: Optional[float] = None,
+                      min_mileage: Optional[int] = None,
+                      max_mileage: Optional[int] = None,
+                      transmission: Optional[str] = None,
+                      fuel_type: Optional[str] = None,
+                      is_sold: Optional[bool] = None) -> list[Listing]:
 
+        query = Listing.query
+
+        # Apply filters dynamically
+        if make:
+            query = query.filter(Listing.make.ilike(f'{make}%')) # Case-insensitive partial search
+        if model:
+            query = query.filter(Listing.model.ilike(f'{model}%')) # Case-insensitive partial search
+        if year:
+            query = query.filter_by(year=year)
+        if min_price is not None:
+            query = query.filter(Listing.price >= min_price)
+        if max_price is not None:
+            query = query.filter(Listing.price <= max_price)
+        if min_mileage is not None:
+            query = query.filter(Listing.mileage >= min_mileage)
+        if max_mileage is not None:
+            query = query.filter(Listing.mileage <= max_mileage)
+        if transmission:
+            try:
+                transmission_enum = TransmissionType(transmission)
+                query = query.filter_by(transmission=transmission_enum)
+            except ValueError:
+                return []  # Invalid transmission value
+        if fuel_type:
+            try:
+                fuel_type_enum = FuelType(fuel_type)
+                query = query.filter_by(fuel_type=fuel_type_enum)
+            except ValueError:
+                return []  # Invalid fuel type value
+        if is_sold is not None:
+            query = query.filter_by(is_sold=is_sold)
+
+        # Execute the query and return the filtered users
+        listings = query.all()
+        listing_list = [listing.to_dict() for listing in listings]
+
+        return listing_list
+    
     @classmethod
     def createListing(cls, id: str,
                       vin: str,
@@ -86,20 +142,32 @@ class Listing(db.Model):
 
         # Check if the listing already exists
         if cls.queryListing(id):
-            return False
+            return False, 409
+        
+        agent_profile = User.queryUserAccount(agent_email).user_profile
+        if not Profile.queryUserProfile(agent_profile).has_listing_permission:
+            return False, 403 # Agent does not have listing permission
 
+        seller = User.queryUserAccount(seller_email)
+        if not seller:
+            return False, 404 # Seller does not exist
+
+        seller_profile = seller.user_profile
+        if not Profile.queryUserProfile(seller_profile).has_sell_permission:
+            return False, 403 # Seller does not have listing permission
+        
         # Validate transmission and fuel_type as Enums
         try:
             transmission = TransmissionType(transmission)
             fuel_type = FuelType(fuel_type)
         except ValueError:
-            return False  # Invalid Enum value
+            return False, 400  # Invalid Enum value
 
         # Convert string listing_date to date object
         try:
             listing_date = datetime.strptime(listing_date, "%Y-%m-%d").date()
         except ValueError:
-            return False  # Invalid date format
+            return False, 400  # Invalid date format
 
         # Create new listing
         new_listing = cls(
@@ -123,7 +191,7 @@ class Listing(db.Model):
         db.session.add(new_listing)
         db.session.commit()
 
-        return True
+        return True, 200
 
     @classmethod
     def updateListing(cls, id: str,
@@ -185,10 +253,10 @@ class Listing(db.Model):
         # Ensure listing exists
         listing = cls.queryListing(id)
         if not listing:
-            return False
+            return False, 404
         
         # Delete listing by id
         cls.query.filter_by(id=id).delete()
         db.session.commit()
         
-        return True
+        return True, 200
