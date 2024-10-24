@@ -60,6 +60,24 @@ class User(db.Model):
         return cls.query.all()
     
     @classmethod
+    def searchUserAccount(cls, email, first_name, user_profile):
+        query = cls.query
+
+        # Apply filters dynamically
+        if email:
+            query = query.filter(User.email.ilike(f'{email}%')) 
+        if first_name:
+            query = query.filter(User.first_name.ilike(f'{first_name}%')) 
+        if user_profile:
+            query = query.filter(User.user_profile.ilike(f'{user_profile}'))
+
+        # Execute the query and return the filtered users
+        users = query.all()
+        account_list = [user.to_dict() for user in users]
+
+        return account_list
+    
+    @classmethod
     def createUserAccount(cls, email:str, password:str = "Placeholder",
                           first_name:str = False,
                           last_name:str = False,
