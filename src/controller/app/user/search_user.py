@@ -4,15 +4,16 @@ from src.controller.app.authentication.permission_required import permission_req
 
 search_user_blueprint = Blueprint('search_user', __name__)
 
-@search_user_blueprint.route('/api/users/search_user', methods=['GET'])
-@permission_required('has_admin_permission')
-def search_user():
-    data = request.get_json()
+class SearchUserController:
+    @search_user_blueprint.route('/api/users/search_user', methods=['GET'])
+    @permission_required('has_admin_permission')
+    def search_user():
+        data = request.get_json()
 
-    email = data.get('email')
-    first_name = data.get('first_name')
-    user_profile = data.get('user_profile')
+        email = data.get('email')
+        first_name = data.get('first_name')
+        user_profile = data.get('user_profile')
 
-    account_list = User.searchUserAccount(email, first_name, user_profile)
+        account_list = User.searchUserAccount(email, first_name, user_profile)
 
-    return jsonify({"message": "Success", "account_list": account_list})
+        return jsonify({"message": "Success", "account_list": account_list})
