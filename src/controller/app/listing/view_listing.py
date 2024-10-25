@@ -6,9 +6,9 @@ from flask_jwt_extended import jwt_required
 from src.entity import Listing
 from src.controller.app.authentication.permission_required import permission_required
 
-class ViewListingController:
-    view_listing_blueprint = Blueprint('view_listing', __name__)
+view_listing_blueprint = Blueprint('view_listing', __name__)
 
+class ViewListingController:
     @view_listing_blueprint.route('/api/listing/view_listing', methods=['GET'])
     @permission_required('has_listing_permission')
     def view_listing():

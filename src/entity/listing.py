@@ -68,7 +68,7 @@ class Listing(db.Model):
         return cls.query.filter_by(id=id).one_or_none()
 
     @classmethod
-    def queryAllListing(cls) -> list[Self]:
+    def queryAllListing(cls):
         """Query all listings."""
         return cls.query.all()
     
@@ -83,7 +83,7 @@ class Listing(db.Model):
                       max_mileage: Optional[int] = None,
                       transmission: Optional[str] = None,
                       fuel_type: Optional[str] = None,
-                      is_sold: Optional[bool] = None) -> list[Listing]:
+                      is_sold: Optional[bool] = None):
 
         query = Listing.query
 
