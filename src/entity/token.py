@@ -66,7 +66,7 @@ class Token(db.Model):
             db.session.add(new_token)
             db.session.commit()
 
-            return True, new_token
+            return True, new_token.access_token
         else:
             # If a token record exists, renew the token
             return cls.renewAccessToken(user)
