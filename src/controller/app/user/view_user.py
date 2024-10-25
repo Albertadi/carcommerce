@@ -9,16 +9,14 @@ class ViewUserController:
     @view_user_blueprint.route('/api/users/view_user', methods=['GET'])
     @permission_required('has_admin_permission')
     def view_user():
-        data = request.get_json()
-
-        user_email = data.get('email')
+        user_email = request.args.get('email')
 
         if not user_email:
-            return jsonify({"error": "Email parameter not provided"}), 400
+            return jsonify({"success": False, "error": "Email parameter not provided"}), 400
         
-        user = User.query.get(user_email)
+        user = User.queryUserAccount(user_email)
 
         if user is None:
-            return jsonify({"error": "User not found"}), 404
+            return jsonify({"success": False, "user": ""}), 404
 
-        return jsonify(user.to_dict()), 200
+        return jsonify({"success": True, "user": user.to_dict()}), 200

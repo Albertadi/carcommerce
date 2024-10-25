@@ -46,3 +46,100 @@ def test_valid_create():
 
     # Delete precondition data
     delete_samples()
+
+@pytest.mark.test_invalid_create
+def test_invalid_create():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    invalid_account = [
+        {
+        "email": "test@test.com",
+        "password": "test",
+        "first_name": "test",
+        "last_name": "test",
+        "dob": "2020-11-22",
+        "user_profile": "admin"
+        },
+        {
+        "email": "test@test.com",
+        "password": "test",
+        "first_name": "test",
+        "last_name": "test",
+        "dob": "2020-11-22",
+        "user_profile": "unknownProfile"
+        }
+    ]
+
+    with flask_app.app_context():
+        # Use api to insert test user into database /api/users/create_user
+        url = "http://localhost:5000/api/users/create_user"
+        for account in invalid_account:
+            response = requests.post(url, json=account, headers=headers)
+            success = json.loads(response.text)["success"]
+            assert success == False
+
+            # Delete test user
+            User.query.filter_by(email=account["email"]).delete()
+            db.session.commit()
+
+    # Delete precondition data
+    delete_samples()
+
+@pytest.mark.test_valid_view
+def test_valid_view():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    valid_account = {"email": "jduggan0@chicagotribune.com"}
+
+    with flask_app.app_context():
+        url = "http://localhost:5000/api/users/view_user"
+        response = requests.get(url, params=valid_account, headers=headers)
+
+        success = json.loads(response.text)["success"]
+        assert success == True
+
+    # Delete precondition data
+    delete_samples()
+
+@pytest.mark.test_invalid_view
+def test_invalid_view():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    invalid_account = {"email": "anonymous@account.com"}
+
+    with flask_app.app_context():
+        url = "http://localhost:5000/api/users/view_user"
+        response = requests.get(url, params=invalid_account, headers=headers)
+
+        success = json.loads(response.text)["success"]
+        assert success == False
+
+    # Delete precondition data
+    delete_samples()

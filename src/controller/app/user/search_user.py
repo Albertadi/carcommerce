@@ -5,7 +5,7 @@ from src.controller.app.authentication.permission_required import permission_req
 search_user_blueprint = Blueprint('search_user', __name__)
 
 class SearchUserController:
-    @search_user_blueprint.route('/api/users/search_user', methods=['GET'])
+    @search_user_blueprint.route('/api/users/search_user', methods=['POST'])
     @permission_required('has_admin_permission')
     def search_user():
         data = request.get_json()

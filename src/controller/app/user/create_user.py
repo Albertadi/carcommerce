@@ -19,7 +19,7 @@ class CreateUserController:
         last_name = data.get('last_name')
         user_profile = data.get('user_profile')
 
-        create_response = User.createUserAccount(email, password, first_name, last_name, dob, user_profile)
+        create_response, status_code = User.createUserAccount(email, password, first_name, last_name, dob, user_profile)
 
-        return jsonify({'success': create_response, 'message': 'create_user API called'}), 201
+        return jsonify({'success': create_response, 'message': 'create_user API called'}), status_code
 

@@ -87,7 +87,7 @@ class User(db.Model):
                           user_profile:str = False):
         
         if cls.queryUserAccount(email):
-            return False
+            return False, 409
 
         # Validate fields
         if not email or not password or not dob or not user_profile:
@@ -102,6 +102,10 @@ class User(db.Model):
         except ValueError:
             return False, 400
         
+        # Prevent admin accounts
+        if user_profile == "admin":
+            return False, 403
+
         new_user = cls(
             email=email,
             password=generate_password_hash(password),
@@ -115,7 +119,7 @@ class User(db.Model):
             db.session.add(new_user)
             db.session.commit()
 
-        return True
+        return True, 201
 
     @classmethod
     def updateUserAccount(cls, email, password, first_name, last_name, dob, user_profile):
