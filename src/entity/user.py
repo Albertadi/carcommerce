@@ -124,7 +124,7 @@ class User(db.Model):
     @classmethod
     def updateUserAccount(cls, email, password, first_name, last_name, dob, user_profile):
         try:
-            user = cls.query.filter_by(email=email).one_or_none()
+            user = cls.queryUserAccount(email)
             if not user:
                 return False, 404
             
@@ -137,6 +137,8 @@ class User(db.Model):
             if dob is not None:
                 user.dob = dob
             if user_profile is not None:
+                if user_profile == "admin" or not Profile.queryUserProfile(user_profile):
+                    return False, 403
                 user.user_profile = user_profile
 
             db.session.commit()

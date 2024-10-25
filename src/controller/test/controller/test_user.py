@@ -143,3 +143,120 @@ def test_invalid_view():
 
     # Delete precondition data
     delete_samples()
+
+@pytest.mark.test_valid_update
+def test_valid_update():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    valid_account = {
+        "email": "jduggan0@chicagotribune.com",
+        "password": "updatedPassword",
+        "first_name": "newFirstName",
+        "last_name": "newLastName",
+        "dob": "2020-3-11",
+        "user_profile": "used car agent"
+    }
+
+    with flask_app.app_context():
+        url = "http://localhost:5000/api/users/update_user"
+        response = requests.post(url, json=valid_account, headers=headers)
+
+        success = json.loads(response.text)["success"]
+        assert success == False
+
+    # Delete precondition data
+    delete_samples()
+
+@pytest.mark.test_invalid_update
+def test_invalid_update():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    invalid_account = [
+        {
+        "email": "hehehehe@heheheh.com",
+        "password": "updatedPassword",
+        "first_name": "newFirstName",
+        "last_name": "newLastName",
+        "dob": "2020-3-11",
+        "user_profile": "admin"
+        },
+        {
+        "email": "jduggan0@chicagotribune.com",
+        "password": "updatedPassword",
+        "first_name": "newFirstName",
+        "last_name": "newLastName",
+        "dob": "2020-3-11",
+        "user_profile": "admin"
+        },
+        {
+        "email": "jduggan0@chicagotribune.com",
+        "password": "updatedPassword",
+        "first_name": "newFirstName",
+        "last_name": "newLastName",
+        "dob": "2020-3-11",
+        "user_profile": "unknownProfile"
+        }
+    ]
+
+    with flask_app.app_context():
+        url = "http://localhost:5000/api/users/update_user"
+        for acount in invalid_account:
+            response = requests.post(url, json=acount, headers=headers)
+
+            success = json.loads(response.text)["success"]
+            assert success == False
+
+    # Delete precondition data
+    delete_samples()
+
+@pytest.mark.test_search_user
+def test_search_user():
+    # Precondition 100 samples
+    insert_samples()
+
+    # Insert admin token into header
+    adminToken = getAdminToken()
+    headers = {
+        "Authorization": f"Bearer {adminToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Test user data
+    valid_account = {
+        "email": "jduggan0@chicagotribune.com",
+        "first_name": "Jenine",
+        "user_profile": "seller"
+    }
+
+    with flask_app.app_context():
+        url = "http://localhost:5000/api/users/search_user"
+        response = requests.post(url, json=valid_account, headers=headers)
+
+        success = json.loads(response.text)["success"]
+        account_list = json.loads(response.text)["account_list"]
+        assert success == True
+        user_details = ["email", "first_name", "last_name", "dob", "user_profile"]
+
+        for detail in user_details:
+            assert type(account_list[0][detail]) == str
+
+    # Delete precondition data
+    delete_samples()

@@ -16,4 +16,4 @@ class SearchUserController:
 
         account_list = User.searchUserAccount(email, first_name, user_profile)
 
-        return jsonify({"message": "Success", "account_list": account_list})
+        return jsonify({"success": True, "account_list": account_list}), 200

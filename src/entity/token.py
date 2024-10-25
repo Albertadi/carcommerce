@@ -38,27 +38,24 @@ class Token(db.Model):
 
     @classmethod
     def renewAccessToken(cls, user):
-        user = User.queryUserAccount(user.email)
-        
-        if not user:
-            return False
-        
         new_token = cls.generateAccessToken(user)
         token_record = cls.query.filter_by(email=user.email).one_or_none()
         
         if token_record:
             token_record.access_token = new_token
             db.session.commit()
-            return True
+            return True, new_token
         
-        return False
+        return False, ""
 
 
 
     @classmethod
     def createAccessToken(cls, email):
-
         user = User.queryUserAccount(email)
+
+        if not User:
+            return False, ""
 
         # If token record does not exist for the user, generate a token record 
         if not cls.queryAccessToken(user.email):
@@ -69,7 +66,7 @@ class Token(db.Model):
             db.session.add(new_token)
             db.session.commit()
 
-            return True
+            return True, new_token
         else:
             # If a token record exists, renew the token
             return cls.renewAccessToken(user)

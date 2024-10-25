@@ -12,7 +12,7 @@ class LoginController:
         data = request.get_json()
 
         if not data or not 'email' in data or not 'password' in data:
-            return jsonify({"error": "Email and password not provided"}), 400
+            return jsonify({"success": False, "error": "Email and password not provided"}), 400
         
         email = data['email']
         password = data['password']
@@ -21,14 +21,12 @@ class LoginController:
         loginValid = User.checkLogin(email, password)
 
         if not loginValid:
-            return jsonify({"error": "Invalid email or password"})
+            return jsonify({"success": False, "error": "Invalid email or password"})
         
         # Create or Renew JWT Token
-        success = Token.createAccessToken(email)
+        success, access_token = Token.createAccessToken(email)
         
         if success:
-            access_token = Token.queryAccessToken(email)
-
             return jsonify({
                 'success': success,
                 'access_token': access_token
@@ -36,5 +34,5 @@ class LoginController:
         
         return jsonify({
             'success': success,
-            'access_token': ""
+            'access_token': access_token
         }), 500
