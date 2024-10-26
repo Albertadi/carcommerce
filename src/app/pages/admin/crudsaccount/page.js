@@ -31,88 +31,57 @@ export default function UserManagement() {
   const [editData, setEditData] = useState({}); // To hold the edited user data
 
   // Replace with your actual token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTkzNzIxNiwianRpIjoiZjQxMjUxMDQtYjBlNS00YThmLWJiMTgtMjUxMjA2ZjkxNzMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTkzNzIxNiwiY3NyZiI6IjVmMzM1NDA2LTU0OTYtNDAwMC1hOGNhLTVmMzg1YzM0ZWQ4NSIsImV4cCI6MTcyOTkzODExNn0.nhDpliXA5LBXEtas1n8ZhzXX2tXhR4rKm-SNj7J3E0o';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTk0MDA2NCwianRpIjoiMzQ2ZGNiNjAtMmJmYS00ZTY3LTkyMTMtNmU3NDg5NTA3NTY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTk0MDA2NCwiY3NyZiI6ImRhZGUyNjVkLTBmZWQtNDk0Ni1hOGVmLTA5MzhhMmQ5YjQwOSIsImV4cCI6MTcyOTk0MDk2NH0.LUqaSFz9Ll2Mhud0i-Myhv9tD70hJzpm_mFrnyPHtIU';
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      setError('');
-      setSuccessMessage('');
-      setInvalidMessage('');
-
-      try {
-        const response = await axios.post('http://localhost:5000/api/users/search_user', {
-          first_name: searchTermFirstName,
-          email: searchTermEmail,
-          user_profile: searchTermProfile,
-        }, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        setUsers(response.data.account_list);
-      } catch (error) {
-        setError('Failed to fetch users. Please try again.');
-        console.error('Error fetching users:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Adding a slight delay to avoid excessive API calls on every keystroke
-    const delayDebounce = setTimeout(() => {
-      fetchUsers();
-    }, 50);
-
-    return () => clearTimeout(delayDebounce);
-    }, [searchTermFirstName, searchTermEmail, searchTermProfile, token]);
-
-    const handleSearchFirstName = (e) => {
-      setSearchTermFirstName(e.target.value);
-    };
-
-    const handleSearchEmail = (e) => {
-      setSearchTermEmail(e.target.value);
-    };
-
-    const handleSearchProfile = (e) => {
-      setSearchTermProfile(e.target.value);
-    };
-
-    const handleSuspend = async () => {
-      if (!duration) {
-          setInvalidMessage('Please enter a valid suspension duration.');
-          return;
-      }
-
+   // Fetch users function
+   const fetchUsers = async () => {
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
     setInvalidMessage('');
 
     try {
-        await axios.post(
-            `http://localhost:5000/api/users/suspend/${selectedUser.id}`,
-            { email: selectedUser.email, duration }, // Send email and duration in the request body
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-        );
-
-        fetchUsers();
-        setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+      const response = await axios.post(
+        'http://localhost:5000/api/users/search_user',
+        {
+          first_name: searchTermFirstName,
+          email: searchTermEmail,
+          user_profile: searchTermProfile,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUsers(response.data.account_list);
     } catch (error) {
-        setError('Failed to suspend the user. Please try again.');
-        console.error('Error suspending user:', error);
+      setError('Failed to fetch users. Please try again.');
+      console.error('Error fetching users:', error);
     } finally {
-        setIsLoading(false);
-        setShowSuspendModal(false);
+      setIsLoading(false);
     }
   };
 
-  // Suspend modal
+  // Call fetchUsers initially when the component mounts
+  useEffect(() => {
+    fetchUsers();
+  }, [token]);
+
+  // Debounced search to avoid excessive API calls
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchUsers();
+    }, 50);
+    return () => clearTimeout(delayDebounce);
+  }, [searchTermFirstName, searchTermEmail, searchTermProfile]);
+
+  // Handle functions
+  const handleSearchFirstName = (e) => setSearchTermFirstName(e.target.value);
+  const handleSearchEmail = (e) => setSearchTermEmail(e.target.value);
+  const handleSearchProfile = (e) => setSearchTermProfile(e.target.value);
+
+  // Suspend function with fetchUsers call
   const openSuspendModal = (user) => {
     setSelectedUser(user);
     setShowSuspendModal(true);
@@ -123,13 +92,40 @@ export default function UserManagement() {
     setDuration('');
   };
 
-  const confirmSuspend = () => {
-    // Implement suspension logic here
-    setSuccessMessage("User suspension confirmed");
-    closeSuspendModal();
+  const handleSuspend = async () => {
+    if (!duration) {
+      setInvalidMessage('Please enter a valid suspension duration.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
+    setInvalidMessage('');
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/users/suspend/${selectedUser.id}`,
+        { email: selectedUser.email, duration },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+      fetchUsers(); // Refresh the user list after suspension
+    } catch (error) {
+      setError('Failed to suspend the user. Please try again.');
+      console.error('Error suspending user:', error);
+    } finally {
+      setIsLoading(false);
+      setShowSuspendModal(false);
+    }
   };
 
-  // Update modal
+  // Update modal functions
   const openUpdateModal = (user) => {
     setSelectedUser(user);
     setEditData({
@@ -147,36 +143,29 @@ export default function UserManagement() {
     setEditData({});
   };
 
+  // Handle update confirm with fetchUsers call
   const handleUpdateConfirm = async () => {
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
-  
-    // Format data to ensure all fields are strings, including DOB in "YYYY-MM-DD" format
+
     const formattedData = {
       first_name: editData.first_name.toString(),
       last_name: editData.last_name.toString(),
-      dob: new Date(editData.dob).toISOString().split('T')[0], // Format DOB as "YYYY-MM-DD"
+      dob: new Date(editData.dob).toISOString().split('T')[0],
       email: editData.email.toString(),
       user_profile: editData.user_profile.toString(),
     };
-  
+
     try {
       await axios.post('http://localhost:5000/api/users/update_user', formattedData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-  
+
       setSuccessMessage(`User ${editData.email} updated successfully!`);
-  
-      // Update the users state with the modified user data
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.email === formattedData.email ? { ...user, ...formattedData } : user
-        )
-      );
-  
+      fetchUsers(); // Refresh the user list after update
       closeUpdateModal();
     } catch (error) {
       setError('Failed to update user. Please try again.');
@@ -184,7 +173,6 @@ export default function UserManagement() {
       setIsLoading(false);
     }
   };
-  
 
   // Function to automatically format DOB input as YYYY-MM-DD with added validation
   const formatDob = (value) => {
@@ -265,8 +253,8 @@ export default function UserManagement() {
     return regex.test(email);
   };
 
+  // Handle adding a user with fetchUsers call
   const handleAddUser = async () => {
-    // Form validation
     if (!firstname || !lastname || !dob || !email || !password || !userProfile) {
       setInvalidMessage('Please fill in all the fields.');
       return;
@@ -290,7 +278,7 @@ export default function UserManagement() {
     const newUser = {
       email,
       password,
-      dob, // Ensure this is in the format YYYY-MM-DD
+      dob,
       first_name: firstname,
       last_name: lastname,
       user_profile: userProfile,
@@ -300,14 +288,14 @@ export default function UserManagement() {
     setError('');
     setSuccessMessage('');
     setInvalidMessage('');
+
     try {
       await axios.post('http://localhost:5000/api/users/create_user', newUser, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      fetchUsers();
-      // Clear form
+      fetchUsers(); // Refresh the user list after adding a new user
       setFirstName('');
       setLastName('');
       setDob('');
@@ -549,7 +537,7 @@ export default function UserManagement() {
             />
             <div className="flex justify-end">
               <button
-                onClick={confirmSuspend}
+                onClick={handleSuspend}
                 className="bg-green-500 text-white p-2 rounded mr-2"
               >
                 Confirm
