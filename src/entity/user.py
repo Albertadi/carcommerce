@@ -135,7 +135,7 @@ class User(db.Model):
             if last_name is not None:
                 user.last_name = last_name
             if dob is not None:
-                user.dob = dob
+                user.dob = datetime.strptime(dob, '%Y-%m-%d').date()
             if user_profile is not None:
                 if user_profile == "admin" or not Profile.queryUserProfile(user_profile):
                     return False, 403

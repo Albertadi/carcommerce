@@ -14,19 +14,31 @@ export default function UserManagement() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userProfile, setUserProfile] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState(''); // New state for success/info messages
+
+  // success and invalid messages state
+  const [successMessage, setSuccessMessage] = useState('');
+  const [invalidMessage, setInvalidMessage] = useState('');
+
+  //for suspend state
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null); // to hold user info like id and email
+  const [duration, setDuration] = useState(''); // to hold the duration input
+
+  //for update state
+  const [editData, setEditData] = useState({}); // To hold the edited user data
 
   // Replace with your actual token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTkyNjUzMSwianRpIjoiYjhjODVlM2MtYTJiZi00MmJmLWI1MDYtYzdhMDIzMzcyY2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTkyNjUzMSwiY3NyZiI6IjEwZDIwYmNjLTY5ZTAtNDcxNS1iNWMyLTU4NzVmNjJjZGQ2ZiIsImV4cCI6MTcyOTkyNzQzMX0.VOXO-ms5O0SOq3QL7x7SgXFIzfXis6Vs3fzE1ytKENI';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTkzNzIxNiwianRpIjoiZjQxMjUxMDQtYjBlNS00YThmLWJiMTgtMjUxMjA2ZjkxNzMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTkzNzIxNiwiY3NyZiI6IjVmMzM1NDA2LTU0OTYtNDAwMC1hOGNhLTVmMzg1YzM0ZWQ4NSIsImV4cCI6MTcyOTkzODExNn0.nhDpliXA5LBXEtas1n8ZhzXX2tXhR4rKm-SNj7J3E0o';
 
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       setError('');
-      setMessage('');
+      setSuccessMessage('');
+      setInvalidMessage('');
 
       try {
         const response = await axios.post('http://localhost:5000/api/users/search_user', {
@@ -53,54 +65,127 @@ export default function UserManagement() {
     }, 50);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTermFirstName, searchTermEmail, searchTermProfile, token]);
+    }, [searchTermFirstName, searchTermEmail, searchTermProfile, token]);
 
-  const handleSearchFirstName = (e) => {
-    setSearchTermFirstName(e.target.value);
-  };
+    const handleSearchFirstName = (e) => {
+      setSearchTermFirstName(e.target.value);
+    };
 
-  const handleSearchEmail = (e) => {
-    setSearchTermEmail(e.target.value);
-  };
+    const handleSearchEmail = (e) => {
+      setSearchTermEmail(e.target.value);
+    };
 
-  const handleSearchProfile = (e) => {
-    setSearchTermProfile(e.target.value);
-  };
+    const handleSearchProfile = (e) => {
+      setSearchTermProfile(e.target.value);
+    };
 
-  //suspend section
-  const handleSuspend = async () => {
-      if (selectedUsers.size === 0) {
-          setMessage('Please select users to suspend');
+    const handleSuspend = async () => {
+      if (!duration) {
+          setInvalidMessage('Please enter a valid suspension duration.');
           return;
       }
 
-      setIsLoading(true);
-      setError('');
-      setMessage('');
-      try {
-          for (const userId of selectedUsers) {
-              await axios.post(
-                  `http://localhost:5000/api/users/suspend/${userId}`,
-                  {}, // The request body (if needed); an empty object if there's no body
-                  {
-                      headers: {
-                          'Authorization': `Bearer ${token}`
-                      }
-                  }
-              );
-          }
-          setSelectedUsers(new Set());
-          fetchUsers();
-          setMessage('Selected users have been suspended successfully');
-      } catch (error) {
-          setError('Failed to suspend users. Please try again.');
-          console.error('Error suspending users:', error);
-      } finally {
-          setIsLoading(false);
-      }
+    setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
+    setInvalidMessage('');
+
+    try {
+        await axios.post(
+            `http://localhost:5000/api/users/suspend/${selectedUser.id}`,
+            { email: selectedUser.email, duration }, // Send email and duration in the request body
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        fetchUsers();
+        setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+    } catch (error) {
+        setError('Failed to suspend the user. Please try again.');
+        console.error('Error suspending user:', error);
+    } finally {
+        setIsLoading(false);
+        setShowSuspendModal(false);
+    }
   };
 
- 
+  // Suspend modal
+  const openSuspendModal = (user) => {
+    setSelectedUser(user);
+    setShowSuspendModal(true);
+  };
+
+  const closeSuspendModal = () => {
+    setShowSuspendModal(false);
+    setDuration('');
+  };
+
+  const confirmSuspend = () => {
+    // Implement suspension logic here
+    setSuccessMessage("User suspension confirmed");
+    closeSuspendModal();
+  };
+
+  // Update modal
+  const openUpdateModal = (user) => {
+    setSelectedUser(user);
+    setEditData({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      dob: user.dob,
+      email: user.email,
+      user_profile: user.user_profile,
+    });
+    setShowUpdateModal(true);
+  };
+
+  const closeUpdateModal = () => {
+    setShowUpdateModal(false);
+    setEditData({});
+  };
+
+  const handleUpdateConfirm = async () => {
+    setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
+  
+    // Format data to ensure all fields are strings, including DOB in "YYYY-MM-DD" format
+    const formattedData = {
+      first_name: editData.first_name.toString(),
+      last_name: editData.last_name.toString(),
+      dob: new Date(editData.dob).toISOString().split('T')[0], // Format DOB as "YYYY-MM-DD"
+      email: editData.email.toString(),
+      user_profile: editData.user_profile.toString(),
+    };
+  
+    try {
+      await axios.post('http://localhost:5000/api/users/update_user', formattedData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      setSuccessMessage(`User ${editData.email} updated successfully!`);
+  
+      // Update the users state with the modified user data
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.email === formattedData.email ? { ...user, ...formattedData } : user
+        )
+      );
+  
+      closeUpdateModal();
+    } catch (error) {
+      setError('Failed to update user. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
   // Function to automatically format DOB input as YYYY-MM-DD with added validation
   const formatDob = (value) => {
 
@@ -114,30 +199,30 @@ export default function UserManagement() {
     // Ensure the month is between 01 and 12
     if (month.length === 2) {
       if (parseInt(month) > 12 || parseInt(month) < 1) {
-        setMessage('Invalid month. Please enter a month between 01 and 12.');
+        setInvalidMessage('Invalid month. Please enter a month between 01 and 12.');
       }
       else {
-        setMessage(''); // Clear message if valid
+        setInvalidMessage(''); // Clear message if valid
       }
     }
 
     // Ensure the day is between 01 and 31
     if (day.length === 2) {
       if (parseInt(day) > 31 || parseInt(day) < 1) {
-        setMessage('Invalid day. Please enter a day between 01 and 31.');
+        setInvalidMessage('Invalid day. Please enter a day between 01 and 31.');
       }
       else {
-        setMessage(''); // Clear message if valid
+        setInvalidMessage(''); // Clear message if valid
       }
     }
 
     // Adjust day for months with only 30 days
     if (month === '04' || month === '06' || month === '09' || month === '11') {
       if (parseInt(day) > 30) {
-        setMessage('Invalid day for the selected month. Please enter a day between 01 and 30.');
+        setInvalidMessage('Invalid day for the selected month. Please enter a day between 01 and 30.');
       }
       else {
-        setMessage(''); // Clear message if valid
+        setInvalidMessage(''); // Clear message if valid
       }
     }
 
@@ -147,10 +232,10 @@ export default function UserManagement() {
         return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
       };
       if (parseInt(day) > 29 || (parseInt(day) === 29 && !isLeapYear(year))) {
-        setMessage('Invalid day for February. Please enter a valid day (01-28 or 29 for leap years).');
+        setInvalidMessage('Invalid day for February. Please enter a valid day (01-28 or 29 for leap years).');
       }
       else {
-        setMessage(''); // Clear message if valid
+        setInvalidMessage(''); // Clear message if valid
       }
     }
 
@@ -183,22 +268,22 @@ export default function UserManagement() {
   const handleAddUser = async () => {
     // Form validation
     if (!firstname || !lastname || !dob || !email || !password || !userProfile) {
-      setMessage('Please fill in all the fields.');
+      setInvalidMessage('Please fill in all the fields.');
       return;
     }
 
     if (!validateDob(dob)) {
-      setMessage('Invalid date format. Please use YYYY-MM-DD and ensure the date is valid.');
+      setInvalidMessage('Invalid date format. Please use YYYY-MM-DD and ensure the date is valid.');
       return;
     }
 
     if (!validateEmail(email)) {
-      setMessage('Please enter a valid email address.');
+      setInvalidMessage('Please enter a valid email address.');
       return;
     }
 
     if (password.length < 8) {
-      setMessage('Password must be at least 8 characters long.');
+      setInvalidMessage('Password must be at least 8 characters long.');
       return;
     }
 
@@ -213,7 +298,8 @@ export default function UserManagement() {
 
     setIsLoading(true);
     setError('');
-    setMessage('');
+    setSuccessMessage('');
+    setInvalidMessage('');
     try {
       await axios.post('http://localhost:5000/api/users/create_user', newUser, {
         headers: {
@@ -228,7 +314,7 @@ export default function UserManagement() {
       setEmail('');
       setPassword('');
       setUserProfile('');
-      setMessage('User added successfully!');
+      setSuccessMessage('User added successfully!');
     } catch (error) {
       setError('Failed to add user. Please try again.');
       console.error('Error adding user:', error);
@@ -246,12 +332,19 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* Success/Info message display */}
-      {message && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-          {message}
-        </div>
-      )}
+      {/* Success message display */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+            {successMessage}
+          </div>
+        )}
+
+        {/* Info message display */}
+        {invalidMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            {invalidMessage}
+          </div>
+        )}
 
       {/* Add new account section */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg mb-8">
@@ -356,71 +449,184 @@ export default function UserManagement() {
 
       {isLoading ? (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-800 border border-gray-600">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
-                <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
-                <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
-                <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>DOB</th>
-                <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '25%' }}>Email</th>
-                <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>User Profile</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Single row with loading animation */}
-              <tr>
-                <td colSpan="6" className="py-16 text-center">
-                  <div className="flex justify-center items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-800 border border-gray-600">
-            <thead>
-            <tr>
-              <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
-              <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
-              <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
-              <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>DOB</th>
-              <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '25%' }}>Email</th>
-              <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>User Profile</th>
-            </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-700">
-                    <td className="py-2 px-4 border border-gray-600">
-                    <button
-                      onClick={() => handleSuspend(user.id)}
-                      className="bg-red-500 text-white p-2 rounded"
-                      disabled={isLoading} // Disables the button when loading
-                    >
-                  Suspend
-                </button>
-                    </td>
-                    <td className="py-2 px-4 border border-gray-600 text-white">{user.first_name}</td>
-                    <td className="py-2 px-4 border border-gray-600 text-white">{user.last_name}</td>
-                    <td className="py-2 px-4 border border-gray-600 text-white">{user.dob}</td>
-                    <td className="py-2 px-4 border border-gray-600 text-white">{user.email}</td>
-                    <td className="py-2 px-4 border border-gray-600 text-white">{user.user_profile}</td>
-                  </tr>
-                ))
-              ) : (
+            <table className="min-w-full bg-gray-800 border border-gray-600">
+              <thead>
                 <tr>
-                  <td colSpan="6" className="py-2 px-4 border border-gray-600 text-center text-white">No users found.</td>
+                  <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
+                  <th className="py-2 px-4 border border-gray-600 text-green-500" style={{ width: '10%' }}>UPDATE</th> 
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>DOB</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>Email</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>User Profile</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {/* Single row with loading animation */}
+                <tr>
+                  <td colSpan="7" className="py-16 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+            ) : (
+              // Loaded table
+            <div className="overflow-x-auto">
+            <table className="min-w-full bg-gray-800 border border-gray-600">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
+                  <th className="py-2 px-4 border border-gray-600 text-green-500" style={{ width: '10%' }}>UPDATE</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>DOB</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>Email</th>
+                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>User Profile</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-700">
+                      <td className="py-2 px-4 border border-gray-600">
+                        {user.email !== 'admin@admin.com' && (
+                          <button
+                            onClick={() => openSuspendModal(user)}
+                            className="bg-red-500 text-white p-2 w-full text-lg rounded"
+                            disabled={isLoading}
+                          >
+                            🛇
+                          </button>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 border border-gray-600">
+                        {user.email !== 'admin@admin.com' && (
+                          <button
+                            onClick={() => openUpdateModal(user)}
+                            className="bg-green-500 text-white p-2 w-full text-lg rounded"
+                          >
+                            ✎
+                          </button>
+                        )}
+                      </td>
+                      <td className="py-2 px-4 border border-gray-600 text-white">{user.first_name}</td>
+                      <td className="py-2 px-4 border border-gray-600 text-white">{user.last_name}</td>
+                      <td className="py-2 px-4 border border-gray-600 text-white">{user.dob}</td>
+                      <td className="py-2 px-4 border border-gray-600 text-white">{user.email}</td>
+                      <td className="py-2 px-4 border border-gray-600 text-white">{user.user_profile}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="py-2 px-4 border border-gray-600 text-center text-white">No users found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+
+            {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
+            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+              
+          </div>
+      )}
+      
+       {/* Suspend Modal */}
+       {showSuspendModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-700 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Suspend {selectedUser.email} for how long?</h2>
+            <input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="border p-2 w-full mb-4 text-black"
+              placeholder="Enter duration in days"
+            />
+            <div className="flex justify-end">
+              <button
+                onClick={confirmSuspend}
+                className="bg-green-500 text-white p-2 rounded mr-2"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={closeSuspendModal}
+                className="bg-red-500 text-white p-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* Update Modal */}
+      {showUpdateModal && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-gray-700 p-6 rounded-lg w-1/3">
+          <h2 className="text-xl font-bold mb-4">Update {selectedUser.email}</h2>
+          
+          <div className="mb-4">
+            <label className="block text-white mb-1">First Name</label>
+            <input
+              type="text"
+              value={editData.first_name}
+              onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
+              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-white mb-1">Last Name</label>
+            <input
+              type="text"
+              value={editData.last_name}
+              onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
+              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-white mb-1">DOB</label>
+            <input
+              type="date"
+              value={editData.dob}
+              onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
+              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-white mb-1">User Profile</label>
+            <select
+              value={editData.user_profile}
+              onChange={(e) => setEditData({ ...editData, user_profile: e.target.value })}
+              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
+            >
+              <option value="">Select User Profile</option>
+              <option value="buyer">Buyer</option>
+              <option value="seller">Seller</option>
+              <option value="used car agent">Used Car Agent</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <button onClick={handleUpdateConfirm} className="bg-green-500 text-white p-2 rounded">
+              Confirm
+            </button>
+            <button onClick={closeUpdateModal} className="bg-red-500 text-white p-2 rounded">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
     </div>
   );
 }
