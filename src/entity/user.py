@@ -71,7 +71,7 @@ class User(db.Model):
         if first_name:
             query = query.filter(User.first_name.ilike(f'{first_name}%')) 
         if user_profile:
-            query = query.filter(User.user_profile.ilike(f'{user_profile}'))
+            query = query.filter(User.user_profile.ilike(f'{user_profile}%'))
 
         # Execute the query and return the filtered users
         users = query.all()
