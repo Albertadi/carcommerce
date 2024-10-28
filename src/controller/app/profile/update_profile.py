@@ -5,31 +5,34 @@ from src.controller.app.authentication.permission_required import permission_req
 
 update_profile_blueprint = Blueprint('update_profile', __name__)
 
-@update_profile_blueprint.route('/api/profile/update_profile', methods=['PUT'])
-@jwt_required()
-@permission_required('has_admin_permission')
-def update_profile():
-    data = request.get_json()
+class UpdateProfileController:
+    @update_profile_blueprint.route('/api/profiles/update_profile', methods=['POST'])
+    @jwt_required()
+    @permission_required('has_admin_permission')
+    def update_profile():
+        updated_details = request.get_json()
 
-    required_fields = ['name', 'description', 'has_buy_permission', 'has_sell_permission', 'has_listing_permission']
-    if not all(field in data for field in required_fields):
-        return jsonify({'error': 'Missing required fields'}), 400
+        name = updated_details.get('name')
+        description = updated_details.get('description')
+        has_buy_permission = updated_details.get('has_buy_permission')
+        has_sell_permission = updated_details.get('has_sell_permission')
+        has_listing_permission = updated_details.get('has_listing_permission')
 
-    try:
-        success = Profile.updateUserProfile(
-            name=data['name'],
-            description=data['description'],
-            has_buy_permission=bool(data['has_buy_permission']),
-            has_sell_permission=bool(data['has_sell_permission']),
-            has_listing_permission=bool(data['has_listing_permission'])
-        )
+        if not all([name, description, has_buy_permission is not None, has_sell_permission is not None, has_listing_permission is not None]):
+            return jsonify({'error': 'Missing required fields'}), 400
 
-        if success:
-            return jsonify({'message': 'Profile updated successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to update profile'}), 400
+        try:
+            success = Profile.updateUserProfile(
+                name=name,
+                description=description,
+                has_buy_permission=bool(has_buy_permission),
+                has_sell_permission=bool(has_sell_permission),
+                has_listing_permission=bool(has_listing_permission)
+            )
 
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
+            return jsonify({"success": success, "message": "Profile updated successfully"}), 200 if success else 400
+
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+        except Exception as e:
+            return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
