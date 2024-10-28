@@ -4,20 +4,19 @@ from src.controller.app.authentication.permission_required import permission_req
 
 view_user_blueprint = Blueprint('view_user', __name__)
 
-# View individual user detail
-@view_user_blueprint.route('/api/users/view_user', methods=['GET'])
-@permission_required('has_admin_permission')
-def view_user():
-    data = request.get_json()
+class ViewUserController:
+    # View individual user detail
+    @view_user_blueprint.route('/api/users/view_user', methods=['GET'])
+    @permission_required('has_admin_permission')
+    def view_user():
+        user_email = request.args.get('email')
 
-    user_email = data.get('email')
+        if not user_email:
+            return jsonify({"success": False, "error": "Email parameter not provided"}), 400
+        
+        user = User.queryUserAccount(user_email)
 
-    if not user_email:
-        return jsonify({"error": "Email parameter not provided"}), 400
-    
-    user = User.query.get(user_email)
+        if user is None:
+            return jsonify({"success": False, "user": ""}), 404
 
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
-
-    return jsonify(user.to_dict()), 200
+        return jsonify({"success": True, "user": user.to_dict()}), 200

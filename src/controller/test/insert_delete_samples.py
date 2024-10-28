@@ -27,18 +27,12 @@ def insert_samples():
         with open(users_path, 'r') as f:
             users = json.load(f)
         for user in users:
-            try:
-                # Convert dob from string to datetime.date object
-                dob = datetime.strptime(user["dob"], "%Y-%m-%d").date()
-            except ValueError:
-                raise ValueError(f"Invalid date format for user {user['email']}. Use YYYY-MM-DD.")
-
             User.createUserAccount(
                 user["email"],
                 user["password"],
                 user["first_name"],
                 user["last_name"],
-                dob,
+                user["dob"],
                 user["user_profile"]
             )
 

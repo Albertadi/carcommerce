@@ -8,12 +8,13 @@ from src.controller.app.authentication.permission_required import permission_req
 
 delete_listing_blueprint = Blueprint('delete_listing', __name__)
 
-@delete_listing_blueprint.route('/api/listing/delete_listing', methods=['POST'])
-@permission_required('has_listing_permission')
-def delete_listing():
-    data = request.get_json()
-    listing_id = data["id"]
+class DeleteListingController:
+    @delete_listing_blueprint.route('/api/listing/delete_listing', methods=['POST'])
+    @permission_required('has_listing_permission')
+    def delete_listing():
+        data = request.get_json()
+        listing_id = data["id"]
 
-    delete_response = Listing.deleteListing(listing_id)
+        delete_response, status_code = Listing.deleteListing(listing_id)
 
-    return jsonify({"success": delete_response, "message": "delete_listing API called"})
+        return jsonify({"success": delete_response, "message": "delete_listing API called"}), status_code

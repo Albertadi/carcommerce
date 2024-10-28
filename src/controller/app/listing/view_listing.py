@@ -8,15 +8,16 @@ from src.controller.app.authentication.permission_required import permission_req
 
 view_listing_blueprint = Blueprint('view_listing', __name__)
 
-@view_listing_blueprint.route('/api/listing/view_listing', methods=['GET'])
-@permission_required('has_listing_permission')
-def view_listing():
-    data = request.get_json()
-    listing_id = data["id"]
+class ViewListingController:
+    @view_listing_blueprint.route('/api/listing/view_listing', methods=['GET'])
+    @permission_required('has_listing_permission')
+    def view_listing():
+        data = request.get_json()
+        listing_id = data["id"]
 
-    listing = Listing.queryListing(listing_id)
+        listing = Listing.queryListing(listing_id)
 
-    if listing is None:
-        jsonify({"error": "Listing not found"}), 404
+        if listing is None:
+            jsonify({"error": "Listing not found"}), 404
 
-    return jsonify({listing.to_dict()}), 200
+        return jsonify({listing.to_dict()}), 200
