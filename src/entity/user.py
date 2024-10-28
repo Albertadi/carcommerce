@@ -1,10 +1,12 @@
 # Libraries
 from flask import current_app
+from datetime import datetime
 from typing_extensions import Self
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Local dependencies
 from .sqlalchemy import db
+from .profile import Profile
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -60,6 +62,24 @@ class User(db.Model):
         return cls.query.all()
     
     @classmethod
+    def searchUserAccount(cls, email, first_name, user_profile):
+        query = cls.query
+
+        # Apply filters dynamically
+        if email:
+            query = query.filter(User.email.ilike(f'{email}%')) 
+        if first_name:
+            query = query.filter(User.first_name.ilike(f'{first_name}%')) 
+        if user_profile:
+            query = query.filter(User.user_profile.ilike(f'{user_profile}%'))
+
+        # Execute the query and return the filtered users
+        users = query.all()
+        account_list = [user.to_dict() for user in users]
+
+        return account_list
+    
+    @classmethod
     def createUserAccount(cls, email:str, password:str = "Placeholder",
                           first_name:str = False,
                           last_name:str = False,
@@ -67,7 +87,24 @@ class User(db.Model):
                           user_profile:str = False):
         
         if cls.queryUserAccount(email):
-            return False
+            return False, 409
+
+        # Validate fields
+        if not email or not password or not dob or not user_profile:
+            return False, 400
+        
+        if not Profile.queryUserProfile(profile_name=user_profile):
+            return False, 404
+
+        # Convert 'dob' string to a datetime.date object
+        try:
+            dob = datetime.strptime(dob, '%Y-%m-%d').date()  # Converts string to a date object
+        except ValueError:
+            return False, 400
+        
+        # Prevent admin accounts
+        if user_profile == "admin":
+            return False, 403
 
         new_user = cls(
             email=email,
@@ -82,29 +119,30 @@ class User(db.Model):
             db.session.add(new_user)
             db.session.commit()
 
-        return True
+        return True, 201
 
     @classmethod
     def updateUserAccount(cls, email, password, first_name, last_name, dob, user_profile):
         try:
-            with current_app.app_context():
-                user = cls.query.filter_by(email=email).one_or_none()
-                if not user:
-                    return False, 404
-                
-                if password is not None:
-                    user.password = generate_password_hash(password)
-                if first_name is not None:
-                    user.first_name = first_name
-                if last_name is not None:
-                    user.last_name = last_name
-                if dob is not None:
-                    user.dob = dob
-                if user_profile is not None:
-                    user.user_profile = user_profile
+            user = cls.queryUserAccount(email)
+            if not user:
+                return False, 404
+            
+            if password is not None:
+                user.password = generate_password_hash(password)
+            if first_name is not None:
+                user.first_name = first_name
+            if last_name is not None:
+                user.last_name = last_name
+            if dob is not None:
+                user.dob = datetime.strptime(dob, '%Y-%m-%d').date()
+            if user_profile is not None:
+                if user_profile == "admin" or not Profile.queryUserProfile(user_profile):
+                    return False, 403
+                user.user_profile = user_profile
 
-                db.session.commit()
-                return True, 200
+            db.session.commit()
+            return True, 200
 
         except Exception as e:
             db.session.rollback()

@@ -17,6 +17,7 @@ from .user.update_user import update_user_blueprint
 from .profile.create_profile import create_profile_blueprint
 from .profile.update_profile import update_profile_blueprint
 from .profile.view_profile import view_profile_blueprint
+from .profile.search_profile import search_profile_blueprint
 from .listing.create_listing import create_listing_blueprint
 from .listing.view_listing import view_listing_blueprint
 from .listing.update_listing import update_listing_blueprint
@@ -82,6 +83,7 @@ flask_app.register_blueprint(search_agent_blueprint)
 flask_app.register_blueprint(create_profile_blueprint)
 flask_app.register_blueprint(view_profile_blueprint)
 flask_app.register_blueprint(update_profile_blueprint)
+flask_app.register_blueprint(search_profile_blueprint)
 
 # Listing
 flask_app.register_blueprint(create_listing_blueprint)

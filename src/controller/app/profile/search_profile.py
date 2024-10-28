@@ -1,30 +1,19 @@
 from flask import Blueprint, request, jsonify
-from src.entity.profile import Profile
+from src.entity.profile import Profile  # Change the import for Profile
 from src.controller.app.authentication.permission_required import permission_required
 
 search_profile_blueprint = Blueprint('search_profile', __name__)
 
-@search_profile_blueprint.route('/api/profile/search_profile', methods=['GET'])
-@permission_required('has_admin_permission')
-def search_profile():
-    account_list = []
-    
-    # Get the role query parameter from the request
-    role = request.args.get('role', None)
+class SearchProfileController:
+    @search_profile_blueprint.route('/api/profiles/search_profile', methods=['POST'])
+    @permission_required('has_admin_permission')
+    def search_profile():
+        data = request.get_json()
 
-    # If no role is provided, return an error message
-    if not role:
-        return jsonify({"message": "Error", "error": "Role parameter is required to perform a search"}), 400
+        name = data.get('name')
+        description = data.get('description')
+        
+        # Assuming there is a searchProfile method in Profile model similar to User
+        profile_list = Profile.searchUserProfile(name, description)
 
-    # Filter profiles by role
-    profiles = Profile.query.filter_by(role=role).all()
-
-    # If no profiles match the role, return a message
-    if not profiles:
-        return jsonify({"message": "No profiles found for the specified role"}), 404
-
-    # Convert each profile to dictionary format
-    for profile in profiles:
-        account_list.append(profile.to_dict())
-
-    return jsonify({"message": "Success", "account_list": account_list})
+        return jsonify({"success": True, "profile_list": profile_list}), 200
