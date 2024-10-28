@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../authorization/AuthContext';
 import axios from 'axios';
 
 export default function UserManagement() {
@@ -30,8 +31,8 @@ export default function UserManagement() {
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
 
-  // Replace with your actual token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTk1NzY2NywianRpIjoiZDE1MDg4MzctMjA4Ni00NzdiLWIzYTEtYjg0YmEwNTFlMDFmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTk1NzY2NywiY3NyZiI6IjIzNTgxMzRhLWFjOGUtNDI1ZS05MjZkLWFiZjNmZmY2MTYwZSIsImV4cCI6MTcyOTk1ODU2N30.H5n89fkjIfco_hyQEEReB3clwnU7Gb8LGJ1t7n5MlLI';
+  //for token
+  const {token, user} = useContext(AuthContext);
 
    // Fetch users function
    const fetchUsers = async () => {
