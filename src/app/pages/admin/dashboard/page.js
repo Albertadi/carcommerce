@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ProfilePage from "../userProfiles/page";
+import CrudsAccount from "../crudsaccount/page";
 
 export default function Dashboard() {
   {
@@ -66,8 +67,7 @@ export default function Dashboard() {
           )}
           {selectedOption === "option3" && (
             <div>
-              <h2 className="text-2xl font-semibold">Content for Option 3</h2>
-              <p>This is the content that shows for Option 3.</p>
+              <CrudsAccount />
             </div>
           )}
         </div>

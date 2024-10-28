@@ -52,7 +52,6 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased`}
       >
         <AuthProvider>
-          <Header> </Header>
           {children}
         </AuthProvider>
       </body>
