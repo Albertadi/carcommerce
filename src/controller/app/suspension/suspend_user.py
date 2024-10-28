@@ -16,12 +16,9 @@ class SuspendUserController:
 
         # Validate input
         if not user_email or not days:
-            return jsonify({'message': 'Email and days are required.'}), 400
+            return jsonify({'success': False, 'message': 'Email and days are required.'}), 400
 
         # Call the createSuspension method from the Suspension entity
-        success = Suspension.createSuspension(user_email, days, reason)
+        create_suspension_response, status_code = Suspension.createSuspension(user_email, days, reason)
 
-        if success:
-            return jsonify({'message': f'User {user_email} has been suspended for {days} days.'}), 200
-        else:
-            return jsonify({'message': 'User not found.'}), 404
+        return jsonify({'success': create_suspension_response, 'message': 'create_suspension API called'}), status_code

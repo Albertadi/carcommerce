@@ -23,7 +23,13 @@ class Suspension(db.Model):
     def createSuspension(cls, user_email: str, days: int, reason: str) -> bool:
         user = User.queryUserAccount(user_email)
         if not user:
-            return False  # User not found
+            return False, 404  # User not found
+
+        if type(days) != int:
+            try:
+                days = int(days)
+            except ValueError:
+                print("Error: Could not convert days to an integer.")
 
         start_date = datetime.now()
         end_date = start_date + timedelta(days=days)
@@ -39,4 +45,4 @@ class Suspension(db.Model):
             db.session.add(new_suspension)
             db.session.commit()
 
-        return True  # Suspension created successfully
+        return True, 200  # Suspension created successfully
