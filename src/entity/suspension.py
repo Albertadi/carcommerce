@@ -20,7 +20,7 @@ class Suspension(db.Model):
     user = db.relationship('User', backref='suspensions')
 
     @classmethod
-    def createSuspension(cls, user_email: str, days: int, reason: str) -> bool:
+    def suspendUser(cls, user_email: str, days: int, reason: str) -> bool:
         user = User.queryUserAccount(user_email)
         if not user:
             return False, 404  # User not found
