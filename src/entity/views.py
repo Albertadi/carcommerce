@@ -6,9 +6,8 @@ class View(db.Model):
     
     id = db.Column(db.String(36), primary_key=True)
     listing_id = db.Column(db.String(36), db.ForeignKey('listings.id'), nullable=False)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)  # Optional if tracking users
+    num_of_views = db.Column(db.Integer(), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships (optional)
     listing = db.relationship('Listing', backref='views')
-    user = db.relationship('User', backref='views')  # Optional if tracking users

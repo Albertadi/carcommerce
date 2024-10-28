@@ -19,6 +19,6 @@ class SuspendUserController:
             return jsonify({'success': False, 'message': 'Email and days are required.'}), 400
 
         # Call the createSuspension method from the Suspension entity
-        create_suspension_response, status_code = Suspension.createSuspension(user_email, days, reason)
+        suspend_user_response, status_code = Suspension.createSuspension(user_email, days, reason)
 
-        return jsonify({'success': create_suspension_response, 'message': 'create_suspension API called'}), status_code
+        return jsonify({'success': suspend_user_response, 'message': 'suspend_user API called'}), status_code
