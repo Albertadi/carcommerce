@@ -83,9 +83,16 @@ class Listing(db.Model):
                       max_mileage: Optional[int] = None,
                       transmission: Optional[str] = None,
                       fuel_type: Optional[str] = None,
-                      is_sold: Optional[bool] = None):
+                      is_sold: Optional[bool] = None,
+                      seller_email: Optional[str] = None,
+                      agent_email: Optional[str] = None):
 
         query = Listing.query
+
+        if seller_email:
+            query = query.filter(Listing.seller_email.ilike(f'{seller_email}%')) # Case-insensitive partial search
+        if agent_email:
+            query = query.filter(Listing.agent_email.ilike(f'{agent_email}%')) # Case-insensitive partial search
 
         # Apply filters dynamically
         if make:
