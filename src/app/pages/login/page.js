@@ -25,7 +25,7 @@ export default function LoginPage() {
       });
 
       login(access_token, userResponse.data); // Call login from context
-      router.push('/'); // Redirect to home page after successful login
+      router.push('../pages/dashboard'); // Redirect to home page after successful login
     } catch (error) {
       setError('Invalid email or password');
     }

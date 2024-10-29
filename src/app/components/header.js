@@ -14,14 +14,14 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-white py-5 shadow-md fixed w-full ">
+    <div className="sticky top-0 bg-white py-3 shadow-xl w-full">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
           <a
             href=""
             target="_blank"
-            className="text-gray-600 text-5xl text-red-500 font-bold"
+            className="text-5xl text-red-500 font-bold"
           >
             TQ
           </a>
@@ -53,7 +53,7 @@ export default function Header() {
               isMenuOpen ? "block" : "hidden"
             }`}
           >
-            <a href="#" className="nav-link text-gray-600 hover:text-gray-800">
+            <a href="#" className="nav-link hover:text-red-500">
               Account
             </a>
           </div>
