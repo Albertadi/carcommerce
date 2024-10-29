@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../authorization/AuthContext';
 import axios from 'axios';
 
 export default function UserManagement() {
@@ -30,11 +31,18 @@ export default function UserManagement() {
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
 
-  // Replace with your actual token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTk1Njk4OSwianRpIjoiZGQ4OTU2OWYtMmRmZC00NDQ4LWIxM2UtN2ZhODViM2UzZDUwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTk1Njk4OSwiY3NyZiI6IjZkYmZlNjcxLTQxOWUtNDZjOS05NDY2LTU3OTBhM2I0YTU3MyIsImV4cCI6MTcyOTk1Nzg4OX0.zO7420leUKBibo6W5wBroXJh305uWp2ZzUE3BoZQ6w8';
+
+  //for user modal details
+  const [rowSelectedUser, setRowSelectedUser] = useState(null);
+  const [isRowModalOpen, setIsRowModalOpen] = useState(false);
+
+  //for token
+  const {token, user} = useContext(AuthContext);
+
 
    // Fetch users function
-   const fetchUsers = async () => {
+
+  const fetchUsers = async () => {
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
@@ -56,7 +64,6 @@ export default function UserManagement() {
       );
       setUsers(response.data.account_list);
     } catch (error) {
-      setError('Failed to fetch users. Please try again.');
       console.error('Error fetching users:', error);
     } finally {
       setIsLoading(false);
@@ -66,8 +73,9 @@ export default function UserManagement() {
   // Call fetchUsers initially when the component mounts
   useEffect(() => {
     fetchUsers();
-  }, [token]);
+  }, [token]); // Only runs on token change or initial mount
 
+// Debounced search to avoid excessive API calls
   // Debounced search to avoid excessive API calls
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -76,10 +84,35 @@ export default function UserManagement() {
     return () => clearTimeout(delayDebounce);
   }, [searchTermFirstName, searchTermEmail, searchTermProfile]);
 
+
   // Handle functions
   const handleSearchFirstName = (e) => setSearchTermFirstName(e.target.value);
   const handleSearchEmail = (e) => setSearchTermEmail(e.target.value);
   const handleSearchProfile = (e) => setSearchTermProfile(e.target.value);
+
+  // Update modal functions
+  const openUpdateModal = (user) => {
+    setSelectedUser(user);
+    setEditData({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      dob: user.dob,
+      email: user.email,
+      user_profile: user.user_profile,
+    });
+    setShowUpdateModal(true);
+  };
+
+  const closeUpdateModal = () => {
+    setShowUpdateModal(false);
+    setEditData({});
+  };
+
+
+  const toggleUserDetails = (user) => {
+      setRowSelectedUser(user);
+      setIsRowModalOpen(true);
+  };
 
   // Suspend function with fetchUsers call
   const openSuspendModal = (user) => {
@@ -125,24 +158,7 @@ export default function UserManagement() {
     }
   };
 
-  // Update modal functions
-  const openUpdateModal = (user) => {
-    setSelectedUser(user);
-    setEditData({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      dob: user.dob,
-      email: user.email,
-      user_profile: user.user_profile,
-    });
-    setShowUpdateModal(true);
-  };
-
-  const closeUpdateModal = () => {
-    setShowUpdateModal(false);
-    setEditData({});
-  };
-
+ 
   // Handle update confirm with fetchUsers call
   const handleUpdateConfirm = async () => {
     setIsLoading(true);
@@ -174,6 +190,7 @@ export default function UserManagement() {
     }
   };
 
+   
   // Function to automatically format DOB input as YYYY-MM-DD with added validation
   const formatDob = (value) => {
 
@@ -479,11 +496,13 @@ export default function UserManagement() {
               <tbody>
                 {users.length > 0 ? (
                   users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-700">
+                                                                                    /*hover at any row to see the modal details*/
+                    <tr key={user.id} className="hover:bg-gray-700 cursor-pointer" onClick={() => toggleUserDetails(user)}> 
+                      
                       <td className="py-2 px-4 border border-gray-600">
                         {user.email !== 'admin@admin.com' && (
                           <button
-                            onClick={() => openSuspendModal(user)}
+                            onClick={(e) => { e.stopPropagation(); openSuspendModal(user); }}  
                             className="bg-red-500 text-white p-2 w-full text-lg rounded"
                             disabled={isLoading}
                           >
@@ -494,7 +513,7 @@ export default function UserManagement() {
                       <td className="py-2 px-4 border border-gray-600">
                         {user.email !== 'admin@admin.com' && (
                           <button
-                            onClick={() => openUpdateModal(user)}
+                            onClick={(e) => { e.stopPropagation(); openUpdateModal(user); }}
                             className="bg-green-500 text-white p-2 w-full text-lg rounded"
                           >
                             ✎
@@ -611,6 +630,24 @@ export default function UserManagement() {
               Cancel
             </button>
           </div>
+        </div>
+      </div>
+    )}
+
+    {/*User Details Modal*/}
+    {isRowModalOpen && rowSelectedUser && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+          <h2 className="text-xl font-bold mb-4">User Details</h2>
+          <p>First Name: {rowSelectedUser.first_name}</p>
+          <p>Last Name: {rowSelectedUser.last_name}</p>
+          <p>Email: {rowSelectedUser.email}</p>
+          <p>DOB: {rowSelectedUser.dob}</p>
+          <p>User Profile: {rowSelectedUser.user_profile}</p>
+          {/* Other user details */}
+          <button onClick={() => setIsRowModalOpen(false)} className="bg-red-500 text-white p-2 rounded mt-4">
+            Close
+          </button>
         </div>
       </div>
     )}
