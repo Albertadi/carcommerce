@@ -10,9 +10,8 @@ from .user import User
 class Suspension(db.Model):
     __tablename__ = 'suspensions'
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
+    user_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False, primary_key=True)
+    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
     end_date = db.Column(db.DateTime, nullable=False)
     reason = db.Column(db.String(255), nullable=True)
 
@@ -20,7 +19,7 @@ class Suspension(db.Model):
     user = db.relationship('User', backref='suspensions')
 
     @classmethod
-    def createSuspension(cls, user_email: str, days: int, reason: str) -> bool:
+    def suspendUser(cls, user_email: str, days: int, reason: str) -> bool:
         user = User.queryUserAccount(user_email)
         if not user:
             return False, 404  # User not found
