@@ -32,12 +32,14 @@ export default function UserManagement() {
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
 
+
   //for user modal details
   const [rowSelectedUser, setRowSelectedUser] = useState(null);
   const [isRowModalOpen, setIsRowModalOpen] = useState(false);
 
   //for token
   const {token, user} = useContext(AuthContext);
+
 
    // Fetch users function
 

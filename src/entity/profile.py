@@ -87,23 +87,23 @@ class Profile(db.Model):
         try:
             profile = cls.queryUserProfile(name)
             if not profile:
-                return False, "Profile not found"
+                return False, 404
 
             profile.description = description
             
             # Ensure only one permission is set to True
             permissions = [has_buy_permission, has_sell_permission, has_listing_permission]
             if sum(permissions) > 1:
-                return False, "A user can only have one type of permission"
+                return False, 403
 
             profile.has_buy_permission = has_buy_permission
             profile.has_sell_permission = has_sell_permission
             profile.has_listing_permission = has_listing_permission
 
             db.session.commit()
-            return True, "Profile updated successfully"
+            return True, 200
         except SQLAlchemyError as e:
             db.session.rollback()
-            return False, f"Database error: {str(e)}"
+            return False, 400
         except Exception as e:
-            return False, f"An error occurred: {str(e)}"
+            return False, 500

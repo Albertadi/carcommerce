@@ -11,8 +11,8 @@ from src.controller.app import flask_app
 from src.controller.test.insert_delete_samples import insert_samples, delete_samples
 from src.controller.test.controller.admintoken import getAdminToken
 
-@pytest.mark.test_valid_create
-def test_valid_create():
+@pytest.mark.test_valid_create_user
+def test_valid_create_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -47,8 +47,8 @@ def test_valid_create():
     # Delete precondition data
     delete_samples()
 
-@pytest.mark.test_invalid_create
-def test_invalid_create():
+@pytest.mark.test_invalid_create_user
+def test_invalid_create_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -87,15 +87,11 @@ def test_invalid_create():
             success = json.loads(response.text)["success"]
             assert success == False
 
-            # Delete test user
-            User.query.filter_by(email=account["email"]).delete()
-            db.session.commit()
-
     # Delete precondition data
     delete_samples()
 
-@pytest.mark.test_valid_view
-def test_valid_view():
+@pytest.mark.test_valid_view_user
+def test_valid_view_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -119,8 +115,8 @@ def test_valid_view():
     # Delete precondition data
     delete_samples()
 
-@pytest.mark.test_invalid_view
-def test_invalid_view():
+@pytest.mark.test_invalid_view_user
+def test_invalid_view_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -144,8 +140,8 @@ def test_invalid_view():
     # Delete precondition data
     delete_samples()
 
-@pytest.mark.test_valid_update
-def test_valid_update():
+@pytest.mark.test_valid_update_user
+def test_valid_update_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -171,13 +167,13 @@ def test_valid_update():
         response = requests.post(url, json=valid_account, headers=headers)
 
         success = json.loads(response.text)["success"]
-        assert success == False
+        assert success == True
 
     # Delete precondition data
     delete_samples()
 
-@pytest.mark.test_invalid_update
-def test_invalid_update():
+@pytest.mark.test_invalid_update_user
+def test_invalid_update_user():
     # Precondition 100 samples
     insert_samples()
 
@@ -218,8 +214,8 @@ def test_invalid_update():
 
     with flask_app.app_context():
         url = "http://localhost:5000/api/users/update_user"
-        for acount in invalid_account:
-            response = requests.post(url, json=acount, headers=headers)
+        for account in invalid_account:
+            response = requests.post(url, json=account, headers=headers)
 
             success = json.loads(response.text)["success"]
             assert success == False
