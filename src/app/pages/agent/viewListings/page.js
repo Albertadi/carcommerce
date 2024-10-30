@@ -12,8 +12,9 @@ export default function UserManagement() {
     const [selectedCar, setSelectedCar] = useState(null);
     const [loading, setLoading] = useState(true); // State for loading
     const [error, setError] = useState(null); // State for error handling
+
     // Fetch car listings from the API with a specific id
-    const fetchCars = async (id) => {
+    const fetchCars = async (id) => { //"id": "7261fe5a-1035-44f2-98b0-23f727246895" (hardcoded)
         try {
             const response = await axios.get(`http://localhost:5000/api/listing/view_listing?id=${id}`, {
                 headers: {
@@ -31,7 +32,7 @@ export default function UserManagement() {
 
     // Call fetchCars with the specific id
     useEffect(() => {
-        fetchCars('e514cec4-e061-4767-87d0-b8558e817dcf');
+        fetchCars();
     }, []);
 
     // Delete a car listing
@@ -44,6 +45,7 @@ export default function UserManagement() {
             });
             fetchCars(); // Refresh the listings
         } catch (error) {
+            setError("Failed to delete the listing")
             console.error("Error deleting car listing:", error);
         }
     };
@@ -58,6 +60,7 @@ export default function UserManagement() {
             });
             setSelectedCar(response.data);
         } catch (error) {
+            setError("Failed to fetch car details")
             console.error("Error fetching car details:", error);
         }
     };
@@ -90,8 +93,6 @@ export default function UserManagement() {
         );
     };
 
-
-
     return (
         <div className="container mx-auto p-4">
             {loading ? (
@@ -103,10 +104,10 @@ export default function UserManagement() {
                     {error && <div className="text-red-500">{error}</div>}
                     <input
                         type="text"
-                        placeholder="Search cars..."
+                        placeholder="Search My Listings..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="border border-gray-300 rounded-lg p-2 mb-4 w-full text-center"
+                        className="border border-gray-300 rounded-lg p-2 mb-4 w-full text-left"
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {cars.filter(car => car.name.toLowerCase().includes(searchQuery.toLowerCase())).map(car => (
