@@ -8,9 +8,9 @@ from src.controller.app.authentication.permission_required import permission_req
 search_listing_blueprint = Blueprint('search_listing', __name__)
 
 class SearchListingController:
-    @search_listing_blueprint.route('/api/listing/search_listing', methods=['GET'])
+    @search_listing_blueprint.route('/api/listing/search_listing', methods=['POST'])
 
-    @permission_required('has_buy_permission', 'has_listing_permission')
+    @permission_required('has_buy_permission', 'has_sell_permission', 'has_listing_permission')
     def search_listing() -> list[Listing]:
         """Search listings with optional filters."""
         data = request.get_json()
