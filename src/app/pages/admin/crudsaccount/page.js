@@ -27,6 +27,7 @@ export default function UserManagement() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // to hold user info like id and email
   const [duration, setDuration] = useState(''); // to hold the duration input
+  const [suspendReason, setSuspendReason] = useState(""); // reason for suspend
 
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
@@ -128,7 +129,21 @@ export default function UserManagement() {
   const handleSuspend = async () => {
     if (!duration) {
       setInvalidMessage('Please enter a valid suspension duration.');
-      return;
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
+      return;  // Exit the function early
+    }
+
+    // Check if reason is provided
+    if (!suspendReason) {
+      setInvalidMessage('Please fill in the reason.');
+      
+      // Clear the invalid message after 3 seconds
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
+      return; 
     }
 
     setIsLoading(true);
@@ -148,11 +163,22 @@ export default function UserManagement() {
       );
 
       setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
       fetchUsers(); // Refresh the user list after suspension
-    } catch (error) {
+    } 
+
+    catch (error) {
       setError('Failed to suspend the user. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
       console.error('Error suspending user:', error);
-    } finally {
+
+    } 
+
+    finally {
       setIsLoading(false);
       setShowSuspendModal(false);
     }
@@ -180,12 +206,25 @@ export default function UserManagement() {
         },
       });
 
-      setSuccessMessage(`User ${editData.email} updated successfully!`);
       fetchUsers(); // Refresh the user list after update
       closeUpdateModal();
-    } catch (error) {
+
+      //successful message after the modal closed
+      setSuccessMessage(`User ${editData.email} updated successfully!`);
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
+    } 
+    
+    catch (error) {
       setError('Failed to update user. Please try again.');
-    } finally {
+      // Timer to clear success message after 3 seconds
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+    } 
+    
+    finally {
       setIsLoading(false);
     }
   };
@@ -205,6 +244,9 @@ export default function UserManagement() {
     if (month.length === 2) {
       if (parseInt(month) > 12 || parseInt(month) < 1) {
         setInvalidMessage('Invalid month. Please enter a month between 01 and 12.');
+        setTimeout(() => {
+          setInvalidMessage(''); // Clear the message after 3 seconds
+        }, 3000);
       }
       else {
         setInvalidMessage(''); // Clear message if valid
@@ -215,9 +257,12 @@ export default function UserManagement() {
     if (day.length === 2) {
       if (parseInt(day) > 31 || parseInt(day) < 1) {
         setInvalidMessage('Invalid day. Please enter a day between 01 and 31.');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -225,9 +270,12 @@ export default function UserManagement() {
     if (month === '04' || month === '06' || month === '09' || month === '11') {
       if (parseInt(day) > 30) {
         setInvalidMessage('Invalid day for the selected month. Please enter a day between 01 and 30.');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -238,9 +286,12 @@ export default function UserManagement() {
       };
       if (parseInt(day) > 29 || (parseInt(day) === 29 && !isLeapYear(year))) {
         setInvalidMessage('Invalid day for February. Please enter a valid day (01-28 or 29 for leap years).');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -274,21 +325,33 @@ export default function UserManagement() {
   const handleAddUser = async () => {
     if (!firstname || !lastname || !dob || !email || !password || !userProfile) {
       setInvalidMessage('Please fill in all the fields.');
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
       return;
     }
 
     if (!validateDob(dob)) {
       setInvalidMessage('Invalid date format. Please use YYYY-MM-DD and ensure the date is valid.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
     if (!validateEmail(email)) {
       setInvalidMessage('Please enter a valid email address.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
     if (password.length < 8) {
       setInvalidMessage('Password must be at least 8 characters long.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
@@ -320,9 +383,17 @@ export default function UserManagement() {
       setPassword('');
       setUserProfile('');
       setSuccessMessage('User added successfully!');
-    } catch (error) {
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
+    } 
+    catch (error) {
       setError('Failed to add user. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
       console.error('Error adding user:', error);
+
     } finally {
       setIsLoading(false);
     }
@@ -547,13 +618,40 @@ export default function UserManagement() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-700 p-6 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Suspend {selectedUser.email} for how long?</h2>
+
+            {/* Duration Input */}
             <input
               type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
+              min="1"
+              value={duration || ""}  // Shows an empty field instead of 0 when cleared
+              onChange={(e) => {
+                const value = Number(e.target.value);
+            
+                if (value > 0) {  
+                  setDuration(value);
+                  setInvalidMessage(""); // Clear the invalid message if input is valid
+                } else {
+                  setDuration(""); // Clear the input if the value is invalid (less than 1)
+                  setInvalidMessage("Please fill in the duration.");
+                  setTimeout(() => {
+                    setInvalidMessage(''); // Clear the message after 3 seconds
+                  }, 3000);
+                }
+              }}
               className="border p-2 w-full mb-4 text-black"
               placeholder="Enter duration in days"
             />
+
+            {/* Reason Input */}
+            <input
+              type="text"
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              className="border p-2 w-full mb-4 text-black"
+              placeholder="Enter suspension reason"
+            />
+            {!suspendReason && <p className="text-red-500">{invalidMessage}</p>} {/* Display invalid message for reason */}
+
             <div className="flex justify-end">
               <button
                 onClick={handleSuspend}
