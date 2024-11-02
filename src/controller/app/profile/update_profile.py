@@ -22,7 +22,7 @@ class UpdateProfileController:
             return jsonify({'error': 'Missing required fields'}), 400
 
         try:
-            success = Profile.updateUserProfile(
+            success, status_code = Profile.updateUserProfile(
                 name=name,
                 description=description,
                 has_buy_permission=bool(has_buy_permission),
@@ -30,9 +30,9 @@ class UpdateProfileController:
                 has_listing_permission=bool(has_listing_permission)
             )
 
-            return jsonify({"success": success, "message": "Profile updated successfully"}), 200 if success else 400
+            return jsonify({"success": success, "message": "Profile updated successfully"}), status_code
 
         except ValueError as e:
-            return jsonify({'error': str(e)}), 400
+            return jsonify({'error': str(e)}), status_code
         except Exception as e:
-            return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
+            return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), status_code

@@ -13,11 +13,11 @@ class CreateProfileController:
         # Define required fields
         required_fields = ['name', 'description', 'has_buy_permission', 'has_sell_permission', 'has_listing_permission']
         if not all(field in data for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
         try:
             # Create the profile using the Profile entity method
-            result = Profile.createUserProfile(
+            create_response, status_code = Profile.createUserProfile(
                 name=data['name'],
                 description=data['description'],
                 has_buy_permission=bool(data['has_buy_permission']),
@@ -25,10 +25,7 @@ class CreateProfileController:
                 has_listing_permission=bool(data['has_listing_permission'])
             )
 
-            if result:
-                return jsonify({'success': True, 'message': 'Profile created successfully'}), 201
-            else:
-                return jsonify({'success': False, 'error': 'Failed to create profile. Profile may already exist or lacks admin permission.'}), 400
+            return jsonify({'success': create_response, 'message': 'Profile created successfully'}), status_code
 
         except Exception as e:
             return jsonify({'success': False, 'error': f'Failed to create profile: {str(e)}'}), 500
