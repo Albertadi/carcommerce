@@ -3,6 +3,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
 import { ListingCard } from '../../../components/ListingCard';
+import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function ListingsPage() {
@@ -10,6 +11,9 @@ export default function ListingsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const { token, user } = useContext(AuthContext); // Get token and user from AuthContext
+
+    // Modal state for 401 Unauthorized error
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     // Search filter state
     const [make, setMake] = useState('');
@@ -65,8 +69,12 @@ export default function ListingsPage() {
 
             setListings(response.data.listing_list); // Update listings state
         } catch (error) {
-            setError('Failed to fetch listings. Please try again.');
-            console.error('Error fetching listings:', error);
+            if (error.response && error.response.status === 401) {
+                setShowLoginModal(true); // Show login modal if 401 error occurs
+            } else {
+                setError('Failed to fetch listings. Please try again.');
+                console.error('Error fetching listings:', error);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -80,6 +88,11 @@ export default function ListingsPage() {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <h1 className="text-3xl font-bold mb-6">Car Listings</h1>
+
+            {/* Login Modal */}
+            {showLoginModal && (
+                <ReloginModal onClose={() => setShowLoginModal(false)} />
+            )}
 
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
