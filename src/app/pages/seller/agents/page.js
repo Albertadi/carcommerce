@@ -10,7 +10,7 @@ export default function ReviewRatingAgent() {
     const [agents, setAgents] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { token } = useContext(AuthContext); // Get token from AuthContext
+    const { access_token } = useContext(AuthContext); // Get token from AuthContext
 
     // State to control the login modal visibility
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -23,7 +23,7 @@ export default function ReviewRatingAgent() {
       try {
         const response = await axios.get('http://localhost:5000/api/users/search_agent', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
           params: {
             first_name: '', // Adjust or add a search parameter here if needed
@@ -46,7 +46,7 @@ export default function ReviewRatingAgent() {
     // Fetch agents on component mount
     useEffect(() => {
       fetchAgents();
-    }, [token]);
+    }, [access_token]);
   
     return (
       <div className="min-h-screen bg-gray-100 p-6">

@@ -10,7 +10,7 @@ export default function ListingsPage() {
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { token, user } = useContext(AuthContext); // Get token and user from AuthContext
+    const { access_token, user } = useContext(AuthContext); // Get token and user from AuthContext
 
     // Modal state for 401 Unauthorized error
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -62,7 +62,7 @@ export default function ListingsPage() {
                 buildSearchFilters(), // Only include filters with values
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${access_token}`,
                     },
                 }
             );
@@ -83,7 +83,7 @@ export default function ListingsPage() {
     // Fetch listings on component mount
     useEffect(() => {
       fetchListings();
-    }, [token]);
+    }, [access_token]);
   
     return (
         <div className="min-h-screen bg-gray-100 p-6">
