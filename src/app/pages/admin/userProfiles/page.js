@@ -5,7 +5,7 @@ import { AuthContext } from "../../authorization/AuthContext"; // Adjust path as
 import axios from "axios";
 
 export default function Profiles() {
-  const { token } = useContext(AuthContext); // Access the token and user data
+  const { access_token } = useContext(AuthContext); // Access the token and user data
   const [profiles, setProfiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [newProfile, setNewProfile] = useState({
@@ -28,7 +28,7 @@ export default function Profiles() {
             "http://localhost:5000/api/profiles/view_profile",
             {
               headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${access_token}`,
               },
               params: {
                 name: searchTerm,
@@ -42,7 +42,7 @@ export default function Profiles() {
             { name: "", description: "" },
             {
               headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${access_token}`,
               },
             }
           );
@@ -70,7 +70,7 @@ export default function Profiles() {
         newProfile,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
@@ -116,7 +116,7 @@ export default function Profiles() {
         updatedProfile,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include JWT token for authorization
+            Authorization: `Bearer ${access_token}`, // Include JWT token for authorization
           },
         }
       );

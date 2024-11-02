@@ -38,7 +38,7 @@ export default function UserManagement() {
   const [isRowModalOpen, setIsRowModalOpen] = useState(false);
 
   //for token
-  const {token, user} = useContext(AuthContext);
+  const {access_token, permissions} = useContext(AuthContext);
 
 
    // Fetch users function
@@ -59,7 +59,7 @@ export default function UserManagement() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
@@ -74,7 +74,7 @@ export default function UserManagement() {
   // Call fetchUsers initially when the component mounts
   useEffect(() => {
     fetchUsers();
-  }, [token]); // Only runs on token change or initial mount
+  }, [access_token]); // Only runs on token change or initial mount
 
 // Debounced search to avoid excessive API calls
   // Debounced search to avoid excessive API calls
@@ -157,7 +157,7 @@ export default function UserManagement() {
         { email: selectedUser.email, duration },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
@@ -202,7 +202,7 @@ export default function UserManagement() {
     try {
       await axios.post('http://localhost:5000/api/users/update_user', formattedData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
 
@@ -372,7 +372,7 @@ export default function UserManagement() {
     try {
       await axios.post('http://localhost:5000/api/users/create_user', newUser, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
       fetchUsers(); // Refresh the user list after adding a new user

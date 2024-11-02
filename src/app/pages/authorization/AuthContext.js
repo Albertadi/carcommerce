@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
+  const [access_token, setToken] = useState(null);
   const [permissions, setPermissions] = useState(null);
 
   // On component mount, check if there's a token in localStorage
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const decodedToken = jwtDecode(newToken); // Decode token
       setPermissions(decodedToken); // Set permissions based on the token
+      localStorage.setItem('permissions', decodedToken)
     } catch (error) {
       console.error("Error decoding token:", error);
     }
@@ -38,10 +39,11 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setPermissions(null);
     localStorage.removeItem('access_token');
+    localStorage.removeItem('permissions');
   };
 
   return (
-    <AuthContext.Provider value={{ token, permissions, login, logout }}>
+    <AuthContext.Provider value={{ access_token, permissions, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

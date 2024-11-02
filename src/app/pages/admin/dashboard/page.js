@@ -1,25 +1,44 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ProfilePage from "../userProfiles/page";
 import CrudsAccount from "../crudsaccount/page";
 import AdminProfile from "../adminProfile/page";
-import { AuthContext } from "../../authorization/AuthContext"; // Adjust path as needed
+import { AuthContext } from "../../authorization/AuthContext";
 
 export default function Dashboard() {
-  {
-    /* This function is for switching the html elements of the right column of the page (depending on the option selected*/
-  }
-  const { authToken, user } = useContext(AuthContext); // Access the token and user data
+  const { access_token, permissions } = useContext(AuthContext); 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true); // Loading state to prevent rendering
+
+  useEffect(() => {
+    // Only proceed if token and permissions are checked
+    if (access_token && permissions) {
+      if (!permissions?.sub.has_admin_permission) {
+        router.push('/');
+      } else {
+        setIsLoading(false); // Allow rendering if authorized
+      }
+    } else if (!access_token) {
+      // If there's no token, redirect immediately
+      router.push('/');
+    }
+  }, [access_token, permissions, router]);
+
   const [selectedOption, setSelectedOption] = useState("option1");
   const handleOptionClick = (option) => {
     setSelectedOption(option);
   };
 
+  if (isLoading) {
+    return null; // Render nothing until loading is complete
+  }
+
   return (
-    <div className="bg-gray-100 flex text-white">
+    <div className="bg-gray-100 flex text-white h-[calc(100vh-64px)] overflow-hidden">
       {/* Left Column: Dashboard Options */}
-      <div className="w-1/2 bg-red-500 p-5 overflow-hidden">
+      <div className="w-1/2 bg-red-500 p-5 overflow-hidden h-full">
         <ul className="space-y-2">
           <li>
             <button
@@ -55,7 +74,7 @@ export default function Dashboard() {
       </div>
 
       {/* Right Column: Content Based on Selected Option */}
-      <div className="w-3/4 p-4 overflow-y-auto h-screen">
+      <div className="w-3/4 p-4 overflow-y-auto h-full">
         {selectedOption === "option1" && (
           <div>
             <AdminProfile />
@@ -73,5 +92,6 @@ export default function Dashboard() {
         )}
       </div>
     </div>
+
   );
 }

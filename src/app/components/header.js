@@ -12,7 +12,7 @@ export default function Header() {
   };
 
   // Access the AuthContext and router
-  const { token, user, logout } = useContext(AuthContext);
+  const { access_token, permissions, logout } = useContext(AuthContext);
   const router = useRouter();
 
   // Handle login redirection
@@ -71,7 +71,7 @@ export default function Header() {
             </a>
 
             {/* Login/Logout Button */}
-            {token ? (
+            {access_token ? (
               <button
                 onClick={handleLogout} // Use the logout function from AuthContext
                 className="text-red-500 font-semibold hover:text-red-700"
