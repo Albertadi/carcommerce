@@ -18,9 +18,12 @@ export default function LoginPage() {
     try {
       const response = await axios.post('http://localhost:5000/api/login', { email, password });
       const { access_token } = response.data;
-
-      // Login and set the token and permissions in context
-      login(access_token);
+      if (response.data.success) {
+        // Login and set the token and permissions in context
+        login(access_token);
+      } else {
+        setError('Invalid email or password');
+      }
     } catch (error) {
       setError('Invalid email or password');
     }
@@ -35,8 +38,10 @@ export default function LoginPage() {
         router.push('/pages/agent/dashboard');
       } else if (permissions.sub.has_sell_permission) {
         router.push('/pages/seller/dashboard');
+      } else if (permissions.sub.has_buy_permission) {
+        router.push('/pages/buyer/dashboard');
       } else {
-        console.log(permissions.sub)
+        setError('Invalid permissions. Please contact IT administrator.');
       }
     }
   }, [permissions, router]); // Watch for permissions to change and redirect
