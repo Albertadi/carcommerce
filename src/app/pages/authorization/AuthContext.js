@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData)); // Store user data as well
   };
 
-  const logout = () => {
+  const logout = () => {    
     setToken(null);
     setUser(null);
     localStorage.removeItem('access_token');

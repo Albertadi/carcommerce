@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../pages/authorization/AuthContext"; // Ensure this path is correct
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   // State for controlling mobile menu visibility
@@ -9,15 +11,28 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Access the AuthContext and router
+  const { token, user, logout } = useContext(AuthContext);
+  const router = useRouter();
+
+  // Handle login redirection
+  const handleLogin = () => {
+    router.push("/pages/login");
+  };
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
+  }
+
+  // Render the header
   return (
     <div className="sticky top-0 bg-white h-16 shadow-xl w-full flex items-center z-10">
-      {/* Outer div now has a fixed height of 16 (64px) */}
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
           <a
-            href=""
-            target="_blank"
+            href="/"
             className="text-5xl text-red-500 font-bold"
           >
             TQ
@@ -50,9 +65,27 @@ export default function Header() {
               isMenuOpen ? "block" : "hidden"
             }`}
           >
+            {/* Account link */}
             <a href="#" className="nav-link hover:text-red-500">
               Account
             </a>
+
+            {/* Login/Logout Button */}
+            {token && user ? (
+              <button
+                onClick={handleLogout} // Use the logout function from AuthContext
+                className="text-red-500 font-semibold hover:text-red-700"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin} // Redirect to login page
+                className="text-red-500 font-semibold hover:text-red-700"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </div>
