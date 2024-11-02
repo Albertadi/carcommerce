@@ -1,43 +1,47 @@
-"use client";
+"use client"
 
 import React, { createContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [permissions, setPermissions] = useState(null);
 
   // On component mount, check if there's a token in localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('access_token');
     if (storedToken) {
       setToken(storedToken);
-
-      // Optionally, you can also fetch the user data using the token
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      try {
+        const decodedToken = jwtDecode(storedToken); // Decode token
+        setPermissions(decodedToken); // Store permissions from the token
+      } catch (error) {
+        console.error("Error decoding token:", error);
       }
     }
   }, []);
 
-  const login = (newToken, userData) => {
+  const login = (newToken) => {
     setToken(newToken);
-    setUser(userData);
     localStorage.setItem('access_token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData)); // Store user data as well
+    try {
+      const decodedToken = jwtDecode(newToken); // Decode token
+      setPermissions(decodedToken); // Set permissions based on the token
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
   };
 
-  const logout = () => {    
+  const logout = () => {
     setToken(null);
-    setUser(null);
+    setPermissions(null);
     localStorage.removeItem('access_token');
-    localStorage.removeItem('user'); // Remove user data from localStorage
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ token, permissions, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

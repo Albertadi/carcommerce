@@ -71,7 +71,7 @@ export default function Header() {
             </a>
 
             {/* Login/Logout Button */}
-            {token && user ? (
+            {token ? (
               <button
                 onClick={handleLogout} // Use the logout function from AuthContext
                 className="text-red-500 font-semibold hover:text-red-700"

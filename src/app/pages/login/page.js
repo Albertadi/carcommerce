@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; 
 import axios from 'axios';
 import { AuthContext } from '../authorization/AuthContext'; // Adjust path as needed
@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useContext(AuthContext); // Access login from AuthContext
+  const { login, permissions } = useContext(AuthContext);
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -19,18 +19,28 @@ export default function LoginPage() {
       const response = await axios.post('http://localhost:5000/api/login', { email, password });
       const { access_token } = response.data;
 
-      // Fetch user data using the email to set in context
-      const userResponse = await axios.get(`http://localhost:5000/api/users/view_user?email=${email}`, {
-        headers: { Authorization: `Bearer ${access_token}` },
-      });
-
-      login(access_token, userResponse.data); // Call login from context
-      router.push('../pages/dashboard'); // Redirect to home page after successful login
+      // Login and set the token and permissions in context
+      login(access_token);
     } catch (error) {
       setError('Invalid email or password');
     }
   };
 
+  useEffect(() => {
+    // Redirect based on permissions once they’re available
+    if (permissions) {
+      if (permissions.sub.has_admin_permission) {
+        router.push('/pages/admin/dashboard');
+      } else if (permissions.sub.has_listing_permission) {
+        router.push('/pages/agent/dashboard');
+      } else if (permissions.sub.has_sell_permission) {
+        router.push('/pages/seller/dashboard');
+      } else {
+        console.log(permissions.sub)
+      }
+    }
+  }, [permissions, router]); // Watch for permissions to change and redirect
+  
   return (
     <div className='flex justify-center items-center h-screen bg-[#f0f0f7] font-rajdhaniSemiBold'>
       <div className='w-96 p-6 border-solid border-4 border-[#f75049]'>
