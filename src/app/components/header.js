@@ -3,18 +3,15 @@
 import { useState } from "react";
 
 export default function Header() {
-  {
-    /* Navigation */
-  }
-
-  /* This function is for minimizing the header in mobile screens (might remove later)*/
+  // State for controlling mobile menu visibility
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <div className="sticky top-0 bg-white py-3 shadow-xl w-full">
+    <div className="sticky top-0 bg-white h-16 shadow-xl w-full flex items-center z-10">
+      {/* Outer div now has a fixed height of 16 (64px) */}
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
