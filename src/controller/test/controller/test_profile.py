@@ -61,19 +61,16 @@ def test_invalid_create_profile():
     # Test profile data for invalid creation
     invalid_profile = [
         {
-            "name": "testProfile",
-            "description": "profile for testing",
+            "name": "testProfile", "description": "profile for testing",
             "has_buy_permission": 0
         },
         {
-            "name": "buyer",
-            "description": "already existing profile",
+            "name": "buyer", "description": "already existing profile",
             "has_buy_permission": 0,
             "has_sell_permission": 1,
             "has_listing_permission": 0
         }
     ]
-
 
     with flask_app.app_context():
         # Use API to attempt creating an invalid profile

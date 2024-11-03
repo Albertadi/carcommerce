@@ -186,30 +186,12 @@ def test_invalid_update_user():
 
     # Test user data
     invalid_account = [
-        {
-        "email": "hehehehe@heheheh.com",
-        "password": "updatedPassword",
-        "first_name": "newFirstName",
-        "last_name": "newLastName",
-        "dob": "2020-3-11",
-        "user_profile": "admin"
-        },
-        {
-        "email": "jduggan0@chicagotribune.com",
-        "password": "updatedPassword",
-        "first_name": "newFirstName",
-        "last_name": "newLastName",
-        "dob": "2020-3-11",
-        "user_profile": "admin"
-        },
-        {
-        "email": "jduggan0@chicagotribune.com",
-        "password": "updatedPassword",
-        "first_name": "newFirstName",
-        "last_name": "newLastName",
-        "dob": "2020-3-11",
-        "user_profile": "unknownProfile"
-        }
+        {"email": "hehehehe@heheheh.com", "password": "updatedPassword", "first_name": "newFirstName",
+        "last_name": "newLastName", "dob": "2020-3-11", "user_profile": "admin"},
+        {"email": "jduggan0@chicagotribune.com","password": "updatedPassword","first_name": "newFirstName",
+        "last_name": "newLastName","dob": "2020-3-11","user_profile": "admin"},
+        {"email": "jduggan0@chicagotribune.com","password": "updatedPassword","first_name": "newFirstName",
+        "last_name": "newLastName","dob": "2020-3-11","user_profile": "unknownProfile"}
     ]
 
     with flask_app.app_context():

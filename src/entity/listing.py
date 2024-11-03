@@ -29,7 +29,7 @@ class Listing(db.Model):
     model = db.Column(db.String(100), nullable=False)
     year = db.Column(db.Integer(), nullable=False)
     price = db.Column(db.Float(), nullable=False)
-    mileage = db.Column(db.Integer(), nullable=False)
+    mileage = db.Column(db.String(100), nullable=False)
     transmission = db.Column(db.Enum(TransmissionType), nullable=False)
     fuel_type = db.Column(db.Enum(FuelType), nullable=False)
     is_sold = db.Column(db.Boolean(), nullable=False, default=False)
@@ -79,8 +79,7 @@ class Listing(db.Model):
                       year: Optional[int] = None,
                       min_price: Optional[float] = None,
                       max_price: Optional[float] = None,
-                      min_mileage: Optional[int] = None,
-                      max_mileage: Optional[int] = None,
+                      mileage: Optional[str] = None,
                       transmission: Optional[str] = None,
                       fuel_type: Optional[str] = None,
                       is_sold: Optional[bool] = None,
@@ -105,10 +104,8 @@ class Listing(db.Model):
             query = query.filter(Listing.price >= min_price)
         if max_price is not None:
             query = query.filter(Listing.price <= max_price)
-        if min_mileage is not None:
-            query = query.filter(Listing.mileage >= min_mileage)
-        if max_mileage is not None:
-            query = query.filter(Listing.mileage <= max_mileage)
+        if mileage is not None:
+            query = query.filter(Listing.model.ilike(f'{mileage}%'))
         if transmission:
             try:
                 transmission_enum = TransmissionType(transmission)
@@ -137,7 +134,7 @@ class Listing(db.Model):
                       model: str,
                       year: int,
                       price: float = 0.0,
-                      mileage: int = 0,
+                      mileage: str = "",
                       transmission: str = "",
                       fuel_type: str = "",
                       is_sold: bool = False,
@@ -207,7 +204,7 @@ class Listing(db.Model):
                       model: Optional[str],
                       year: Optional[int],
                       price: Optional[float] = 0.0,
-                      mileage: Optional[int] = 0,
+                      mileage: Optional[str] = "",
                       transmission: Optional[str] = "",
                       fuel_type: Optional[str] = "",
                       is_sold: Optional[bool] = False,
