@@ -3,44 +3,28 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
 import { ListingCard } from '../../../components/ListingCard';
+import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function ListingsPage() {
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { token, user } = useContext(AuthContext); // Get token and user from AuthContext
+    const { access_token, permissions } = useContext(AuthContext); // Get token and user from AuthContext
+
+    // Modal state for 401 Unauthorized error
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     // Search filter state
-    const [make, setMake] = useState('');
-    const [model, setModel] = useState('');
-    const [year, setYear] = useState('');
-    const [minPrice, setMinPrice] = useState('');
-    const [maxPrice, setMaxPrice] = useState('');
-    const [minMileage, setMinMileage] = useState('');
-    const [maxMileage, setMaxMileage] = useState('');
-    const [transmission, setTransmission] = useState('');
-    const [fuelType, setFuelType] = useState('');
-    const [isSold, setIsSold] = useState(false);
     const [agentEmail, setAgentEmail] = useState('');
 
     // Automatically set sellerEmail from AuthContext user data
-    const sellerEmail = user?.email || ''; // Fallback to an empty string if user is not set
+    const sellerEmail = permissions?.sub.email || ''; // Fallback to an empty string if user is not set
 
     // Function to build search filters
     const buildSearchFilters = () => {
         const filters = {};
 
-        if (make) filters.make = make;
-        if (model) filters.model = model;
-        if (year) filters.year = year;
-        if (minPrice) filters.min_price = minPrice;
-        if (maxPrice) filters.max_price = maxPrice;
-        if (minMileage) filters.min_mileage = minMileage;
-        if (maxMileage) filters.max_mileage = maxMileage;
-        if (transmission) filters.transmission = transmission;
-        if (fuelType) filters.fuel_type = fuelType;
-        if (isSold !== undefined) filters.is_sold = isSold;
         if (sellerEmail) filters.seller_email = sellerEmail; // Use the seller email from AuthContext
         if (agentEmail) filters.agent_email = agentEmail;
 
@@ -58,15 +42,19 @@ export default function ListingsPage() {
                 buildSearchFilters(), // Only include filters with values
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${access_token}`,
                     },
                 }
             );
 
             setListings(response.data.listing_list); // Update listings state
         } catch (error) {
-            setError('Failed to fetch listings. Please try again.');
-            console.error('Error fetching listings:', error);
+            if (error.response && error.response.status === 401) {
+                setShowLoginModal(true); // Show login modal if 401 error occurs
+            } else {
+                setError('Failed to fetch listings. Please try again.');
+                console.error('Error fetching listings:', error);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -75,11 +63,16 @@ export default function ListingsPage() {
     // Fetch listings on component mount
     useEffect(() => {
       fetchListings();
-    }, [token]);
+    }, [access_token]);
   
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <h1 className="text-3xl font-bold mb-6">Car Listings</h1>
+
+            {/* Redirect User to Login if token expires */}
+            {showLoginModal && (
+                <ReloginModal onClose={() => setShowLoginModal(false)} />
+            )}
 
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">

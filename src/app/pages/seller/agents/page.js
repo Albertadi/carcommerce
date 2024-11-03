@@ -3,13 +3,17 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
 import { ReviewCard } from '../../../components/ReviewCard';
+import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function ReviewRatingAgent() {
     const [agents, setAgents] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { token } = useContext(AuthContext); // Get token from AuthContext
+    const { access_token } = useContext(AuthContext); // Get token from AuthContext
+
+    // State to control the login modal visibility
+    const [showLoginModal, setShowLoginModal] = useState(false);
   
     // Function to fetch agents from API
     const fetchAgents = async () => {
@@ -19,7 +23,7 @@ export default function ReviewRatingAgent() {
       try {
         const response = await axios.get('http://localhost:5000/api/users/search_agent', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
           params: {
             first_name: '', // Adjust or add a search parameter here if needed
@@ -28,8 +32,12 @@ export default function ReviewRatingAgent() {
   
         setAgents(response.data.account_list); // Update agent list state
       } catch (error) {
-        setError('Failed to fetch agents. Please try again.');
-        console.error('Error fetching agents:', error);
+        if (error.response && error.response.status === 401) {
+          setShowLoginModal(true); // Show login modal if 401 error occurs
+        } else {
+          setError('Failed to fetch agents. Please try again.');
+          console.error('Error fetching agents:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -38,12 +46,15 @@ export default function ReviewRatingAgent() {
     // Fetch agents on component mount
     useEffect(() => {
       fetchAgents();
-    }, [token]);
+    }, [access_token]);
   
     return (
       <div className="min-h-screen bg-gray-100 p-6">
         <h1 className="text-3xl font-bold mb-6">Used Car Agents</h1>
-  
+
+        {/* Relogin Modal */}
+        {showLoginModal && <ReloginModal onClose={() => setShowLoginModal(false)} />}
+
         {/* Display error message */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -53,10 +64,10 @@ export default function ReviewRatingAgent() {
   
         {/* Loading Indicator */}
         {isLoading ? (
-            <div className="flex justify-center items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
-            </div>
-            ) : (
+          <div className="flex justify-center items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+          </div>
+        ) : (
           <div className="grid gap-4">
             {agents.length > 0 ? (
               agents.map((agent) => (
@@ -74,4 +85,4 @@ export default function ReviewRatingAgent() {
         )}
       </div>
     );
-  }
+}
