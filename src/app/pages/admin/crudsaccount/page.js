@@ -153,7 +153,7 @@ export default function UserManagement() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/users/suspend/${selectedUser.id}`,
+        `http://localhost:5000/api/suspension/suspend_user/${selectedUser.id}`,
         { email: selectedUser.email, duration },
         {
           headers: {
