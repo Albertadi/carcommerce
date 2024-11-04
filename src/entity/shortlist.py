@@ -16,10 +16,9 @@ class Shortlist(db.Model):
     # Composite primary key columns
     email = db.Column(db.String(100), db.ForeignKey('users.email', ondelete='CASCADE'), primary_key=True)
     listing_id = db.Column(db.String(36), db.ForeignKey('listings.id', ondelete='CASCADE'), primary_key=True)
-    
+    seller_email = db.Column(db.String(100), db.ForeignKey('users.email', ondelete = 'CASCADE'), primary_key=True)
     # Metadata
     date_added = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
-    note = db.Column(db.String(500))  # Optional note for the shortlisted item
     
     # Relationships with cascade delete
     user = db.relationship(
@@ -156,3 +155,29 @@ class Shortlist(db.Model):
         # Execute query and return results
         shortlist_entries = query.order_by(cls.date_added.desc()).all()
         return [entry.to_dict() for entry in shortlist_entries]
+    
+    @classmethod
+    def count_buyerlistings_onshortlist(cls, seller_email: str) -> dict:
+        """
+        Get total count of shortlists for a seller's listings.
+        
+        Args:
+            seller_email: The seller's email
+            
+        Returns:
+            dict: Count of total shortlists for the seller
+        """
+        try:
+            # Count total shortlists where seller_email matches
+            total_shortlists = cls.query.filter_by(seller_email=seller_email).count()
+                
+            return {
+                'success': True,
+                'total_shortlists': total_shortlists
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e)
+            }

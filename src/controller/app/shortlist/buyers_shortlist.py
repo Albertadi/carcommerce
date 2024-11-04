@@ -3,6 +3,7 @@ from src.entity.profile import Profile
 from src.entity.user import User
 from src.entity import Shortlist
 from src.controller.app.authentication.permission_required import permission_required
+from flask_jwt_extended import get_jwt_identity 
 
 buyers_shortlist_blueprint = Blueprint('buyers_shortlist', __name__)
 
@@ -11,32 +12,20 @@ class BuyersShortlistController:
     @permission_required('has_seller_permission')
     def buyers_shortlists():
         try:
-            # Get the seller's email from the request
-            seller_email = request.args.get('seller_email')
+            # Get seller email from JWT token
+            seller_data = get_jwt_identity()
+            seller_email = seller_data['email']
 
-            if not seller_email:
+            # Get total count
+            result = Shortlist.count_buyerlistings_onshortlist(seller_email)
+            
+            if not result['success']:
                 return jsonify({
                     'success': False,
-                    'error': 'Seller email parameter is required'
-                }), 400
+                    'error': result['error']
+                }), 500
 
-            # Get the list of buyers who have shortlisted the seller's listings
-            buyer_shortlists = Shortlist.get_buyers_shortlists(seller_email)
-
-            # Fetch the user profiles for the buyers
-            buyer_profiles = [User.queryUserAccount(entry['email']) for entry in buyer_shortlists]
-
-            # Prepare the response data
-            response_data = [{
-                'buyer_email': profile.email,
-                'buyer_name': f"{profile.first_name} {profile.last_name}",
-                'shortlisted_listings': [item for item in buyer_shortlists if item['email'] == profile.email]
-            } for profile in buyer_profiles]
-
-            return jsonify({
-                'success': True,
-                'data': response_data
-            }), 200
+            return jsonify(result), 200
 
         except Exception as e:
             return jsonify({

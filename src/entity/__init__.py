@@ -10,4 +10,4 @@ from .views import Views
 
 __all__ = [
     "db", "User", "Profile", "Listing", "Token", "Suspension", "Shortlist", "Views", "ReviewRating"
-
+]
