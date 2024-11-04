@@ -1,11 +1,12 @@
 # Libraries
 from uuid import uuid4
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
+import os
 
 # Local dependencies
-from src.entity import db, User, Profile, Listing
+from src.entity import db, Listing
 from src.controller.app.authentication.permission_required import permission_required
 
 create_listing_blueprint = Blueprint('create_listing', __name__)
