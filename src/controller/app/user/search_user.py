@@ -1,18 +1,19 @@
 from flask import Blueprint, request, jsonify
 from src.entity.user import User
+from src.controller.app.authentication.permission_required import permission_required
 
 search_user_blueprint = Blueprint('search_user', __name__)
 
-@search_user_blueprint.route('/api/users/', methods=['GET'])
-def search_user():
-    user_email = request.args.get('email')
+class SearchUserController:
+    @search_user_blueprint.route('/api/users/search_user', methods=['POST'])
+    @permission_required('has_admin_permission')
+    def search_user():
+        data = request.get_json()
 
-    if not user_email:
-        return jsonify({"error": "Email parameter not provided"}), 400
-    
-    user = User.query.get(user_email)
+        email = data.get('email')
+        first_name = data.get('first_name')
+        user_profile = data.get('user_profile')
 
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
+        account_list = User.searchUserAccount(email, first_name, user_profile)
 
-    return jsonify(user.to_dict()), 200
+        return jsonify({"success": True, "account_list": account_list}), 200

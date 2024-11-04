@@ -1,39 +1,25 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from src.entity.user import User, db
+from src.entity import db, User, Profile
+from src.controller.app.authentication.permission_required import permission_required
 
 create_user_blueprint = Blueprint('create_user', __name__)
 
-@create_user_blueprint.route('/api/users', methods=['POST'])
-def create_user():
-    data = request.get_json()
+class CreateUserController:
+    @create_user_blueprint.route('/api/users/create_user', methods=['POST'])
 
-    email = data.get('email')
-    password = data.get('password')  # Password to be hashed
-    dob = data.get('dob')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    user_profile = data.get('user_profile')
+    @permission_required('has_admin_permission')
+    def create_user():
+        data = request.get_json()
 
-    # Validate fields
-    if not email or not password or not dob or not user_profile:
-        return jsonify({'error': 'Missing required fields'}), 400
+        email = data.get('email')
+        password = data.get('password')  # Password to be hashed
+        dob = data.get('dob')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        user_profile = data.get('user_profile')
 
-    # Convert 'dob' string to a datetime.date object
-    try:
-        dob = datetime.strptime(dob, '%Y-%m-%d').date()  # Converts string to a date object
-    except ValueError:
-        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
+        create_response, status_code = User.createUserAccount(email, password, first_name, last_name, dob, user_profile)
 
-    # Create a new User object (without 'password')
-    new_user = User(email=email, dob=dob, first_name=first_name, last_name=last_name, user_profile=user_profile)
-
-    # Set and hash the password using the set_password method
-    new_user.set_password(password)
-
-    # Save the user to the database
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'message': 'User created successfully', 'user': new_user.to_dict()}), 201
+        return jsonify({'success': create_response, 'message': 'create_user API called'}), status_code
 
