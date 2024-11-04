@@ -12,12 +12,17 @@ class ViewListingController:
     @view_listing_blueprint.route('/api/listing/view_listing', methods=['GET'])
     @permission_required('has_listing_permission')
     def view_listing():
-        data = request.get_json()
-        listing_id = data["id"]
+        # Get listing ID from query parameters
+        listing_id = request.args.get("id")
 
+        if not listing_id:
+            return jsonify({"error": "Listing ID is required"}), 400
+
+        # Query the listing
         listing = Listing.queryListing(listing_id)
 
         if listing is None:
-            jsonify({"error": "Listing not found"}), 404
+            return jsonify({"error": "Listing not found"}), 404
 
-        return jsonify({listing.to_dict()}), 200
+        # Return the listing as a dictionary
+        return jsonify(listing.to_dict()), 200

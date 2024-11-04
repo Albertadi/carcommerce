@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../authorization/AuthContext';
 import axios from 'axios';
 
 export default function UserManagement() {
@@ -26,15 +27,23 @@ export default function UserManagement() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // to hold user info like id and email
   const [duration, setDuration] = useState(''); // to hold the duration input
+  const [suspendReason, setSuspendReason] = useState(""); // reason for suspend
 
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
 
-  // Replace with your actual token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTk0MDA2NCwianRpIjoiMzQ2ZGNiNjAtMmJmYS00ZTY3LTkyMTMtNmU3NDg5NTA3NTY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInVzZXJfcHJvZmlsZSI6ImFkbWluIiwiaGFzX2FkbWluX3Blcm1pc3Npb24iOnRydWUsImhhc19idXlfcGVybWlzc2lvbiI6ZmFsc2UsImhhc19zZWxsX3Blcm1pc3Npb24iOmZhbHNlLCJoYXNfbGlzdGluZ19wZXJtaXNzaW9uIjpmYWxzZX0sIm5iZiI6MTcyOTk0MDA2NCwiY3NyZiI6ImRhZGUyNjVkLTBmZWQtNDk0Ni1hOGVmLTA5MzhhMmQ5YjQwOSIsImV4cCI6MTcyOTk0MDk2NH0.LUqaSFz9Ll2Mhud0i-Myhv9tD70hJzpm_mFrnyPHtIU';
+
+  //for user modal details
+  const [rowSelectedUser, setRowSelectedUser] = useState(null);
+  const [isRowModalOpen, setIsRowModalOpen] = useState(false);
+
+  //for token
+  const {access_token, permissions} = useContext(AuthContext);
+
 
    // Fetch users function
-   const fetchUsers = async () => {
+
+  const fetchUsers = async () => {
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
@@ -50,13 +59,12 @@ export default function UserManagement() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
       setUsers(response.data.account_list);
     } catch (error) {
-      setError('Failed to fetch users. Please try again.');
       console.error('Error fetching users:', error);
     } finally {
       setIsLoading(false);
@@ -66,8 +74,9 @@ export default function UserManagement() {
   // Call fetchUsers initially when the component mounts
   useEffect(() => {
     fetchUsers();
-  }, [token]);
+  }, [access_token]); // Only runs on token change or initial mount
 
+// Debounced search to avoid excessive API calls
   // Debounced search to avoid excessive API calls
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -76,54 +85,11 @@ export default function UserManagement() {
     return () => clearTimeout(delayDebounce);
   }, [searchTermFirstName, searchTermEmail, searchTermProfile]);
 
+
   // Handle functions
   const handleSearchFirstName = (e) => setSearchTermFirstName(e.target.value);
   const handleSearchEmail = (e) => setSearchTermEmail(e.target.value);
   const handleSearchProfile = (e) => setSearchTermProfile(e.target.value);
-
-  // Suspend function with fetchUsers call
-  const openSuspendModal = (user) => {
-    setSelectedUser(user);
-    setShowSuspendModal(true);
-  };
-
-  const closeSuspendModal = () => {
-    setShowSuspendModal(false);
-    setDuration('');
-  };
-
-  const handleSuspend = async () => {
-    if (!duration) {
-      setInvalidMessage('Please enter a valid suspension duration.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setSuccessMessage('');
-    setInvalidMessage('');
-
-    try {
-      await axios.post(
-        `http://localhost:5000/api/users/suspend/${selectedUser.id}`,
-        { email: selectedUser.email, duration },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
-      fetchUsers(); // Refresh the user list after suspension
-    } catch (error) {
-      setError('Failed to suspend the user. Please try again.');
-      console.error('Error suspending user:', error);
-    } finally {
-      setIsLoading(false);
-      setShowSuspendModal(false);
-    }
-  };
 
   // Update modal functions
   const openUpdateModal = (user) => {
@@ -143,6 +109,82 @@ export default function UserManagement() {
     setEditData({});
   };
 
+
+  const toggleUserDetails = (user) => {
+      setRowSelectedUser(user);
+      setIsRowModalOpen(true);
+  };
+
+  // Suspend function with fetchUsers call
+  const openSuspendModal = (user) => {
+    setSelectedUser(user);
+    setShowSuspendModal(true);
+  };
+
+  const closeSuspendModal = () => {
+    setShowSuspendModal(false);
+    setDuration('');
+  };
+
+  const handleSuspend = async () => {
+    if (!duration) {
+      setInvalidMessage('Please enter a valid suspension duration.');
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
+      return;  // Exit the function early
+    }
+
+    // Check if reason is provided
+    if (!suspendReason) {
+      setInvalidMessage('Please fill in the reason.');
+      
+      // Clear the invalid message after 3 seconds
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
+      return; 
+    }
+
+    setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
+    setInvalidMessage('');
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/suspension/suspend_user/${selectedUser.id}`,
+        { email: selectedUser.email, duration },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
+      fetchUsers(); // Refresh the user list after suspension
+    } 
+
+    catch (error) {
+      setError('Failed to suspend the user. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+      console.error('Error suspending user:', error);
+
+    } 
+
+    finally {
+      setIsLoading(false);
+      setShowSuspendModal(false);
+    }
+  };
+
+ 
   // Handle update confirm with fetchUsers call
   const handleUpdateConfirm = async () => {
     setIsLoading(true);
@@ -160,20 +202,34 @@ export default function UserManagement() {
     try {
       await axios.post('http://localhost:5000/api/users/update_user', formattedData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
 
-      setSuccessMessage(`User ${editData.email} updated successfully!`);
       fetchUsers(); // Refresh the user list after update
       closeUpdateModal();
-    } catch (error) {
+
+      //successful message after the modal closed
+      setSuccessMessage(`User ${editData.email} updated successfully!`);
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
+    } 
+    
+    catch (error) {
       setError('Failed to update user. Please try again.');
-    } finally {
+      // Timer to clear success message after 3 seconds
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+    } 
+    
+    finally {
       setIsLoading(false);
     }
   };
 
+   
   // Function to automatically format DOB input as YYYY-MM-DD with added validation
   const formatDob = (value) => {
 
@@ -188,6 +244,9 @@ export default function UserManagement() {
     if (month.length === 2) {
       if (parseInt(month) > 12 || parseInt(month) < 1) {
         setInvalidMessage('Invalid month. Please enter a month between 01 and 12.');
+        setTimeout(() => {
+          setInvalidMessage(''); // Clear the message after 3 seconds
+        }, 3000);
       }
       else {
         setInvalidMessage(''); // Clear message if valid
@@ -198,9 +257,12 @@ export default function UserManagement() {
     if (day.length === 2) {
       if (parseInt(day) > 31 || parseInt(day) < 1) {
         setInvalidMessage('Invalid day. Please enter a day between 01 and 31.');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -208,9 +270,12 @@ export default function UserManagement() {
     if (month === '04' || month === '06' || month === '09' || month === '11') {
       if (parseInt(day) > 30) {
         setInvalidMessage('Invalid day for the selected month. Please enter a day between 01 and 30.');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -221,9 +286,12 @@ export default function UserManagement() {
       };
       if (parseInt(day) > 29 || (parseInt(day) === 29 && !isLeapYear(year))) {
         setInvalidMessage('Invalid day for February. Please enter a valid day (01-28 or 29 for leap years).');
+        setTimeout(() => {
+          setInvalidMessage(''); 
+        }, 3000);
       }
       else {
-        setInvalidMessage(''); // Clear message if valid
+        setInvalidMessage(''); 
       }
     }
 
@@ -257,21 +325,33 @@ export default function UserManagement() {
   const handleAddUser = async () => {
     if (!firstname || !lastname || !dob || !email || !password || !userProfile) {
       setInvalidMessage('Please fill in all the fields.');
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
       return;
     }
 
     if (!validateDob(dob)) {
       setInvalidMessage('Invalid date format. Please use YYYY-MM-DD and ensure the date is valid.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
     if (!validateEmail(email)) {
       setInvalidMessage('Please enter a valid email address.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
     if (password.length < 8) {
       setInvalidMessage('Password must be at least 8 characters long.');
+      setTimeout(() => {
+        setInvalidMessage(''); 
+      }, 3000);
       return;
     }
 
@@ -292,7 +372,7 @@ export default function UserManagement() {
     try {
       await axios.post('http://localhost:5000/api/users/create_user', newUser, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
       fetchUsers(); // Refresh the user list after adding a new user
@@ -303,9 +383,17 @@ export default function UserManagement() {
       setPassword('');
       setUserProfile('');
       setSuccessMessage('User added successfully!');
-    } catch (error) {
+      setTimeout(() => {
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
+    } 
+    catch (error) {
       setError('Failed to add user. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
       console.error('Error adding user:', error);
+
     } finally {
       setIsLoading(false);
     }
@@ -479,11 +567,13 @@ export default function UserManagement() {
               <tbody>
                 {users.length > 0 ? (
                   users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-700">
+                                                                                    /*hover at any row to see the modal details*/
+                    <tr key={user.id} className="hover:bg-gray-700 cursor-pointer" onClick={() => toggleUserDetails(user)}> 
+                      
                       <td className="py-2 px-4 border border-gray-600">
                         {user.email !== 'admin@admin.com' && (
                           <button
-                            onClick={() => openSuspendModal(user)}
+                            onClick={(e) => { e.stopPropagation(); openSuspendModal(user); }}  
                             className="bg-red-500 text-white p-2 w-full text-lg rounded"
                             disabled={isLoading}
                           >
@@ -494,7 +584,7 @@ export default function UserManagement() {
                       <td className="py-2 px-4 border border-gray-600">
                         {user.email !== 'admin@admin.com' && (
                           <button
-                            onClick={() => openUpdateModal(user)}
+                            onClick={(e) => { e.stopPropagation(); openUpdateModal(user); }}
                             className="bg-green-500 text-white p-2 w-full text-lg rounded"
                           >
                             ✎
@@ -528,13 +618,40 @@ export default function UserManagement() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-700 p-6 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Suspend {selectedUser.email} for how long?</h2>
+
+            {/* Duration Input */}
             <input
               type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
+              min="1"
+              value={duration || ""}  // Shows an empty field instead of 0 when cleared
+              onChange={(e) => {
+                const value = Number(e.target.value);
+            
+                if (value > 0) {  
+                  setDuration(value);
+                  setInvalidMessage(""); // Clear the invalid message if input is valid
+                } else {
+                  setDuration(""); // Clear the input if the value is invalid (less than 1)
+                  setInvalidMessage("Please fill in the duration.");
+                  setTimeout(() => {
+                    setInvalidMessage(''); // Clear the message after 3 seconds
+                  }, 3000);
+                }
+              }}
               className="border p-2 w-full mb-4 text-black"
               placeholder="Enter duration in days"
             />
+
+            {/* Reason Input */}
+            <input
+              type="text"
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              className="border p-2 w-full mb-4 text-black"
+              placeholder="Enter suspension reason"
+            />
+            {!suspendReason && <p className="text-red-500">{invalidMessage}</p>} {/* Display invalid message for reason */}
+
             <div className="flex justify-end">
               <button
                 onClick={handleSuspend}
@@ -611,6 +728,24 @@ export default function UserManagement() {
               Cancel
             </button>
           </div>
+        </div>
+      </div>
+    )}
+
+    {/*User Details Modal*/}
+    {isRowModalOpen && rowSelectedUser && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+          <h2 className="text-xl font-bold mb-4">User Details</h2>
+          <p>First Name: {rowSelectedUser.first_name}</p>
+          <p>Last Name: {rowSelectedUser.last_name}</p>
+          <p>Email: {rowSelectedUser.email}</p>
+          <p>DOB: {rowSelectedUser.dob}</p>
+          <p>User Profile: {rowSelectedUser.user_profile}</p>
+          {/* Other user details */}
+          <button onClick={() => setIsRowModalOpen(false)} className="bg-red-500 text-white p-2 rounded mt-4">
+            Close
+          </button>
         </div>
       </div>
     )}

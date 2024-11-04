@@ -10,9 +10,8 @@ from .user import User
 class Suspension(db.Model):
     __tablename__ = 'suspensions'
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
+    user_email = db.Column(db.String(100), db.ForeignKey('users.email'), nullable=False, primary_key=True)
+    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
     end_date = db.Column(db.DateTime, nullable=False)
     reason = db.Column(db.String(255), nullable=True)
 
