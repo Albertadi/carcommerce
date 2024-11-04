@@ -16,7 +16,7 @@ export default function CreateListing() {
     fuel_type: '',
     seller_email: ''
   });
-  const [images, setImages] = useState([]); // Store image files here
+  const [image, setImage] = useState(null); // Store a single image file
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,49 +27,54 @@ export default function CreateListing() {
   };
 
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]); // Store actual files
+    const file = e.target.files[0]; // Get only the first file
+    if (file) {
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        alert('Invalid file type. Please upload a PNG or JPEG image.');
+        setImage(null); // Clear the image state
+        return;
+      }
+      setImage(file); // Store the single file
+    }
   };
 
-  const handleImageDelete = (index) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  const handleImageDelete = () => {
+    setImage(null); // Remove the image
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure all fields are filled out
     const isValid = Object.values(formData).every((field) => field !== '');
     if (!isValid) {
       alert('Please fill out all fields.');
       return;
     }
 
-    // Prepare FormData to include form fields and images
     const formSubmissionData = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       formSubmissionData.append(key, value);
     });
 
-    // Append each image file to FormData
-    images.forEach((imageFile) => {
-      formSubmissionData.append('images', imageFile); // Ensure backend is set to handle 'images' key for multiple files
-    });
+    if (image) {
+      formSubmissionData.append('image', image); // Change 'images' to 'image'
+    }
 
     try {
       const response = await fetch('http://localhost:5000/api/listing/create_listing', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${access_token}`, // Use token from AuthContext
+          Authorization: `Bearer ${access_token}`,
         },
-        body: formSubmissionData, // Send FormData with images and fields
+        body: formSubmissionData,
       });
 
       if (response.ok) {
         alert('Listing created successfully!');
-        // Optionally reset the form or redirect user
       } else {
         const error = await response.json();
+        console.error('Error details:', error); // Log the error details
         alert(`Error: ${error.message}`);
       }
     } catch (error) {
@@ -86,7 +91,7 @@ export default function CreateListing() {
 
         {/* Image Upload Section */}
         <div className="mb-6">
-          <label className="block text-gray-700 mb-2">Upload Car Images</label>
+          <label className="block text-gray-700 mb-2">Upload Car Image</label>
           <div className="flex items-center space-x-4">
             <label
               className="flex items-center justify-center w-24 h-24 rounded-lg bg-blue-100 text-blue-500 text-2xl cursor-pointer"
@@ -95,29 +100,28 @@ export default function CreateListing() {
               +
               <input
                 type="file"
-                multiple
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="hidden"
               />
             </label>
             <div className="flex overflow-x-scroll space-x-4 py-2">
-              {images.map((file, index) => (
-                <div key={index} className="relative group w-24 h-24 flex-shrink-0">
+              {image && (
+                <div className="relative group w-24 h-24 flex-shrink-0">
                   <img
-                    src={URL.createObjectURL(file)}
-                    alt={`Car image ${index + 1}`}
+                    src={URL.createObjectURL(image)}
+                    alt="Car image preview"
                     className="w-full h-full object-cover rounded-lg shadow-lg"
                   />
                   <button
-                    onClick={() => handleImageDelete(index)}
+                    onClick={handleImageDelete}
                     className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     style={{ fontSize: '12px' }}
                   >
                     X
                   </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -251,7 +255,7 @@ export default function CreateListing() {
               type="submit"
               className="w-full py-3 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              Submit Listing
+              Create Listing
             </button>
           </div>
         </form>
