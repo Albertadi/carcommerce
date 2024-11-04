@@ -11,6 +11,8 @@ from src.entity import db, User, Profile
 from .authentication.login import login_blueprint
 from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
+from .authentication.login import login_blueprint
+from .review.create_reviewRating import create_reviewRating_blueprint
 from .user.search_agent import search_agent_blueprint
 from .user.view_user import view_user_blueprint
 from .user.update_user import update_user_blueprint
@@ -24,6 +26,10 @@ from .listing.update_listing import update_listing_blueprint
 from .listing.delete_listing import delete_listing_blueprint
 from .listing.search_listing import search_listing_blueprint
 from .suspension.suspend_user import suspend_user_blueprint
+from .shortlist.buyers_shortlist import buyers_shortlist_blueprint
+from .shortlist.saveto_shortlist import saveto_shortlist_blueprint
+from .shortlist.search_shortlist import search_shortlist_blueprint
+from .shortlist.view_shortlist import view_shortlist_blueprint
 from .suspension.check_user_suspended import check_user_suspended_blueprint
 from .views.get_views import get_views_blueprint
 from .views.increment_views import increment_views_blueprint
@@ -103,6 +109,15 @@ flask_app.register_blueprint(check_user_suspended_blueprint)
 
 # ReviewRating
 
+#shortlist
+flask_app.register_blueprint(buyers_shortlist_blueprint)
+flask_app.register_blueprint(saveto_shortlist_blueprint)
+flask_app.register_blueprint(search_shortlist_blueprint)
+flask_app.register_blueprint(view_shortlist_blueprint)
+
+
+# Review Rating
+flask_app.register_blueprint(create_reviewRating_blueprint)
 
 # Views
 flask_app.register_blueprint(increment_views_blueprint)
