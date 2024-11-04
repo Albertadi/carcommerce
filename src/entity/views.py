@@ -11,3 +11,5 @@ class View(db.Model):
 
     # Relationships (optional)
     listing = db.relationship('Listing', backref='views')
+
+    
