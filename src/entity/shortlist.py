@@ -20,17 +20,10 @@ class Shortlist(db.Model):
     # Metadata
     date_added = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     
-    # Relationships with cascade delete
-    user = db.relationship(
-        'User',
-        backref=db.backref('shortlists', cascade='all, delete-orphan', lazy='dynamic'),
-        lazy='joined'
-    )
-    listing = db.relationship(
-        'Listing',
-        backref=db.backref('shortlisted_by', cascade='all, delete-orphan', lazy='dynamic'),
-        lazy='joined'
-    )
+    # Foreign Key relationships
+    buyerRelation = db.relationship('User', foreign_keys=[email], backref='buyer_shortlist')
+    sellerRelation = db.relationship('User', foreign_keys=[seller_email], backref='seller_shortlist')
+    listingRelation = db.relationship('Listing', foreign_keys=[listing_id], backref='listing_shortlist')
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of the shortlist entry."""
