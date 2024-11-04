@@ -23,8 +23,16 @@ class CreateListingController:
         if not file:
             return jsonify({'success': False, 'message': 'No image file provided'}), 400
 
-        # Generate a unique filename
-        image_filename = f"{uuid4()}.png"  # Generate a unique filename
+        # Validate file type (optional but recommended)
+        if file.mimetype not in ['image/png', 'image/jpeg', 'image/jpg']:
+            return jsonify({'success': False, 'message': 'Invalid file type. Only PNG and JPEG are allowed.'}), 400
+
+        # Generate a unique filename with the correct extension
+        extension = file.filename.split('.')[-1]  # Get the file extension
+        if extension not in ['png', 'jpg', 'jpeg']:
+            return jsonify({'success': False, 'message': 'Invalid file type. Only PNG and JPEG are allowed.'}), 400
+            
+        image_filename = f"{uuid4()}.{extension}"  # Generate a unique filename with the extension
         image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
 
         # Save the uploaded file
