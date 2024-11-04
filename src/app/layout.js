@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import { AuthProvider } from "./pages/authorization/AuthContext";
 import Header from "./components/header";
 import "./globals.css";
+import Footer from './components/footer'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -51,9 +52,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased`}
       >
+      <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
           <Header></Header>
           {children} 
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
