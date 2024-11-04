@@ -17,5 +17,5 @@ class ViewReviewRatingController():
         # Return the reviews and average rating
         return jsonify({
             'reviews': reviews_list,
-            'average_rating': round(avg_rating, 2)
+            'average_rating': avg_rating
         }), status_code
