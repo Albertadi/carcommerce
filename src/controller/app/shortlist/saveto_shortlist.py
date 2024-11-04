@@ -20,11 +20,13 @@ class SaveToShortlistController:
             # Extract listing_id and optional note from request
             listing_id = data.get('listing_id')
             user_email = data.get('email')
+            seller_email = data.get('seller_email')
 
             # Add to shortlist using the Shortlist model
             success, status_code, error_message = Shortlist.add_to_shortlist(
                 email=user_email,
-                listing_id=listing_id
+                listing_id=listing_id,
+                seller_email=seller_email
             )
 
             if not success:

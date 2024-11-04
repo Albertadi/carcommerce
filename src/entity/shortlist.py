@@ -37,12 +37,12 @@ class Shortlist(db.Model):
         return {
             'listing_id': self.listing_id,
             'date_added': self.date_added.isoformat(),
-            'note': self.note,
+            'seller_email': self.seller_email,
             'listing': self.listing.to_dict() if self.listing else None
         }
 
     @classmethod
-    def add_to_shortlist(cls, email: str, listing_id: str, note: Optional[str] = None) -> tuple[bool, int, Optional[str]]:
+    def add_to_shortlist(cls, email: str, listing_id: str, seller_email: str = "") -> tuple[bool, int, Optional[str]]:
         """
         Add a listing to user's shortlist.
         
@@ -84,7 +84,7 @@ class Shortlist(db.Model):
             shortlist_entry = cls(
                 email=email,
                 listing_id=listing_id,
-                note=note
+                seller_email=seller_email
             )
 
             db.session.add(shortlist_entry)
