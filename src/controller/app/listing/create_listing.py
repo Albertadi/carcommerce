@@ -23,7 +23,7 @@ class CreateListingController:
         if not file:
             return jsonify({'success': False, 'message': 'No image file provided'}), 400
 
-        # Validate file type (optional but recommended)
+        # File type validation
         if file.mimetype not in ['image/png', 'image/jpeg', 'image/jpg']:
             return jsonify({'success': False, 'message': 'Invalid file type. Only PNG and JPEG are allowed.'}), 400
 
@@ -32,15 +32,15 @@ class CreateListingController:
         if extension not in ['png', 'jpg', 'jpeg']:
             return jsonify({'success': False, 'message': 'Invalid file type. Only PNG and JPEG are allowed.'}), 400
             
-        image_filename = f"{uuid4()}.{extension}"  # Generate a unique filename with the extension
+        image_filename = f"{uuid4()}.{extension}"
         image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
 
         # Save the uploaded file
         file.save(image_path)
-        image_url = f"/uploads/{image_filename}"  # Set the image URL for storage
+        image_url = f"/uploads/{image_filename}" 
 
-        # Extract other data from the request
-        data = request.form  # Changed to handle form data
+        # Extract other data
+        data = request.form 
         vin = data.get('vin')
         make = data.get('make')
         model = data.get('model')
@@ -64,8 +64,8 @@ class CreateListingController:
             fuel_type=fuel_type,
             is_sold=is_sold,
             listing_date=current_date,
-            image_url=image_url,  # Pass the saved image URL to the entity method
-            agent_email=agent['email'],
+            image_url=image_url,
+            agent_email=agent['email'], #Use agent email from jwt token
             seller_email=seller_email
         )
 
