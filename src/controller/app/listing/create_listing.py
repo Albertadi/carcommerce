@@ -19,7 +19,7 @@ class CreateListingController:
         current_date = datetime.today().strftime('%Y-%m-%d')
         
         # Handle file upload
-        file = request.files.get('image')  # Expecting the image to be uploaded with this key
+        file = request.files.get('image')
         if not file:
             return jsonify({'success': False, 'message': 'No image file provided'}), 400
 
