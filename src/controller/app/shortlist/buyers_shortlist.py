@@ -1,6 +1,4 @@
 from flask import Blueprint, request, jsonify
-from src.entity.profile import Profile
-from src.entity.user import User
 from src.entity import Shortlist
 from src.controller.app.authentication.permission_required import permission_required
 from flask_jwt_extended import get_jwt_identity 
@@ -16,15 +14,9 @@ class BuyersShortlistController:
             seller_data = get_jwt_identity()
             seller_email = seller_data['email']
 
-            # Get total count
+            # Get total count from Shortlist entity
             result = Shortlist.count_buyerlistings_onshortlist(seller_email)
             
-            if not result['success']:
-                return jsonify({
-                    'success': False,
-                    'error': result['error']
-                }), 500
-
             return jsonify(result), 200
 
         except Exception as e:
