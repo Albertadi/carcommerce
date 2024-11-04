@@ -3,23 +3,32 @@
 from flask import current_app
 from datetime import datetime
 from .sqlalchemy import db
+from .listing import Listing
 
 class Views(db.Model):
     __tablename__ = 'views'
 
-<<<<<<< HEAD
-    # Relationships (optional)
-    listing = db.relationship('Listing', backref='views')
-
-    
-=======
     id = db.Column(db.Integer, primary_key=True)
     listing_id = db.Column(db.Integer, nullable=False, unique=True)
     views_count = db.Column(db.Integer, nullable=False, default=0)
     last_viewed = db.Column(db.DateTime, nullable=True)
 
     @classmethod
-    def increment_and_get_views(cls, listing_id: int) -> int:
+    def getViews(cls, listing_id) -> int:
+        view_record = cls.query.filter_by(listing_id=listing_id).one_or_none()
+        
+        if not view_record:
+            return False, 404
+        
+        return view_record.views_count, 200
+
+    @classmethod
+    def incrementViews(cls, listing_id: int) -> int:
+        # Check if the listing exists
+        listing_exists = Listing.query.get(listing_id)
+        if not listing_exists:
+            return False, 404
+        
         with current_app.app_context():
             # Check if the listing already has views
             view_record = cls.query.filter_by(listing_id=listing_id).one_or_none()
@@ -39,5 +48,4 @@ class Views(db.Model):
 
             # Commit changes and return the updated views count
             db.session.commit()
-            return view_record.views_count
->>>>>>> 892ffe858fbd7b541574377c57d95f2c9918f6cc
+            return True, 200

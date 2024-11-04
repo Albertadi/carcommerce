@@ -25,7 +25,9 @@ from .listing.delete_listing import delete_listing_blueprint
 from .listing.search_listing import search_listing_blueprint
 from .suspension.suspend_user import suspend_user_blueprint
 from .suspension.check_user_suspended import check_user_suspended_blueprint
-from .views.see_listing_views import see_listing_views_blueprint
+from .views.get_views import get_views_blueprint
+from .views.increment_views import increment_views_blueprint
+
 # Initialize Flask App
 flask_app = Flask(__name__)
 
@@ -98,6 +100,10 @@ flask_app.register_blueprint(search_listing_blueprint)
 # Suspension
 flask_app.register_blueprint(suspend_user_blueprint)
 flask_app.register_blueprint(check_user_suspended_blueprint)
+
 # ReviewRating
 
 
+# Views
+flask_app.register_blueprint(increment_views_blueprint)
+flask_app.register_blueprint(get_views_blueprint)
