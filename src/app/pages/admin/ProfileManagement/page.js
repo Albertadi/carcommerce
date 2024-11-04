@@ -133,8 +133,6 @@ export default function ProfileManagement() {
     setEditingProfile({ ...editingProfile, [name]: val });
   };
 
-  const EditProfile = () => {};
-
   return (
     <div className="flex flex-col items-center p-8 bg-gray-100 text-neon-red">
       <h1 className="text-2xl font-extrabold mb-5 uppercase tracking-widest">
