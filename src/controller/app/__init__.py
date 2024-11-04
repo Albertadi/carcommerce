@@ -28,7 +28,8 @@ from .shortlist.buyers_shortlist import buyers_shortlist_blueprint
 from .shortlist.saveto_shortlist import saveto_shortlist_blueprint
 from .shortlist.search_shortlist import search_shortlist_blueprint
 from .shortlist.view_shortlist import view_shortlist_blueprint
-
+from .suspension.check_user_suspended import check_user_suspended_blueprint
+from .views.see_listing_views import see_listing_views_blueprint
 # Initialize Flask App
 flask_app = Flask(__name__)
 
@@ -100,7 +101,7 @@ flask_app.register_blueprint(search_listing_blueprint)
 
 # Suspension
 flask_app.register_blueprint(suspend_user_blueprint)
-
+flask_app.register_blueprint(check_user_suspended_blueprint)
 # ReviewRating
 
 #shortlist
