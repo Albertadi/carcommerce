@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from werkzeug.security import generate_password_hash
 from datetime import datetime
+import os
 
 # Local dependencies
 from src.entity import db, User, Profile
@@ -43,6 +44,11 @@ flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
 flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 flask_app.config['SQLALCHEMY_ECHO'] = True
 flask_app.config['JWT_SECRET_KEY'] = 'secret_key' # In an actual project, use os.environ.get('SECRET_KEY')
+flask_app.config['UPLOAD_FOLDER'] = os.path.join(flask_app.root_path, 'uploads')
+
+if not os.path.exists(flask_app.config['UPLOAD_FOLDER']):
+    os.makedirs(flask_app.config['UPLOAD_FOLDER'])
+
 
 CORS(flask_app)  # Enable CORS for cross-origin requests from Next.js
 
