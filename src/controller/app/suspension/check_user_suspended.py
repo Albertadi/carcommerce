@@ -21,6 +21,7 @@ class CheckUserSuspendedController:
         if suspension_info['is_suspended']:
             return jsonify({
                 'success': True,
+                'is_suspended': suspension_info['is_suspended'],
                 'message': 'User is currently suspended.',
                 'suspension_details': {
                     'start_date': suspension_info['start_date'],
@@ -31,5 +32,6 @@ class CheckUserSuspendedController:
         else:
             return jsonify({
                 'success': True,
+                'is_suspended': suspension_info['is_suspended'],
                 'message': 'User is not suspended.'
             }), 200
