@@ -13,6 +13,7 @@ from .user.create_user import create_user_blueprint
 from .user.search_user import search_user_blueprint
 from .authentication.login import login_blueprint
 from .review.create_reviewRating import create_reviewRating_blueprint
+from .review.view_reviewRating import view_reviewRating_blueprint
 from .user.search_agent import search_agent_blueprint
 from .user.view_user import view_user_blueprint
 from .user.update_user import update_user_blueprint
@@ -107,17 +108,15 @@ flask_app.register_blueprint(search_listing_blueprint)
 flask_app.register_blueprint(suspend_user_blueprint)
 flask_app.register_blueprint(check_user_suspended_blueprint)
 
-# ReviewRating
-
 #shortlist
 flask_app.register_blueprint(buyers_shortlist_blueprint)
 flask_app.register_blueprint(saveto_shortlist_blueprint)
 flask_app.register_blueprint(search_shortlist_blueprint)
 flask_app.register_blueprint(view_shortlist_blueprint)
 
-
 # Review Rating
 flask_app.register_blueprint(create_reviewRating_blueprint)
+flask_app.register_blueprint(view_reviewRating_blueprint)
 
 # Views
 flask_app.register_blueprint(increment_views_blueprint)
