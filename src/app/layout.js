@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import { AuthProvider } from './pages/authorization/AuthContext';
 import "./globals.css";
+import Footer from './components/footer'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -47,10 +48,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
-          {children}
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
