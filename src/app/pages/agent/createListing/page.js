@@ -45,22 +45,28 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const isValid = Object.values(formData).every((field) => field !== '');
     if (!isValid) {
       alert('Please fill out all fields.');
       return;
     }
-
+  
+    // Additional validation for price and mileage (optional)
+    if (isNaN(formData.price) || isNaN(formData.mileage)) {
+      alert('Price and Mileage must be valid numbers.');
+      return;
+    }
+  
     const formSubmissionData = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       formSubmissionData.append(key, value);
     });
-
+  
     if (image) {
-      formSubmissionData.append('image', image); // Change 'images' to 'image'
+      formSubmissionData.append('image', image); // Correctly append the image
     }
-
+  
     try {
       const response = await fetch('http://localhost:5000/api/listing/create_listing', {
         method: 'POST',
@@ -69,16 +75,30 @@ export default function CreateListing() {
         },
         body: formSubmissionData,
       });
-
+  
       if (response.ok) {
         alert('Listing created successfully!');
+        // Optionally reset the form and image after successful submission
+        setFormData({
+          vin: '',
+          make: '',
+          model: '',
+          year: '',
+          price: '',
+          mileage: '',
+          transmission: '',
+          fuel_type: '',
+          seller_email: ''
+        });
+        setImage(null); // Reset image state
       } else {
         const error = await response.json();
-        console.error('Error details:', error); // Log the error details
-        alert(`Error: ${error.message}`);
+        console.error('Error details:', error);
+        alert(`Error: ${error.message || 'An error occurred while creating the listing.'}`);
       }
     } catch (error) {
       console.error('Failed to submit listing:', error);
+      alert('An unexpected error occurred.');
     }
   };
 
