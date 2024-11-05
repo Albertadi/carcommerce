@@ -105,34 +105,34 @@ export default function CreateListing() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 shadow-lg w-full max-w-2xl">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Car Listing</h2>
+        <h2 className="text-2xl font-rajdhaniBold mb-6 text-center">Create Car Listing</h2>
 
         {/* Grid layout for upload box and form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Image Upload Section */}
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-gray-700 mb-2">Upload Car Image</label>
+            <label className="block text-gray-700 font-rajdhaniSemiBold mb-2">Upload Car Image</label>
             <div className="flex items-center justify-center">
               {image ? (
                 <div className="relative flex items-center justify-center w-full max-w-lg h-auto">
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Car image preview"
-                    className="max-w-full max-h-48 rounded-lg shadow-lg object-contain"
+                    className="max-w-full max-h-48 rounded shadow-lg object-contain"
                   />
                   <button
                     onClick={handleImageDelete}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                    style={{ fontSize: '12px' }}
+                    className="absolute top-2 right-2 font-rajdhaniSemiBold bg-[#f75049] text-white rounded p-1"
+                    style={{ fontSize: '18px' }}
                   >
-                    X
+                    &nbsp; X &nbsp;
                   </button>
                 </div>
               ) : (
                 <label
-                  className="flex items-center justify-center w-full h-48 rounded-lg bg-blue-100 text-blue-500 text-4xl cursor-pointer"
-                  style={{ border: '2px dashed #3b82f6' }}
+                  className="flex items-center font-rajdhaniSemiBold justify-center w-full h-48 rounded bg-[#f75049]/25 text-[#f75049] text-6xl cursor-pointer"
+                  style={{ border: '3px solid #f75049' }}
                 >
                   +
                   <input
@@ -151,17 +151,17 @@ export default function CreateListing() {
             
             {/* Year Field */}
             <div>
-              <label className="block text-gray-700">Year</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Year</label>
               <select
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               >
-                <option value="">Select Year</option>
+                <option className="font-rajdhaniSemiBold" value="">Select Year</option>
                 {years.map((year) => (
-                  <option key={year} value={year}>
+                  <option className="font-rajdhaniSemiBold" key={year} value={year}>
                     {year}
                   </option>
                 ))}
@@ -170,112 +170,118 @@ export default function CreateListing() {
 
             {/* Make Field */}
             <div>
-              <label className="block text-gray-700">Make</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Make</label>
               <input
                 type="text"
                 name="make"
                 value={formData.make}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Enter Car Make"
+                className="w-full px-4 font-rajdhaniSemiBold py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* Model Field */}
             <div>
-              <label className="block text-gray-700">Model</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Model</label>
               <input
                 type="text"
                 name="model"
                 value={formData.model}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Enter Car Model"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* Transmission Field */}
             <div>
-              <label className="block text-gray-700">Transmission</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Transmission</label>
               <select
                 name="transmission"
                 value={formData.transmission}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               >
-                <option value="">Select Transmission</option>
-                <option value="Automatic">AUTOMATIC</option>
-                <option value="Manual">MANUAL</option>
+                <option className="font-rajdhaniSemiBold" value="">Select Transmission</option>
+                <option className="font-rajdhaniSemiBold" value="Automatic">AUTOMATIC</option>
+                <option className="font-rajdhaniSemiBold" value="Manual">MANUAL</option>
               </select>
             </div>
 
             {/* Mileage Field */}
             <div>
-              <label className="block text-gray-700">Mileage</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Mileage</label>
               <input
                 type="text"
                 name="mileage"
                 value={formData.mileage}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Enter Car Mileage"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* Fuel Type Field */}
             <div>
-              <label className="block text-gray-700">Fuel</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Fuel</label>
               <select
                 name="fuel_type"
                 value={formData.fuel_type}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               >
-                <option value="">Select Fuel Type</option>
-                <option value="PETROL">PETROL</option>
-                <option value="DIESEL">DIESEL</option>
-                <option value="ELECTRIC">ELECTRIC</option>
-                <option value="HYBRID">HYBRID</option>
+                <option className="font-rajdhaniSemiBold" value="">Select Fuel Type</option>
+                <option className="font-rajdhaniSemiBold" value="PETROL">PETROL</option>
+                <option className="font-rajdhaniSemiBold" value="DIESEL">DIESEL</option>
+                <option className="font-rajdhaniSemiBold" value="ELECTRIC">ELECTRIC</option>
+                <option className="font-rajdhaniSemiBold" value="HYBRID">HYBRID</option>
               </select>
             </div>
 
             {/* Price Field */}
             <div>
-              <label className="block text-gray-700">Price</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Price</label>
               <input
                 type="text"
                 name="price"
                 value={formData.price}
+                placeholder="Enter Price"
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* VIN Field */}
             <div>
-              <label className="block text-gray-700">VIN</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">VIN</label>
               <input
                 type="text"
                 name="vin"
                 value={formData.vin}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Enter VIN"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* Seller Email Field */}
             <div>
-              <label className="block text-gray-700">Seller Email</label>
+              <label className="block font-rajdhaniSemiBold text-gray-700">Seller Email</label>
               <input
                 type="text"
                 name="seller_email"
                 value={formData.seller_email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Enter Sellers' Email"
+                className="w-full px-4 py-2 font-rajdhaniSemiBold border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
                 required
               />
             </div>
@@ -284,7 +290,7 @@ export default function CreateListing() {
             <div className="col-span-1 md:col-span-2">
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="w-full py-3 px-4 bg-[#f75049] font-rajdhaniSemiBold text-white text-xl rounded hover:bg-[#5ef6ff] transition-colors"
               >
                 Create Listing
               </button>
