@@ -8,8 +8,7 @@ from .listing import Listing
 class Views(db.Model):
     __tablename__ = 'views'
 
-    id = db.Column(db.Integer, primary_key=True)
-    listing_id = db.Column(db.Integer, nullable=False, unique=True)
+    listing_id = db.Column(db.Integer, nullable=False, unique=True, primary_key=True)
     views_count = db.Column(db.Integer, nullable=False, default=0)
     last_viewed = db.Column(db.DateTime, nullable=True)
 
