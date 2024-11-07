@@ -1,17 +1,18 @@
 "use client"; // Mark as Client Component
 
 import { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../../authorization/AuthContext';
+import { AuthContext } from '../authorization/AuthContext'; // Corrected import path
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import axios from 'axios'; // Import Axios for API requests
 
 export default function BuyerPage() {
   const { user, token } = useContext(AuthContext); // Access user and token from context
-  const [filterOptions, setFilterOptions] = useState({});
   const [searchInput, setSearchInput] = useState(''); // State for search input
   const [carListings, setCarListings] = useState([]); // State for car listings
-  const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered listings
+  const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered car listings
+  const [selectedFilters, setSelectedFilters] = useState({}); // State for selected filters (price, mileage, etc.)
+  const [dropdownVisibility, setDropdownVisibility] = useState({}); // State to track visibility of each dropdown
   const router = useRouter(); // Initialize router
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export default function BuyerPage() {
       try {
         const response = await axios.get('/api/cars'); // Replace with your API endpoint
         setCarListings(response.data); // Assuming the API returns an array of car listings
-        setFilteredCarListings(response.data); // Initially show all car listings
+        setFilteredCarListings(response.data); // Set filtered listings to be the same as the full list initially
       } catch (error) {
         console.error("Error fetching car listings:", error);
       }
@@ -38,53 +39,80 @@ export default function BuyerPage() {
     Availability: ["Available", "Sold Out"],
   };
 
-  const handleMouseEnter = (filter) => {
-    setFilterOptions((prev) => ({ ...prev, [filter]: true }));
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+    filterCarListings(e.target.value, selectedFilters); // Call filtering on input change
   };
 
-  const handleMouseLeave = (filter) => {
-    setFilterOptions((prev) => ({ ...prev, [filter]: false }));
+  // Handle dropdown option change (filtering)
+  const handleFilterChange = (filterCategory, value) => {
+    const updatedFilters = { ...selectedFilters, [filterCategory]: value };
+    setSelectedFilters(updatedFilters); // Update selected filters
+    filterCarListings(searchInput, updatedFilters); // Apply the filter based on selected filters and search input
+    toggleDropdownVisibility(filterCategory); // Close the dropdown after selection
   };
 
-  // Handle dropdown option click
-  const handleDropdownClick = (option) => {
-    if (!token) {
-      // Redirect to login page if not authenticated
-      router.push('/login');
-    } else {
-      router.push('/buyer'); // Navigate to the buyer page
+  // Toggle visibility of dropdown
+  const toggleDropdownVisibility = (filterCategory) => {
+    setDropdownVisibility((prevVisibility) => ({
+      ...prevVisibility,
+      [filterCategory]: !prevVisibility[filterCategory], // Toggle visibility of the dropdown
+    }));
+  };
+
+  // Function to filter car listings based on search input and selected filters
+  const filterCarListings = (searchKeyword, filters) => {
+    let filtered = carListings;
+
+    // Filter by search keyword (car model matching)
+    if (searchKeyword) {
+      filtered = filtered.filter(car => car.model.toLowerCase().includes(searchKeyword.toLowerCase()));
     }
+
+    // Filter by selected filters (price, mileage, etc.)
+    Object.keys(filters).forEach((filterCategory) => {
+      const filterValue = filters[filterCategory];
+      if (filterValue) {
+        filtered = filtered.filter(car => {
+          if (filterCategory === "Price") {
+            // Handle price range filtering
+            if (filterValue === "Under $10,000" && car.price < 10000) return true;
+            if (filterValue === "$10,000 - $20,000" && car.price >= 10000 && car.price <= 20000) return true;
+            if (filterValue === "$20,000 - $30,000" && car.price >= 20000 && car.price <= 30000) return true;
+            if (filterValue === "Over $30,000" && car.price > 30000) return true;
+          }
+          if (filterCategory === "Mileage") {
+            // Handle mileage range filtering
+            if (filterValue === "Under 20,000 km" && car.mileage < 20000) return true;
+            if (filterValue === "20,000 - 50,000 km" && car.mileage >= 20000 && car.mileage <= 50000) return true;
+            if (filterValue === "50,000 - 100,000 km" && car.mileage >= 50000 && car.mileage <= 100000) return true;
+            if (filterValue === "Over 100,000 km" && car.mileage > 100000) return true;
+          }
+          if (filterCategory === "Year") {
+            // Handle year filtering
+            if (filterValue === car.year) return true;
+          }
+          if (filterCategory === "Availability") {
+            // Handle availability filtering
+            if (filterValue === car.availability) return true;
+          }
+          return false;
+        });
+      }
+    });
+
+    setFilteredCarListings(filtered); // Update filtered car listings
   };
 
   // Handle car image or view details click
   const handleCarClick = (id) => {
     if (!token) {
       // Redirect to login page if not authenticated
-      router.push('/login');
+      window.location.href = '/pages/login';
     } else {
       // Navigate to car details page (assuming you have a route for this)
-      router.push(`/car/${id}`); // Adjust the path as needed
-    }
-  };
-
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchInput(e.target.value);
-  };
-
-  // Filter car listings based on search input
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      if (!token) {
-        router.push('/login'); // Redirect to login page if not authenticated
-      } else {
-        const filtered = carListings.filter(car => 
-          car.model.toLowerCase().includes(searchInput.toLowerCase()) ||
-          car.year.toString().includes(searchInput) ||
-          car.price.toLowerCase().includes(searchInput.toLowerCase())
-        );
-        setFilteredCarListings(filtered); // Update the filtered car listings
-      }
+      router.push(`/pages/car/${id}`); // Adjust the path as needed
     }
   };
 
@@ -104,24 +132,23 @@ export default function BuyerPage() {
           className="w-full max-w-lg p-2 mb-4 border border-gray-300 rounded text-black"
           value={searchInput} // Set the value of the input
           onChange={handleSearchChange} // Handle input change
-          onKeyPress={handleKeyPress} // Handle key press event
         />
         <div className="flex space-x-2">
           {Object.keys(filterData).map((filter) => (
-            <div 
-              key={filter} 
-              className="relative group"
-              onMouseEnter={() => handleMouseEnter(filter)}
-              onMouseLeave={() => handleMouseLeave(filter)}
-            >
-              <button className="bg-gray-200 px-3 py-1 rounded">{filter}</button>
-              {filterOptions[filter] && (
+            <div key={filter} className="relative group">
+              <button 
+                className="bg-gray-200 px-3 py-1 rounded" 
+                onClick={() => toggleDropdownVisibility(filter)} // Toggle dropdown visibility
+              >
+                {filter}
+              </button>
+              {dropdownVisibility[filter] && ( // Show dropdown only if visible
                 <div className="absolute z-10 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg">
                   {filterData[filter].map((option) => (
                     <div 
                       key={option} 
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleDropdownClick(option)} // Call handleDropdownClick on click
+                      onClick={() => handleFilterChange(filter, option)} // Apply filter on click
                     >
                       {option}
                     </div>
@@ -142,20 +169,17 @@ export default function BuyerPage() {
             filteredCarListings.map(car => (
               <div key={car.id} className="bg-white p-4 rounded shadow">
                 <img 
-                  src={car.image} 
+                  src={car.imageUrl} 
                   alt={car.model} 
-                  className="w-full h-48 object-cover rounded cursor-pointer" 
-                  onClick={() => handleCarClick(car.id)} // Handle car image click
+                  className="w-full h-48 object-cover rounded"
                 />
                 <h2 className="text-xl font-bold mt-2">{car.model} ({car.year})</h2>
-                <p className="text-lg text-[#f75049]">{car.price}</p>
+                <p className="text-gray-600">Price: ${car.price}</p>
+                <p className="text-gray-600">Mileage: {car.mileage} km</p>
                 <Link 
-                  href="#" // Keep this link disabled or adjust based on your routing
-                  className="text-blue-500 hover:underline" 
-                  onClick={() => handleCarClick(car.id)} // View details on click
-                >
-                  View Details
-                </Link>
+                  href={`/car/${car.id}`} 
+                  onClick={() => handleCarClick(car.id)} 
+                  className="text-blue-500 underline">View Details</Link>
               </div>
             ))
           )}
