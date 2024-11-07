@@ -2,8 +2,8 @@
 
 import { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ProfilePage from "../userProfiles/page";
-import CrudsAccount from "../crudsaccount/page";
+import ProfileManagement from "../ProfileManagement/page";
+import UserManagement from "../UserManagement/page";
 import AdminProfile from "../adminProfile/page";
 import { AuthContext } from "../../authorization/AuthContext";
 
@@ -82,12 +82,12 @@ export default function Dashboard() {
         )}
         {selectedOption === "option2" && (
           <div>
-            <ProfilePage />
+            <ProfileManagement />
           </div>
         )}
         {selectedOption === "option3" && (
           <div>
-            <CrudsAccount />
+            <UserManagement />
           </div>
         )}
       </div>
