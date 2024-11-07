@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> ed17ec4aa5424b7046608903095f3171e25ec09b
 import React from "react";
 import { FaInstagram } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
@@ -68,8 +64,4 @@ function Footer() {
 	);
 }
 
-<<<<<<< HEAD
 export default Footer;
-=======
-export default Footer;
->>>>>>> ed17ec4aa5424b7046608903095f3171e25ec09b
