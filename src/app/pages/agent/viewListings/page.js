@@ -40,28 +40,25 @@ export default function ListingsPage() {
     const [mileageError, setMileageError] = useState({ min: '', max: '' });
     const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-    const buildSearchFilters = () => {
-        const filters = {};
-        if (make) filters.make = make;
-        if (model) filters.model = model;
-        if (year) filters.year = year;
-        if (minPrice) filters.min_price = minPrice;
-        if (maxPrice) filters.max_price = maxPrice;
-        if (minMileage) filters.min_mileage = minMileage;
-        if (maxMileage) filters.max_mileage = maxMileage;
-        if (transmission) filters.transmission = transmission;
-        if (fuelType) filters.fuel_type = fuelType;
-        if (isSold !== undefined) filters.is_sold = isSold;
-        if (sellerEmail) filters.seller_email = sellerEmail;
-        if (agentEmail) filters.agent_email = agentEmail;
-        return filters;
-    };
+    const buildSearchFilters = () => ({
+        make,
+        model,
+        year: year ? parseInt(year) : undefined,
+        min_price: minPrice ? parseFloat(minPrice.replace(/,/g, '')) : undefined,
+        max_price: maxPrice ? parseFloat(maxPrice.replace(/,/g, '')) : undefined,
+        min_mileage: minMileage ? parseInt(minMileage.replace(/,/g, '')) : undefined,
+        max_mileage: maxMileage ? parseInt(maxMileage.replace(/,/g, '')) : undefined,
+        transmission,
+        fuel_type: fuelType,
+        is_sold: isSold,
+        seller_email: sellerEmail,
+        agent_email: agentEmail,
+    });
 
 
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
-        console.log("token is " + access_token)
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
@@ -74,7 +71,6 @@ export default function ListingsPage() {
             console.error('Error fetching listings:', error);
         } finally {
             setIsLoading(false);
-            setShowFilters(false);
         }
     };
 
@@ -84,7 +80,6 @@ export default function ListingsPage() {
         } else {
             setError("You need to log in to view listings.");
         }
-        // Only run this effect on initial mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
@@ -92,14 +87,14 @@ export default function ListingsPage() {
     const handleInputChange = (setter, errorSetter, field) => (e) => {
         let value = e.target.value;
     
-        // Remove any non-numeric characters except the decimal point for price
-        if (field.includes("Price")) {
-            value = value.replace(/[^0-9.]/g, '');
-        } else {
-            value = value.replace(/[^0-9]/g, ''); // Remove decimals for mileage
+        // Apply numeric restriction only for price and mileage fields
+        if (['minPrice', 'maxPrice'].includes(field)) {
+            value = value.replace(/[^0-9.]/g, ''); // Allow only numbers and decimal points for price
+        } else if (['minMileage', 'maxMileage'].includes(field)) {
+            value = value.replace(/[^0-9]/g, ''); // Allow only numbers for mileage
         }
     
-        // Enforce minimum and maximum constraints
+        // Enforce minimum and maximum constraints for price and mileage
         if (field === 'minPrice' || field === 'maxPrice') {
             if (parseFloat(value) < 0) value = "0";
             else if (parseFloat(value) > 9999999) value = "9999999";
@@ -108,20 +103,20 @@ export default function ListingsPage() {
             else if (parseInt(value) > 1000000) value = "1000000";
         }
     
-        // Format the value with commas for display purposes
-        const formattedValue = value ? (field.includes("Price") ? parseFloat(value).toLocaleString() : parseInt(value).toLocaleString()) : '';
+        // Format the value with commas if it's for price or mileage
+        const formattedValue = value ? (
+            (field === 'minPrice' || field === 'maxPrice') 
+                ? parseFloat(value).toLocaleString() 
+                : parseInt(value).toLocaleString()
+        ) : '';
     
-        // Set the formatted value in state for display
-        setter(formattedValue);
+        // Set the formatted or raw value in the state for display
+        setter(field === 'make' || field === 'model' ? value : formattedValue);
     
-        // Store the raw value for submission (without commas)
-        const rawValue = field.includes("Price") ? parseFloat(value) || 0 : parseInt(value) || 0;
-    
-        // Save raw value for submission (you might need to adjust where you store this)
-        // You might want to save rawValue in another state variable if needed.
-    
-        errorSetter((prev) => ({ ...prev, [field]: '' })); // Clear the error for the specific field
+        // Clear the error for the specific field
+        errorSetter((prev) => ({ ...prev, [field]: '' }));
     };
+    
     
     // Validate prices
     const validatePrices = () => {
@@ -195,8 +190,6 @@ export default function ListingsPage() {
         return valid;
     };
     
-    
-    
     const handleViewDetails = (listing) => {
         setSelectedListing(listing);
         setViewDetailsModal(true);
@@ -237,7 +230,6 @@ export default function ListingsPage() {
         }
     };
     
-
     const handleDeleteClick = (listing) => {
         setListingToDelete(listing);
         setShowDeleteConfirmation(true);
@@ -247,21 +239,11 @@ export default function ListingsPage() {
         const priceValid = validatePrices(); 
         const mileageValid = validateMileages(); 
 
-        // Check if there are any validation errors
-        if (!priceValid || !mileageValid) {
-            // If there are errors, do not close the modal
-            return; // Exit the function to keep the modal open
-        }
-    
-        // If there are no validation errors and inputs are empty, close the modal
-        if (!minPrice && !maxPrice && !minMileage && !maxMileage) {
-            setFilterModalOpen(false); // Close the modal
-        } else {
-            // Proceed with your search logic here
-            console.log('Searching with:', { minPrice, maxPrice, minMileage, maxMileage });
-            // You can also close the modal here if you want after successful search
-        }
+        if (!priceValid || !mileageValid) return;
+
+        fetchListings();
     };
+
     
     return (
         <div className="min-h-screen bg-gray-100 p-6">
@@ -287,77 +269,80 @@ export default function ListingsPage() {
             {showFilters && (
             <div className="bg-white p-4 rounded-md shadow-md mt-4 max-h-96 overflow-y-auto">
                 <div className="space-y-4">
-                <input
-                    value={make}
-                    onChange={handleInputChange(setMake, () => {}, 'make')}
-                    placeholder="Make"
-                    className="border p-2 rounded w-full text-black"
-                />
-                <input
-                    value={model}
-                    onChange={handleInputChange(setModel, () => {}, 'model')}
-                    placeholder="Model"
-                    className="border p-2 rounded w-full text-black"
-                />
-                <input
-                    value={year}
-                    onChange={handleInputChange(setYear, () => {}, 'year')}
-                    placeholder="Year"
-                    className="border p-2 rounded w-full text-black"
-                />
+                    <input
+                        value={make}
+                        onChange={handleInputChange(setMake, () => {}, 'make')}
+                        placeholder="Make"
+                        className="border p-2 rounded w-full text-black"
+                    />
+                    <input
+                        value={model}
+                        onChange={handleInputChange(setModel, () => {}, 'model')}
+                        placeholder="Model"
+                        className="border p-2 rounded w-full text-black"
+                    />
+                    <input
+                        value={year}
+                        onChange={handleInputChange(setYear, () => {}, 'year')}
+                        placeholder="Year"
+                        className="border p-2 rounded w-full text-black"
+                    />
 
-                <div>
-                    <div className="flex space-x-2">
-                    <div className="w-full">
-                        <input
-                        value={minPrice}
-                        onChange={handleInputChange(setMinPrice, setPriceError, 'min')}
-                        placeholder="Min Price"
-                        className={`border p-2 rounded w-full text-black ${priceError.min ? 'border-red-500' : ''}`} // Fixed the template literal
-                        />
-                        {priceError.min && <p className="text-red-500 text-sm mt-1">{priceError.min}</p>} {/* Display min price error under min input */}
+                    {/* Price Filter Section */}
+                    <div>
+                        <div className="flex space-x-2">
+                            <div className="w-full">
+                                <input
+                                    value={minPrice}
+                                    onChange={handleInputChange(setMinPrice, setPriceError, 'minPrice')}
+                                    placeholder="Min Price"
+                                    className={`border p-2 rounded w-full text-black ${priceError.min ? 'border-red-500' : ''}`}
+                                />
+                                {priceError.min && <p className="text-red-500 text-sm mt-1">{priceError.min}</p>}
+                            </div>
+                            <div className="w-full">
+                                <input
+                                    value={maxPrice}
+                                    onChange={handleInputChange(setMaxPrice, setPriceError, 'maxPrice')}
+                                    placeholder="Max Price"
+                                    className={`border p-2 rounded w-full text-black ${priceError.max ? 'border-red-500' : ''}`}
+                                />
+                                {priceError.max && <p className="text-red-500 text-sm mt-1">{priceError.max}</p>}
+                            </div>
+                        </div>
                     </div>
-                    <div className="w-full">
-                        <input
-                        value={maxPrice}
-                        onChange={handleInputChange(setMaxPrice, setPriceError, 'max')}
-                        placeholder="Max Price"
-                        className={`border p-2 rounded w-full text-black ${priceError.max ? 'border-red-500' : ''}`} // Fixed the template literal
-                        />
-                        {priceError.max && <p className="text-red-500 text-sm mt-1">{priceError.max}</p>} {/* Display max price error under max input */}
-                    </div>
-                    </div>
-                </div>
 
-                <div>
-                    <div className="flex space-x-2">
-                    <div className="w-full">
-                        <input
-                        value={minMileage}
-                        onChange={handleInputChange(setMinMileage, setMileageError, 'min')}
-                        placeholder="Min Mileage"
-                        className={`border p-2 rounded w-full text-black ${mileageError.min ? 'border-red-500' : ''}`} // Fixed the template literal
-                        />
-                        {mileageError.min && <p className="text-red-500 text-sm mt-1">{mileageError.min}</p>} {/* Display min mileage error under min input */}
+                    {/* Mileage Filter Section */}
+                    <div>
+                        <div className="flex space-x-2">
+                            <div className="w-full">
+                                <input
+                                    value={minMileage}
+                                    onChange={handleInputChange(setMinMileage, setMileageError, 'minMileage')}
+                                    placeholder="Min Mileage"
+                                    className={`border p-2 rounded w-full text-black ${mileageError.min ? 'border-red-500' : ''}`}
+                                />
+                                {mileageError.min && <p className="text-red-500 text-sm mt-1">{mileageError.min}</p>}
+                            </div>
+                            <div className="w-full">
+                                <input
+                                    value={maxMileage}
+                                    onChange={handleInputChange(setMaxMileage, setMileageError, 'maxMileage')}
+                                    placeholder="Max Mileage"
+                                    className={`border p-2 rounded w-full text-black ${mileageError.max ? 'border-red-500' : ''}`}
+                                />
+                                {mileageError.max && <p className="text-red-500 text-sm mt-1">{mileageError.max}</p>}
+                            </div>
+                        </div>
                     </div>
-                    <div className="w-full">
-                        <input
-                        value={maxMileage}
-                        onChange={handleInputChange(setMaxMileage, setMileageError, 'max')}
-                        placeholder="Max Mileage"
-                        className={`border p-2 rounded w-full text-black ${mileageError.max ? 'border-red-500' : ''}`} // Fixed the template literal
-                        />
-                        {mileageError.max && <p className="text-red-500 text-sm mt-1">{mileageError.max}</p>} {/* Display max mileage error under max input */}
-                    </div>
-                    </div>
-                </div>
 
-                <div className="flex space-x-4">
-                    <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
-                </div>
+                    <div className="flex space-x-4">
+                        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+                    </div>
                 </div>
             </div>
-            )}
+        )}
+
 
 
             {/* Listings */}
@@ -427,7 +412,7 @@ export default function ListingsPage() {
                             <p><strong>Model:</strong> {selectedListing.model}</p>
                             <p><strong>Year:</strong> {selectedListing.year}</p>
                             <p><strong>Price:</strong> ${selectedListing.price}</p>
-                            <p><strong>Mileage:</strong> {selectedListing.mileage} miles</p>
+                            <p><strong>Mileage:</strong> {selectedListing.mileage} km</p>
                             <p><strong>Transmission:</strong> {selectedListing.transmission}</p>
                             <p><strong>Fuel Type:</strong> {selectedListing.fuel_type}</p>
                             <p><strong>Description:</strong> {selectedListing.description}</p>
