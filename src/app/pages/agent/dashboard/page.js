@@ -1,89 +1,99 @@
 "use client";
 
-import { useState } from "react"
+// Libraries
+import { useState, useContext, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+// Local dependencies
 import ListingPage from '../viewListings/page'
+import { AuthContext } from "../../authorization/AuthContext";
+
 
 export default function Dashboard() {
-  {
-    /* This function is for minimizing the header in mobile screens (might remove later)*/
-  }
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const { access_token, permissions } = useContext(AuthContext); 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true); // Loading state to prevent rendering
 
-  {
-    /* This function is for switching the html elements of the right column of the page (depending on the option selected*/
-  }
+  useEffect(() => {
+    // Only proceed if token and permissions are checked
+    if (access_token && permissions) {
+      if (!permissions?.sub.has_listing_permission) {
+        router.push('/');
+      } else {
+        setIsLoading(false); // Allow rendering if authorized
+      }
+    } else if (!access_token) {
+      // If there's no token, redirect immediately
+      router.push('/');
+    }
+  }, [access_token, permissions, router]);
+
   const [selectedOption, setSelectedOption] = useState("option1");
   const handleOptionClick = (option) => {
     setSelectedOption(option);
   };
 
+  if (isLoading) {
+    return null; // Render nothing until loading is complete
+  }
+
   return (
-    <body className="bg-gray-100">
-      {/* Main Section */}
-
-      <div className="flex pt-20 text-black">
-        {/* Left Column: Dashboard Options */}
-        <div className="w-1/2 bg-red-500 p-5 h-screen">
-          <ul className="space-y-2">
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded hover:bg-gray-200 ${
-                  selectedOption === "option1" ? "bg-gray-300" : ""
-                }`}
-                onClick={() => handleOptionClick("option1")}
-              >
-                Profile
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded hover:bg-gray-200 ${
-                  selectedOption === "option2" ? "bg-gray-300" : ""
-                }`}
-                onClick={() => handleOptionClick("option2")}
-              >
-                Used Car Agents
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded hover:bg-gray-200 ${
-                  selectedOption === "option3" ? "bg-gray-300" : ""
-                }`}
-                onClick={() => handleOptionClick("option3")}
-              >
-                My Listings
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Right Column: Content Based on Selected Option */}
-        <div className="w-3/4 p-4">
-          {selectedOption === "option1" && (
-            <div>
-              <h2 className="text-2xl font-semibold">Content for Option 1</h2>
-              <p>This is the content that shows for Option 1.</p>
-            </div>
-          )}
-          {selectedOption === "option2" && (
-            <div>
-              <p> placeholder </p>
-            </div>
-          )}
-          {selectedOption === "option3" && (
-            <div>
-              <ListingPage/>  
-            </div>
-          )}
-        </div>
+    <div className="bg-gray-100 flex text-white h-[calc(100vh-64px)] overflow-hidden">
+      {/* Left Column: Dashboard Options */}
+      <div className="w-1/2 bg-red-500 p-5 overflow-hidden h-full">
+        <ul className="space-y-2">
+          <li>
+            <button
+              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
+                selectedOption === "option1" ? "bg-red-300" : ""
+              }`}
+              onClick={() => handleOptionClick("option1")}
+            >
+              Profile
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
+                selectedOption === "option2" ? "bg-red-300" : ""
+              }`}
+              onClick={() => handleOptionClick("option2")}
+            >
+              User Car Agents
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
+                selectedOption === "option3" ? "bg-red-300" : ""
+              }`}
+              onClick={() => handleOptionClick("option3")}
+            >
+              My Listings
+            </button>
+          </li>
+        </ul>
       </div>
 
-      {/* Switch Section */}
-      <div className=""></div>
-    </body>
+      {/* Right Column: Content Based on Selected Option */}
+      <div className="w-3/4 p-4 overflow-y-auto h-full">
+        {selectedOption === "option1" && (
+          <div>
+            <ListingPage />
+          </div>
+        )}
+        {selectedOption === "option2" && (
+          <div>
+            <p>placeholder for review</p>
+          </div>
+        )}
+        {selectedOption === "option3" && (
+          <div>
+            <p>placeholder</p>
+          </div>
+        )}
+      </div>
+    </div>
+
   );
 }
