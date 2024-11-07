@@ -28,7 +28,7 @@ from .listing.update_listing import update_listing_blueprint
 from .listing.delete_listing import delete_listing_blueprint
 from .listing.search_listing import search_listing_blueprint
 from .suspension.suspend_user import suspend_user_blueprint
-from .shortlist.buyers_shortlist import buyers_shortlist_blueprint
+from .shortlist.see_num_car_shortlist import see_num_car_shortlist_blueprint
 from .shortlist.saveto_shortlist import saveto_shortlist_blueprint
 from .shortlist.search_shortlist import search_shortlist_blueprint
 from .shortlist.view_shortlist import view_shortlist_blueprint
@@ -115,7 +115,7 @@ flask_app.register_blueprint(suspend_user_blueprint)
 flask_app.register_blueprint(check_user_suspended_blueprint)
 
 #shortlist
-flask_app.register_blueprint(buyers_shortlist_blueprint)
+flask_app.register_blueprint(see_num_car_shortlist_blueprint)
 flask_app.register_blueprint(saveto_shortlist_blueprint)
 flask_app.register_blueprint(search_shortlist_blueprint)
 flask_app.register_blueprint(view_shortlist_blueprint)

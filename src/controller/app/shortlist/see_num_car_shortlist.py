@@ -3,12 +3,12 @@ from src.entity import Shortlist
 from src.controller.app.authentication.permission_required import permission_required
 from flask_jwt_extended import get_jwt_identity 
 
-buyers_shortlist_blueprint = Blueprint('buyers_shortlist', __name__)
+see_num_car_shortlist_blueprint = Blueprint('see_num_car_shortlist', __name__)
 
-class BuyersShortlistController:
-    @buyers_shortlist_blueprint.route('/api/shortlist/buyers_shortlist', methods=['GET'])
+class SeeNumCarShortlistController:
+    @see_num_car_shortlist_blueprint.route('/api/shortlist/see_num_car_shortlist', methods=['GET'])
     @permission_required('has_seller_permission')
-    def buyers_shortlists():
+    def see_num_car_shortlist():
         try:
             # Get seller email from JWT token
             seller_data = get_jwt_identity()

@@ -4,7 +4,7 @@ from src.entity import Views
 
 get_views_blueprint = Blueprint('get_views', __name__)
 
-class GetViewsController:
+class GetNumCarViewsController:
     @get_views_blueprint.route('/api/views/get_views', methods=['POST'])
     def increment_and_get_listing_views():
         data = request.get_json()
