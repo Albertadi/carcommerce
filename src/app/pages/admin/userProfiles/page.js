@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../authorization/AuthContext"; // Adjust path as needed
 import axios from "axios";
 
-export default function Profiles() {
+export default function ProfileManagement() {
   const { access_token } = useContext(AuthContext); // Access the token and user data
   const [profiles, setProfiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
