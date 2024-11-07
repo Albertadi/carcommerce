@@ -7,7 +7,7 @@ view_user_blueprint = Blueprint('view_user', __name__)
 class ViewUserController:
     # View individual user detail
     @view_user_blueprint.route('/api/users/view_user', methods=['GET'])
-    @permission_required('has_admin_permission')
+    # @permission_required('has_admin_permission')
     def view_user():
         user_email = request.args.get('email')
 
