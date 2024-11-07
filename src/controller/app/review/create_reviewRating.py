@@ -4,6 +4,7 @@ from src.entity.reviewRating import ReviewRating, db
 from src.controller.app.authentication.permission_required import permission_required
 
 create_reviewRating_blueprint = Blueprint('create_reviewRating', __name__)
+@create_reviewRating_blueprint.route('/api/reviewRating/create_reviewRating', methods=['POST'])
 
 # Create Review
 @permission_required('has_buy_permission', 'has_sell_permission')

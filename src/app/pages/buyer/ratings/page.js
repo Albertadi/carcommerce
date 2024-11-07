@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { AuthContext } from "../../authorization/AuthContext";
 
 const SellerRatingPage = () => {
@@ -47,7 +46,6 @@ const SellerRatingPage = () => {
   const handleAgentSelect = (agent) => {
     setSelectedAgent(agent);
     setShowModal(true);
-    fetchAgentRatings(agent.email); // Fetch ratings when an agent is selected
   };
 
   // Handle submitting the review
@@ -100,6 +98,32 @@ const SellerRatingPage = () => {
     setShowAllReviewsModal(true);
   };
 
+  const handleSubmitRating = () => {
+    const newReview = { review: feedback, timestamp: new Date().toISOString().split('T')[0] };
+    
+    // Update the ratings for the selected agent
+    setRatingsByAgent((prevRatings) => {
+      const updatedRatings = { ...prevRatings };
+      const agentEmail = selectedAgent.email;
+
+      // If the agent already has ratings, add the new one to the list
+      if (updatedRatings[agentEmail]) {
+        updatedRatings[agentEmail] = [newReview, ...updatedRatings[agentEmail]];
+      } else {
+        // If this agent doesn't have any ratings yet, create a new entry
+        updatedRatings[agentEmail] = [newReview];
+      }
+
+      return updatedRatings;
+    });
+
+    // Clear input fields and close modal
+    setRating(0);
+    setFeedback('');
+    setShowModal(false);
+    setShowAllReviewsModal(true);  // Open the 'view all reviews' modal with updated ratings
+  };
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">Rate Agents</h1>
@@ -122,15 +146,21 @@ const SellerRatingPage = () => {
       <div className="space-y-4">
         {agents.length > 0 ? (
           agents.map((agent) => (
-            <div key={agent.id} className="bg-gray-100 p-4 rounded-lg shadow-md">
+            <div key={agent.email} className="bg-gray-100 p-4 rounded-lg shadow-md">
               <h2 className="font-semibold">Agent Name: {agent.first_name} {agent.last_name}</h2>
               <p className="text-gray-600">{agent.user_profile}</p>
               <p className="text-yellow-500 font-semibold">Average Rating: {ratingsByAgent[agent.email]?.avgRating || '0'} / 5</p>
               <button
-                onClick={() => handleAgentSelect(agent)} // Use the new select handler
+                onClick={() => handleAgentSelect(agent)}
                 className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
               >
                 Submit New Rating
+              </button>
+              <button
+                onClick={() => handleViewAllReviews(agent)}
+                className="mt-2 ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
+              >
+                View All Reviews
               </button>
             </div>
           ))
@@ -168,13 +198,13 @@ const SellerRatingPage = () => {
               />
             </div>
             <div className="flex justify-between">
-              <button 
-                onClick={submitRating} // Call the updated submit function
+              <button
+                onClick={handleSubmitRating}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
               >
                 Submit Rating
               </button>
-              <button 
+              <button
                 onClick={() => setShowModal(false)}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
               >
@@ -210,7 +240,7 @@ const SellerRatingPage = () => {
             </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
