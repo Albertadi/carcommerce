@@ -51,8 +51,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
-          <Header></Header>
-          {children} 
+          <Header />
           <main className="flex-grow">
             {children}
           </main>

@@ -68,7 +68,7 @@ class CreateListingController:
                 agent_email=agent_email,  # Use the extracted email here
                 seller_email=data['seller_email']
             )
-
+            # Test
             # Save the image and update the image_url if needed
             image_filename = f"{listing_id}.jpg"  # Or any appropriate extension
             image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
