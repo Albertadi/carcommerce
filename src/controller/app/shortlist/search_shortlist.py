@@ -1,7 +1,7 @@
-from typing import Tuple
-from src.entity import Shortlist, Listing, User, Profile
-from src.controller.app.authentication.permission_required import permission_required
 from flask import Blueprint, request, jsonify
+from src.entity import Shortlist
+from src.controller.app.authentication.permission_required import permission_required
+from flask_jwt_extended import get_jwt_identity
 
 search_shortlist_blueprint = Blueprint('search_shortlist', __name__)
 
@@ -10,34 +10,25 @@ class SearchShortlistController:
     @permission_required('has_buy_permission')
     def search_shortlist():
         try:
-            # Get required parameters
-            user_email = request.args.get('email')
+            # Get user from JWT and search parameters
+            user_data = get_jwt_identity()
             search_term = request.args.get('search')
-
-            # Validate required parameters
-            if not user_email:
-                return jsonify({
-                    'success': False,
-                    'error': 'Email parameter is required'
-                }), 400
-
-            if not search_term:
-                return jsonify({
-                    'success': False,
-                    'error': 'Search term is required'
-                }), 400
-
-            # Search in user's shortlist using the search_in_shortlist method
+            min_price = request.args.get('min_price')
+            max_price = request.args.get('max_price')
+            
+            # Convert price strings to float if they exist
+            min_price = float(min_price) if min_price else None
+            max_price = float(max_price) if max_price else None
+            
+            # Call entity method
             search_results = Shortlist.search_in_shortlist(
-                email=user_email,
+                email=user_data['email'],
                 search_term=search_term,
-                include_sold=False  # Exclude sold vehicles by default
+                min_price=min_price,
+                max_price=max_price
             )
 
-            return jsonify({
-                'success': True,
-                'data': search_results
-            }), 200
+            return jsonify(search_results), 200
 
         except Exception as e:
             return jsonify({

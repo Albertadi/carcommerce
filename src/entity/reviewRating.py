@@ -68,7 +68,7 @@ class ReviewRating(db.Model):
     def createReviewRating(cls, rating, review, agent_email, reviewer_email):
             
         # Create a new Review object
-        new_reviewRating = cls(rating=rating, review=review, agentEmail = agent_email, reviewerName = reviewer_email)
+        new_reviewRating = cls(rating=rating, review=review, agentEmail = agent_email, reviewerEmail = reviewer_email)
 
         # Validate agent and reviewer email existence
         if not User.queryUserAccount(agent_email) or not User.queryUserAccount(reviewer_email):
