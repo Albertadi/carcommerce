@@ -31,4 +31,3 @@ class SearchListingController:
         listing_list = Listing.searchListing(make, model, year, min_price, max_price, min_mileage, max_mileage, transmission, fuel_type, is_sold, seller_email, agent_email)
 
         return jsonify({"message": "Success", "listing_list": listing_list})
-
