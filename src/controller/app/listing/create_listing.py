@@ -16,8 +16,9 @@ class CreateListingController:
     @permission_required('has_listing_permission')
     def create_listing():
         try:
-            agent = get_jwt_identity()
-            current_date = datetime.today().strftime('%Y-%m-%d')
+            agent_info = get_jwt_identity()  # Get the current user's info
+            agent_email = agent_info['email']  # Extract the email from the user info
+            current_date = datetime.now().date()  # Get the current date
             
             # Check if file exists
             file = request.files.get('image')
@@ -37,12 +38,50 @@ class CreateListingController:
                 if field not in data or not data[field]:
                     print(f"Missing required field: {field}")
                     return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
-
-            # If validation passed, proceed with file save and database entry
-            # (existing code here to handle file save and database entry)
             
+            # Validate year, price, and mileage as integers
+            try:
+                year = int(data['year'])
+                price = float(data['price'])
+                mileage = int(data['mileage'])
+            except ValueError as ve:
+                print(f"Value error: {str(ve)}")
+                return jsonify({'success': False, 'message': 'Year, price, and mileage must be valid numbers.'}), 400
+
+            # Generate a new UUID for the listing ID
+            listing_id = str(uuid4())
+
+            # Prepare the new listing
+            new_listing = Listing(
+                id=listing_id,
+                vin=data['vin'],
+                make=data['make'],
+                model=data['model'],
+                year=year,
+                price=price,
+                mileage=mileage,
+                transmission=data['transmission'],
+                fuel_type=data['fuel_type'],
+                is_sold=False,  # Default value
+                listing_date=current_date,  # Use the current date
+                image_url='',  # Placeholder for the image URL
+                agent_email=agent_email,  # Use the extracted email here
+                seller_email=data['seller_email']
+            )
+            # Test
+            # Save the image and update the image_url if needed
+            image_filename = f"{listing_id}.jpg"  # Or any appropriate extension
+            image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
+            file.save(image_path)
+            new_listing.image_url = image_filename  # Update the listing with the saved image URL
+
+            # Add the new listing to the database
+            db.session.add(new_listing)
+            db.session.commit()
+
             return jsonify({'success': True, 'message': 'Listing created successfully'}), 201
 
         except Exception as e:
             print(f"Error in create_listing: {str(e)}")
+            db.session.rollback()  # Rollback if there is an error
             return jsonify({'success': False, 'message': f'Error creating listing: {str(e)}'}), 500

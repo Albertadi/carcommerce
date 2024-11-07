@@ -46,18 +46,18 @@ export const metadata = {
   description: "hi im description",
 };
 
-export default function RootLayout({ children }) { 
-  return ( 
-    <html lang="en"> 
-      <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased flex flex-col min-h-screen`}> 
-        <AuthProvider> 
-          <Header /> 
-          <main className="flex-grow"> 
-            {children} 
-          </main> 
-          <Footer /> 
-        </AuthProvider> 
-      </body> 
-    </html> 
-  ); 
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} ${rajdhaniBold.variable} ${rajdhaniLight.variable} ${rajdhaniMedium.variable} ${rajdhaniRegular.variable} ${rajdhaniSemiBold.variable} antialiased flex flex-col min-h-screen`}>
+        <AuthProvider>
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
+      </body>
+    </html>
+  );
 }

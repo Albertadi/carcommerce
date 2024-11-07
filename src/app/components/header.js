@@ -33,9 +33,11 @@ export default function Header() {
           {/* Brand Logo */}
           <a
             href="/"
-            className="text-5xl text-red-500 font-bold"
+            className="text-5xl text-[#e2e2ef] font-rajdhaniBold"
           >
-            TQ
+            <p>
+							TECH<span className="text-[#f75049]">Quest</span>
+						</p>
           </a>
 
           {/* Navbar toggle (for small screens) */}
@@ -66,7 +68,7 @@ export default function Header() {
             }`}
           >
             {/* Account link */}
-            <a href="#" className="nav-link hover:text-red-500">
+            <a href="#" className="nav-link hover:text-[#f75049] font-rajdhaniSemiBold text-lg">
               Account
             </a>
 
@@ -74,14 +76,14 @@ export default function Header() {
             {access_token ? (
               <button
                 onClick={handleLogout} // Use the logout function from AuthContext
-                className="text-red-500 font-semibold hover:text-red-700"
+                className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
               >
                 Logout
               </button>
             ) : (
               <button
                 onClick={handleLogin} // Redirect to login page
-                className="text-red-500 font-semibold hover:text-red-700"
+                className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
               >
                 Login
               </button>
