@@ -58,6 +58,7 @@ export default function CreateListing() {
     }
 
     const formSubmissionData = new FormData();
+
     Object.entries(formData).forEach(([key, value]) => {
       formSubmissionData.append(key, value);
     });
