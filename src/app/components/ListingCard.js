@@ -1,6 +1,6 @@
 import React from 'react';
-import { FaCar, FaTachometerAlt, FaGasPump } from 'react-icons/fa';
 import PropTypes from 'prop-types';
+import { FaCar, FaTachometerAlt, FaGasPump, FaTag } from 'react-icons/fa';
 
 export function ListingCard({
   imageSrc,
@@ -11,73 +11,63 @@ export function ListingCard({
   mileage,
   transmission,
   fuelType,
-  agentEmail,
-  sellerEmail,
+  dashboardType,
+  onViewDetails,
+  onDelete,
   isSold,
-  listingDate,
-  vin,
-  dashboardType, // Determines if user is a buyer, seller, or agent
-  onMarkAsSold, // Handler for marking as sold
-  onUpdateListing, // Handler for updating the listing
 }) {
   return (
-    <div className="flex p-6 bg-gray-100 rounded-lg shadow-md w-[48rem]">
+    <div className="flex p-4 bg-white rounded-lg shadow-md relative">
       {/* Image Section */}
-      <div className="w-1/4">
-        <img src={imageSrc} alt="Listing" className="rounded-lg object-cover w-full h-40" />
+      <div className="w-40 h-40 flex-shrink-0 mr-4 overflow-hidden rounded-md shadow-md">
+        <img
+          src={imageSrc || 'https://dummyimage.com/300x300/000/fff&text=Car'}
+          alt={`${make} ${model}`}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Details Section */}
-      <div className="flex-1 pl-6">
-        {/* Title and Price */}
-        <div className="flex items-center justify-between">
-          <p className="text-lg font-semibold text-black">{`${make} ${model} ${year}`}</p>
-          <div className="text-right">
-            <p className="text-red-600 font-bold text-xl">${price?.toLocaleString()}</p>
-          </div>
+      <div className="flex-1">
+        {/* Title and Year */}
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          {make} {model} ({year})
+        </h3>
+
+        {/* Mileage, Transmission, Fuel Type, and Price */}
+        <div className="text-gray-600 space-y-1">
+          <p className="flex items-center">
+            <FaTachometerAlt className="mr-2 text-gray-500" /> 
+            <span className="font-semibold">Mileage:</span> {mileage?.toLocaleString()} km
+          </p>
+          <p className="flex items-center">
+            <FaCar className="mr-2 text-gray-500" /> 
+            <span className="font-semibold">Transmission:</span> {transmission || 'N/A'}
+          </p>
+          <p className="flex items-center">
+            <FaGasPump className="mr-2 text-gray-500" /> 
+            <span className="font-semibold">Fuel Type:</span> {fuelType || 'N/A'}
+          </p>
+          <p className="flex items-center text-red-600 text-lg font-semibold">
+            <FaTag className="mr-2" /> 
+            ${price?.toLocaleString()}
+          </p>
         </div>
 
-        {/* Details Row */}
-        <div className="flex items-center text-gray-700 mt-3 space-x-6">
-          <div className="flex items-center space-x-1">
-            <FaCar />
-            <span>{transmission || 'N/A'}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <FaTachometerAlt />
-            <span>{mileage ? `${mileage.toLocaleString()} km` : 'N/A'}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <FaGasPump />
-            <span>{fuelType || 'N/A'}</span>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mt-4 text-gray-600">
-          <p>VIN: {vin || 'N/A'}</p>
-          <p>Agent Email: {agentEmail || 'N/A'}</p>
-          <p>Seller Email: {sellerEmail || 'N/A'}</p>
-          <p>Listing Date: {new Date(listingDate).toLocaleDateString() || 'N/A'}</p>
-          <p>Status: {isSold ? 'Sold' : 'Available'}</p>
-        </div>
-
-        {/* Action Buttons based on dashboardType */}
-        <div className="mt-4">
-          {dashboardType === 'seller' && !isSold && (
-            <button
-              onClick={onMarkAsSold}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mr-2"
-            >
-              Mark as Sold
-            </button>
-          )}
+        {/* Action Buttons */}
+        <div className="absolute bottom-4 right-4 flex space-x-2">
+          <button
+            onClick={onViewDetails}
+            className="bg-blue-500 text-white py-1 px-3 rounded-lg flex items-center hover:bg-blue-600"
+          >
+            <span>View Details</span>
+          </button>
           {dashboardType === 'agent' && (
             <button
-              onClick={onUpdateListing}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={onDelete}
+              className="bg-red-500 text-white py-1 px-3 rounded-lg flex items-center hover:bg-red-600"
             >
-              Update Listing
+              <span>Delete</span>
             </button>
           )}
         </div>
@@ -88,33 +78,27 @@ export function ListingCard({
 
 // PropTypes for type-checking
 ListingCard.propTypes = {
-  imageSrc: PropTypes.string.isRequired,
+  imageSrc: PropTypes.string,
   make: PropTypes.string.isRequired,
   model: PropTypes.string.isRequired,
   year: PropTypes.number.isRequired,
   price: PropTypes.number.isRequired,
-  mileage: PropTypes.number.isRequired,
+  mileage: PropTypes.number,
   transmission: PropTypes.string,
   fuelType: PropTypes.string,
-  agentEmail: PropTypes.string,
-  sellerEmail: PropTypes.string,
-  isSold: PropTypes.bool,
-  listingDate: PropTypes.string,
-  vin: PropTypes.string,
   dashboardType: PropTypes.oneOf(['buyer', 'seller', 'agent']),
-  onMarkAsSold: PropTypes.func,
-  onUpdateListing: PropTypes.func,
+  onViewDetails: PropTypes.func,
+  onDelete: PropTypes.func,
+  isSold: PropTypes.bool,
 };
 
 ListingCard.defaultProps = {
+  imageSrc: '',
+  mileage: 0,
   transmission: 'N/A',
   fuelType: 'N/A',
-  agentEmail: '',
-  sellerEmail: '',
-  isSold: false,
-  listingDate: '',
-  vin: '',
   dashboardType: 'buyer',
-  onMarkAsSold: () => {},
-  onUpdateListing: () => {},
+  onViewDetails: () => {},
+  onDelete: () => {},
+  isSold: false,
 };

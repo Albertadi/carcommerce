@@ -1,10 +1,13 @@
 "use client";
 
 import React from 'react';
+import { useContext } from "react";
 import { useRouter } from 'next/navigation';
+import { AuthContext } from '../pages/authorization/AuthContext';
 
 export function ReloginModal({ onClose }) {
     const router = useRouter();
+    const { logout } = useContext(AuthContext);
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -13,6 +16,7 @@ export function ReloginModal({ onClose }) {
                 <p className="mb-4">Your session has expired. Please log in again.</p>
                 <button
                     onClick={() => {
+                        logout()
                         router.push("/pages/login");
                         onClose();
                     }}

@@ -88,7 +88,7 @@ export default function ListingsPage() {
                         listings.map((listing) => (
                             <ListingCard
                                 key={listing.id}
-                                imageSrc={listing.image || 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                                imageSrc={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
                                 make={listing.make}
                                 model={listing.model}
                                 year={listing.year}
@@ -96,6 +96,7 @@ export default function ListingsPage() {
                                 mileage={listing.mileage}
                                 transmission={listing.transmission}
                                 fuelType={listing.fuel_type}
+                                dashboardType={"seller"}
                             />
                         ))
                     ) : (
