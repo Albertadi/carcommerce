@@ -73,32 +73,35 @@ class Listing(db.Model):
         return cls.query.all()
     
     @classmethod
-    def searchListing(cls,
-                      make: Optional[str] = None,
-                      model: Optional[str] = None,
-                      year: Optional[int] = None,
-                      min_price: Optional[float] = None,
-                      max_price: Optional[float] = None,
-                      min_mileage: Optional[int] = None,
-                      max_mileage: Optional[int] = None,
-                      transmission: Optional[str] = None,
-                      fuel_type: Optional[str] = None,
-                      is_sold: Optional[bool] = None,
-                      seller_email: Optional[str] = None,
-                      agent_email: Optional[str] = None):
-
+    def searchListing(
+        cls,
+        make: Optional[str] = None,
+        model: Optional[str] = None,
+        year: Optional[int] = None,
+        min_price: Optional[float] = None,
+        max_price: Optional[float] = None,
+        min_mileage: Optional[int] = None,
+        max_mileage: Optional[int] = None,
+        transmission: Optional[str] = None,
+        fuel_type: Optional[str] = None,
+        is_sold: Optional[bool] = None,
+        seller_email: Optional[str] = None,
+        agent_email: Optional[str] = None,
+    ):
+        # Start with the base query for Listing
         query = Listing.query
 
+        # Apply filters dynamically based on parameters passed in the request
         if seller_email:
-            query = query.filter(Listing.seller_email.ilike(f'{seller_email}%')) # Case-insensitive partial search
+            query = query.filter(Listing.seller_email.ilike(f'{seller_email}%'))  # Case-insensitive partial search
         if agent_email:
-            query = query.filter(Listing.agent_email.ilike(f'{agent_email}%')) # Case-insensitive partial search
+            query = query.filter(Listing.agent_email.ilike(f'{agent_email}%'))  # Case-insensitive partial search
 
-        # Apply filters dynamically
+        # Filter by make, model, year, price, mileage
         if make:
-            query = query.filter(Listing.make.ilike(f'{make}%')) # Case-insensitive partial search
+            query = query.filter(Listing.make.ilike(f'{make}%'))  # Case-insensitive partial search
         if model:
-            query = query.filter(Listing.model.ilike(f'{model}%')) # Case-insensitive partial search
+            query = query.filter(Listing.model.ilike(f'{model}%'))  # Case-insensitive partial search
         if year:
             query = query.filter_by(year=year)
         if min_price is not None:
@@ -109,27 +112,34 @@ class Listing(db.Model):
             query = query.filter(Listing.mileage >= min_mileage)
         if max_mileage is not None:
             query = query.filter(Listing.mileage <= max_mileage)
+
+        # Handling transmission and fuel_type with enums
         if transmission:
             try:
-                transmission_enum = TransmissionType(transmission)
+                transmission_enum = TransmissionType(transmission)  # Converts string to enum
                 query = query.filter_by(transmission=transmission_enum)
             except ValueError:
-                return []  # Invalid transmission value
+                return []  # Invalid transmission value, return empty list
+
         if fuel_type:
             try:
-                fuel_type_enum = FuelType(fuel_type)
+                fuel_type_enum = FuelType(fuel_type)  # Converts string to enum
                 query = query.filter_by(fuel_type=fuel_type_enum)
             except ValueError:
-                return []  # Invalid fuel type value
+                return []  # Invalid fuel type value, return empty list
+
+        # Filter by is_sold
         if is_sold is not None:
             query = query.filter_by(is_sold=is_sold)
 
-        # Execute the query and return the filtered users
+        # Execute the query and return the filtered listings
         listings = query.all()
+
+        # Convert the listings to dictionaries for response
         listing_list = [listing.to_dict() for listing in listings]
 
         return listing_list
-    
+
     @classmethod
     def createListing(cls, id: str,
                       vin: str,
