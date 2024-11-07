@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
-import { ListingCard } from '../../../components/ListingCard';
 import axios from 'axios';
 
 export default function ListingsPage() {
@@ -42,39 +41,81 @@ export default function ListingsPage() {
 
     const buildSearchFilters = () => {
         const filters = {};
-        if (make) filters.make = make;
-        if (model) filters.model = model;
-        if (year) filters.year = year;
-        if (minPrice) filters.min_price = minPrice;
-        if (maxPrice) filters.max_price = maxPrice;
-        if (minMileage) filters.min_mileage = minMileage;
-        if (maxMileage) filters.max_mileage = maxMileage;
-        if (transmission) filters.transmission = transmission;
-        if (fuelType) filters.fuel_type = fuelType;
-        if (isSold !== undefined) filters.is_sold = isSold;
-        if (sellerEmail) filters.seller_email = sellerEmail;
-        if (agentEmail) filters.agent_email = agentEmail;
-        return filters;
+        
+        // Text fields (trim and only add if not empty)
+        if (make?.trim()) filters.make = make.trim();
+        if (model?.trim()) filters.model = model.trim();
+        if (transmission?.trim()) filters.transmission = transmission.trim();
+        if (fuelType?.trim()) filters.fuel_type = fuelType.trim();
+        if (sellerEmail?.trim()) filters.seller_email = sellerEmail.trim();
+        if (agentEmail?.trim()) filters.agent_email = agentEmail.trim();
+        
+        // Numeric fields - ensure they're numbers and not formatted strings
+        if (year) {
+            const yearNum = parseInt(year.toString().replace(/[^0-9]/g, ''));
+            if (!isNaN(yearNum)) filters.year = yearNum;
+        }
+        
+        if (minPrice) {
+            const minPriceNum = parseFloat(minPrice.toString().replace(/[^0-9.]/g, ''));
+            if (!isNaN(minPriceNum)) filters.min_price = minPriceNum;
+        }
+        
+        if (maxPrice) {
+            const maxPriceNum = parseFloat(maxPrice.toString().replace(/[^0-9.]/g, ''));
+            if (!isNaN(maxPriceNum)) filters.max_price = maxPriceNum;
+        }
+        
+        if (minMileage) {
+            const minMileageNum = parseInt(minMileage.toString().replace(/[^0-9]/g, ''));
+            if (!isNaN(minMileageNum)) filters.min_mileage = minMileageNum;
+        }
+        
+        if (maxMileage) {
+            const maxMileageNum = parseInt(maxMileage.toString().replace(/[^0-9]/g, ''));
+            if (!isNaN(maxMileageNum)) filters.max_mileage = maxMileageNum;
+        }
+        
+        // Boolean field
+        if (typeof isSold === 'boolean') filters.is_sold = isSold;
+        
+        return filters;
+    };
+
+    const handleSearch = () => {
+        const priceValid = validatePrices(); 
+        const mileageValid = validateMileages(); 
+    
+        if (!priceValid || !mileageValid) {
+            return;
+        }
+    
+        fetchListings(); // Add this line
+        setFilterModalOpen(false);
     };
 
 
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
+        const filters = buildSearchFilters();
+        console.log('Sending filters to API:', filters);
+        
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
-                buildSearchFilters(),
+                filters,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setListings(response.data.listing_list);
         } catch (error) {
-            setError('Failed to fetch listings. Please try again.');
+            console.error('Error response:', error.response?.data);
+            setError(error.response?.data?.error || 'Failed to fetch listings. Please try again.');
             console.error('Error fetching listings:', error);
         } finally {
             setIsLoading(false);
             setShowFilters(false);
-        }
+        }
     };
 
     useEffect(() => {
@@ -83,36 +124,36 @@ export default function ListingsPage() {
 
     const handleInputChange = (setter, errorSetter, field) => (e) => {
         let value = e.target.value;
-    
-        // Remove any non-numeric characters except the decimal point for price
+        
+        // Remove non-numeric characters, keeping decimals for price
         if (field.includes("Price")) {
             value = value.replace(/[^0-9.]/g, '');
+            // Ensure only one decimal point
+            const parts = value.split('.');
+            if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
         } else {
-            value = value.replace(/[^0-9]/g, ''); // Remove decimals for mileage
+            value = value.replace(/[^0-9]/g, '');
         }
-    
-        // Enforce minimum and maximum constraints
-        if (field === 'minPrice' || field === 'maxPrice') {
-            if (parseFloat(value) < 0) value = "0";
-            else if (parseFloat(value) > 9999999) value = "9999999";
-        } else if (field === 'minMileage' || field === 'maxMileage') {
-            if (parseInt(value) < 0) value = "0";
-            else if (parseInt(value) > 1000000) value = "1000000";
+        
+        // Convert to number for validation
+        let numValue = field.includes("Price") ? parseFloat(value) : parseInt(value);
+        
+        // Handle NaN case
+        if (isNaN(numValue)) numValue = 0;
+        
+        // Enforce limits
+        if (field.includes("Price")) {
+            numValue = Math.max(0, Math.min(numValue, 9999999));
+        } else if (field.includes("Mileage")) {
+            numValue = Math.max(0, Math.min(numValue, 1000000));
         }
-    
-        // Format the value with commas for display purposes
-        const formattedValue = value ? (field.includes("Price") ? parseFloat(value).toLocaleString() : parseInt(value).toLocaleString()) : '';
-    
-        // Set the formatted value in state for display
-        setter(formattedValue);
-    
-        // Store the raw value for submission (without commas)
-        const rawValue = field.includes("Price") ? parseFloat(value) || 0 : parseInt(value) || 0;
-    
-        // Save raw value for submission (you might need to adjust where you store this)
-        // You might want to save rawValue in another state variable if needed.
-    
-        errorSetter((prev) => ({ ...prev, [field]: '' })); // Clear the error for the specific field
+        
+        // Format for display
+        const displayValue = numValue.toLocaleString();
+        
+        // Store the actual numeric value
+        setter(numValue.toString());
+        errorSetter((prev) => ({ ...prev, [field]: '' }));
     };
     
     // Validate prices
@@ -235,25 +276,6 @@ export default function ListingsPage() {
         setShowDeleteConfirmation(true);
     };
 
-    const handleSearch = () => {
-        const priceValid = validatePrices(); 
-        const mileageValid = validateMileages(); 
-
-        // Check if there are any validation errors
-        if (!priceValid || !mileageValid) {
-            // If there are errors, do not close the modal
-            return; // Exit the function to keep the modal open
-        }
-    
-        // If there are no validation errors and inputs are empty, close the modal
-        if (!minPrice && !maxPrice && !minMileage && !maxMileage) {
-            setFilterModalOpen(false); // Close the modal
-        } else {
-            // Proceed with your search logic here
-            console.log('Searching with:', { minPrice, maxPrice, minMileage, maxMileage });
-            // You can also close the modal here if you want after successful search
-        }
-    };
     
     return (
         <div className="min-h-screen bg-gray-100 p-6">
