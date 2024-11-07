@@ -207,8 +207,8 @@ export default function CreateListing() {
                 required
               >
                 <option className="font-rajdhaniSemiBold" value="">Select Transmission</option>
-                <option className="font-rajdhaniSemiBold" value="Automatic">AUTOMATIC</option>
-                <option className="font-rajdhaniSemiBold" value="Manual">MANUAL</option>
+                <option className="font-rajdhaniSemiBold" value="AUTOMATIC">AUTOMATIC</option>
+                <option className="font-rajdhaniSemiBold" value="MANUAL">MANUAL</option>
               </select>
             </div>
 

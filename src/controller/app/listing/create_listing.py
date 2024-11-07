@@ -68,18 +68,33 @@ class CreateListingController:
                 agent_email=agent_email,  # Use the extracted email here
                 seller_email=data['seller_email']
             )
-            # Test
-            # Save the image and update the image_url if needed
-            image_filename = f"{listing_id}.jpg"  # Or any appropriate extension
+
+            # Set uploaded image url
+            image_filename = f"{listing_id}.jpg"
             image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
-            file.save(image_path)
             new_listing.image_url = image_filename  # Update the listing with the saved image URL
 
-            # Add the new listing to the database
-            db.session.add(new_listing)
-            db.session.commit()
+            success, status_code = Listing.createListing(
+                id=listing_id,
+                vin=data['vin'],
+                make=data['make'],
+                model=data['model'],
+                year=year,
+                price=price,
+                mileage=mileage,
+                transmission=data['transmission'],
+                fuel_type=data['fuel_type'],
+                is_sold=False,
+                listing_date=datetime.now().date().isoformat(),
+                image_url=image_filename,
+                agent_email=agent_email,
+                seller_email=data['seller_email']
+            )
 
-            return jsonify({'success': True, 'message': 'Listing created successfully'}), 201
+            if (success):
+                file.save(image_path)
+
+            return jsonify({'success': success, 'message': 'create_listing API called'}), status_code
 
         except Exception as e:
             print(f"Error in create_listing: {str(e)}")

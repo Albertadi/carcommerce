@@ -9,7 +9,7 @@ export default function ListingsPage() {
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { token, user } = useContext(AuthContext);
+    const { access_token, user } = useContext(AuthContext);
     const [showFilters, setShowFilters] = useState(false); // Toggle state for filters
 
     // Search filter state
@@ -61,11 +61,12 @@ export default function ListingsPage() {
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
+        console.log("token is " + access_token)
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
                 buildSearchFilters(),
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${access_token}` } }
             );
             setListings(response.data.listing_list);
         } catch (error) {
@@ -78,8 +79,15 @@ export default function ListingsPage() {
     };
 
     useEffect(() => {
-        fetchListings();
-    }, [token]);
+        if (access_token) {
+            fetchListings();
+        } else {
+            setError("You need to log in to view listings.");
+        }
+        // Only run this effect on initial mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
 
     const handleInputChange = (setter, errorSetter, field) => (e) => {
         let value = e.target.value;
@@ -210,7 +218,7 @@ export default function ListingsPage() {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/delete_listing',
                 { id: listingToDelete.id },
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${access_token}` } }
             );
     
             if (response.data.success) {
@@ -355,45 +363,55 @@ export default function ListingsPage() {
             {/* Listings */}
             {isLoading ? (
                 <div className="flex justify-center items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
                 </div>
             ) : (
-                <div className="grid gap-4 mt-6">
-                    {listings.length > 0 ? (
-                        listings.map((listing) => (
-                            <div key={listing.id} className="relative border rounded-lg shadow-lg p-4">
-                                <img 
-                                    src={listing.image || 'https://dummyimage.com/600x400/000/fff&text=Car'} 
-                                    alt={`${listing.make} ${listing.model}`} 
-                                    className="w-full h-32 object-cover rounded" 
-                                />
-                                <h3 className="text-xl font-semibold text-black">{listing.make} {listing.model} ({listing.year})</h3>
-                                <p className="text-gray-600">Mileage: {listing.mileage} km</p>
-                                <p className="text-gray-600">Transmission: {listing.transmission}</p>
-                                <p className="text-gray-600">Fuel Type: {listing.fuel_type}</p>
-                                <span className="block text-lg text-gray-600">{listing.price}</span>
+                <div className="grid gap-8 mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {listings.length > 0 ? (
+                    listings.map((listing) => (
+                    <div key={listing.id} className="relative border rounded-lg shadow-lg overflow-hidden">
+                        <img
+                        src={listing.image || 'https://dummyimage.com/600x400/000/fff&text=Car'} 
+                        alt={`${listing.make} ${listing.model}`}
+                        className="w-full h-48 object-cover"
+                        />
+                        <div className="p-4">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                            {listing.make} {listing.model} ({listing.year})
+                        </h3>
+                        <p className="text-gray-600 mb-1">
+                            <span className="font-semibold">Mileage:</span> {listing.mileage.toLocaleString()} km
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                            <span className="font-semibold">Transmission:</span> {listing.transmission}
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                            <span className="font-semibold">Fuel Type:</span> {listing.fuel_type}
+                        </p>
+                        <p className="text-lg font-semibold text-red-600 mt-2">
+                            ${listing.price.toLocaleString()}
+                        </p>
 
-                                <div className="absolute bottom-4 right-4 flex flex-col space-y-2">
-                                    <button
-                                        onClick={() => handleViewDetails(listing)}
-                                        className="bg-blue-500 text-white py-2 px-4 rounded w-full"
-                                    >
-                                        View Details
-                                    </button>
-
-                                    <button
-                                        onClick={() => handleDeleteClick(listing)}
-                                        className="bg-red-500 text-white py-2 px-4 rounded w-full"
-                                    >
-                                        Delete
-                                    </button>
-
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-gray-500">No listings found.</p>
-                    )}
+                        <div className="flex justify-between mt-4">
+                            <button
+                            onClick={() => handleViewDetails(listing)}
+                            className="bg-blue-500 text-white py-1 px-3 rounded-lg"
+                            >
+                            View Details
+                            </button>
+                            <button
+                            onClick={() => handleDeleteClick(listing)}
+                            className="bg-red-500 text-white py-1 px-3 rounded-lg"
+                            >
+                            Delete
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                    ))
+                ) : (
+                    <p className="text-gray-500">No listings found.</p>
+                )}
                 </div>
             )}
 
