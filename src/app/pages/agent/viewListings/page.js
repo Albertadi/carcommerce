@@ -371,10 +371,11 @@ export default function ListingsPage() {
                     listings.map((listing) => (
                     <div key={listing.id} className="relative border rounded-lg shadow-lg overflow-hidden">
                         <img
-                        src={listing.image || 'https://dummyimage.com/600x400/000/fff&text=Car'} 
-                        alt={`${listing.make} ${listing.model}`}
-                        className="w-full h-48 object-cover"
+                            src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                            alt={`${listing.make} ${listing.model}`}
+                            className="w-full h-48 object-cover"
                         />
+
                         <div className="p-4">
                         <h3 className="text-xl font-semibold text-gray-800 mb-2">
                             {listing.make} {listing.model} ({listing.year})

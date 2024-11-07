@@ -1,5 +1,5 @@
 # Libraries
-from flask import Flask
+from flask import Flask, send_from_directory
 from sqlalchemy import event
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -82,9 +82,9 @@ with flask_app.app_context():
     db.session.commit()
     
 
-@flask_app.route('/api/hello', methods=['GET'])
-def hello():
-    return {'message': 'Hello from Flask!'}, 200
+@flask_app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(flask_app.config['UPLOAD_FOLDER'], filename)
 
 # Load all routes
 # Authentication
