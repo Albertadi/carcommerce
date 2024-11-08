@@ -47,6 +47,27 @@ class Suspension(db.Model):
         return True, 200  # Suspension created successfully
     
     @classmethod
+    def suspendProfile(cls, profile: str, days: int, reason: str):
+        # Fetch the list of users with the specified profile
+        user_list = User.searchUserAccount(None, None, user_profile=profile)
+        
+        # Check if the result is a list and has users
+        if not isinstance(user_list, list) or not user_list:
+            return False, 404  # No users found with the specified profile
+
+        # Iterate through each user and suspend their account
+        for user in user_list:
+            user_email = user.get("email")  # Safely get email
+            if user_email:
+                success, status_code = cls.suspendUser(user_email, days, reason)
+                
+                # Optionally, log each suspension result
+                if not success:
+                    print(f"Failed to suspend {user_email} with status code {status_code}")
+
+        return True, 200  # Return success if all suspensions were processed
+    
+    @classmethod
     def check_user_suspended(cls, user_email: str) -> dict:
         # Check if the user is suspended
         suspension = cls.query.filter_by(user_email=user_email).first()

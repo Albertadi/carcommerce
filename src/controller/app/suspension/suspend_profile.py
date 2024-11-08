@@ -18,12 +18,7 @@ class SuspendProfileController:
         # Validate input
         if not profile or not days:
             return jsonify({'success': False, 'message': 'Profile and days are required.'}), 400
+        
+        suspend_user_response, status_code = Suspension.suspendProfile(profile, days, reason)
 
-        # Call the createSuspension method from the Suspension entity
-        account_list = User.searchUserAccount(None, None, profile)
-        for account in account_list:
-            suspend_user_response, status_code = Suspension.suspendUser(account.email, days, reason)
-
-
-
-        return jsonify({'success': suspend_user_response, 'message': 'suspend_user API called'}), status_code
+        return jsonify({'success': suspend_user_response, 'message': 'suspend_profile API called'}), status_code

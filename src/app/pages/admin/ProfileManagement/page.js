@@ -22,6 +22,13 @@ export default function ProfileManagement() {
   });
   const [editingProfile, setEditingProfile] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [selectedUserForSuspension, setSelectedUserForSuspension] = useState(null);
+  const [suspendDuration, setSuspendDuration] = useState('');
+  const [suspendReason, setSuspendReason] = useState('');
+  const [suspendInvalidMessage, setSuspendInvalidMessage] = useState('');
+
+  const [error, setError] = useState('');
 
   // Fetch profiles from the backend API
   useEffect(() => {
@@ -60,6 +67,11 @@ export default function ProfileManagement() {
     fetchProfiles();
   }, [searchTerm]);
 
+  const handleShowSuspendModal = (profile) => {
+    setSelectedUserForSuspension(profile);
+    setShowSuspendModal(true);
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const val = type === "checkbox" ? checked : value;
@@ -74,6 +86,8 @@ export default function ProfileManagement() {
 
   const addProfile = async () => {
     try {
+      setIsLoading(true); // Add loading state while creating profile
+      
       // Make API call to create the new profile
       const response = await axios.post(
         "http://localhost:5000/api/profiles/create_profile",
@@ -84,9 +98,17 @@ export default function ProfileManagement() {
           },
         }
       );
-
-      // Assuming the API responds with the created profile
-      setProfiles([...profiles, response.data.profile]);
+  
+      // Fetch the updated list of profiles after creating new one
+      await fetchProfiles();
+  
+      // Show success message
+      setSuccessMessage('Profile created successfully');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+  
+      // Reset form and close modal
       setShowModal(false);
       setNewProfile({
         name: "",
@@ -96,13 +118,17 @@ export default function ProfileManagement() {
         has_sell_permission: false,
         has_listing_permission: false,
       });
+  
     } catch (error) {
       console.error("Error adding profile:", error);
+      // Show error message to user
+      setError('Failed to create profile. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const deleteProfile = (name) => {
-    setProfiles(profiles.filter((profile) => profile.name !== name));
   };
 
   const startEditing = (profile) => {
@@ -157,6 +183,7 @@ export default function ProfileManagement() {
   // Add fetchProfiles function outside of useEffect
   const fetchProfiles = async () => {
     try {
+      setIsLoading(true);
       if (searchTerm) {
         const response = await axios.get(
           "http://localhost:5000/api/profiles/view_profile",
@@ -169,7 +196,7 @@ export default function ProfileManagement() {
             },
           }
         );
-        setProfiles([response.data.profile]);
+        setProfiles(response.data.profile ? [response.data.profile] : []);
       } else {
         const response = await axios.post(
           "http://localhost:5000/api/profiles/search_profile",
@@ -180,10 +207,16 @@ export default function ProfileManagement() {
             },
           }
         );
-        setProfiles(response.data.profile_list);
+        setProfiles(response.data.profile_list || []);
       }
     } catch (error) {
       console.error("Error fetching profiles:", error);
+      setError('Failed to fetch profiles. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -196,6 +229,52 @@ export default function ProfileManagement() {
     const { name, value, type, checked } = e.target;
     const val = type === "checkbox" ? checked : value;
     setEditingProfile({ ...editingProfile, [name]: val });
+  };
+
+  const handleSuspend = async () => {
+    // Validate inputs
+    if (!suspendDuration) {
+      setSuspendInvalidMessage('Please fill in the duration.');
+      return;
+    }
+    if (!suspendReason) {
+      setSuspendInvalidMessage('Please provide a reason for suspension.');
+      return;
+    }
+    
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/suspension/suspend_profile',
+        {
+          profile: selectedUserForSuspension.name,
+          days: suspendDuration,
+          reason: suspendReason
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+  
+      if (response.data.success) {
+        setSuccessMessage('Profile suspended successfully');
+        
+        // Close modal and reset state
+        setShowSuspendModal(false);
+        setSelectedUserForSuspension(null);
+        setSuspendDuration('');
+        setSuspendReason('');
+        
+        // Refresh the profiles list
+        fetchProfiles();
+      } else {
+        setSuspendInvalidMessage(response.data.message || 'Failed to suspend Profile');
+      }
+    } catch (error) {
+      console.error('Error suspending Profile:', error);
+      setSuspendInvalidMessage(error.response?.data?.message || 'An error occurred while suspending the Profile');
+    }
   };
 
   
@@ -263,44 +342,44 @@ export default function ProfileManagement() {
     </thead>
     <tbody>
     {profiles && profiles.length > 0 ? (
-  profiles.map((profile) => (
-    <tr 
-      key={profile.name} 
-      className="hover:bg-gray-700 cursor-pointer"
-      onClick={() => toggleProfileDetails(profile)}
-    >
-      <td className="py-2 px-4 border border-gray-600 text-white">{profile.name}</td>
-      <td className="py-2 px-4 border border-gray-600 text-white">{profile.description}</td>
-      <td className="py-2 px-4 border border-gray-600 text-white">
-        {profile.has_buy_permission ? "✓" : "✕"}
-      </td>
-      <td className="py-2 px-4 border border-gray-600 text-white">
-        {profile.has_sell_permission ? "✓" : "✕"}
-      </td>
-      <td className="py-2 px-4 border border-gray-600 text-white">
-        {profile.has_listing_permission ? "✓" : "✕"}
-      </td>
-      <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
-        {profile.name !== 'admin' && (
-          <button
-            onClick={() => showSuspendModal()}
-            className="bg-red-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
-          >
-            🚫
-          </button>
-        )}
-      </td>
-      <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
-        {profile.name !== 'admin' && (
-          <button
-            onClick={() => startEditing(profile)}
-            className="bg-green-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
-          >
-            ✎
-          </button>
-        )}
-      </td>
-    </tr>
+    profiles.map((profile) => (
+      <tr 
+        key={profile.name} 
+        className="hover:bg-gray-700 cursor-pointer"
+        onClick={() => toggleProfileDetails(profile)}
+      >
+        <td className="py-2 px-4 border border-gray-600 text-white">{profile.name}</td>
+        <td className="py-2 px-4 border border-gray-600 text-white">{profile.description}</td>
+        <td className="py-2 px-4 border border-gray-600 text-white">
+          {profile.has_buy_permission ? "✓" : "✕"}
+        </td>
+        <td className="py-2 px-4 border border-gray-600 text-white">
+          {profile.has_sell_permission ? "✓" : "✕"}
+        </td>
+        <td className="py-2 px-4 border border-gray-600 text-white">
+          {profile.has_listing_permission ? "✓" : "✕"}
+        </td>
+        <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+          {profile.name !== 'admin' && (
+            <button
+              onClick={() => handleShowSuspendModal(profile)}
+              className="bg-red-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+            >
+              🚫
+            </button>
+          )}
+        </td>
+        <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+          {profile.name !== 'admin' && (
+            <button
+              onClick={() => startEditing(profile)}
+              className="bg-green-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+            >
+              ✎
+            </button>
+          )}
+        </td>
+      </tr>
   ))
 ) : (
   <tr>
@@ -321,76 +400,89 @@ export default function ProfileManagement() {
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-5 rounded shadow-lg">
-            <h2 className="text-xl mb-4">Add New Profile</h2>
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96 border border-gray-700">
+          <h2 className="text-3xl font-bold mb-6 text-white">Add New Profile</h2>
+          
+          <div className="space-y-4">
+            {/* Profile Name Input */}
             <input
               type="text"
               name="name"
               placeholder="Profile Name"
               value={newProfile.name}
               onChange={handleChange}
-              className="mb-2 p-2 border rounded w-full"
+              className="w-full p-3 bg-gray-700/75 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
+
+            {/* Description Input */}
             <input
               type="text"
               name="description"
               placeholder="Description"
               value={newProfile.description}
               onChange={handleChange}
-              className="mb-2 p-2 border rounded w-full"
+              className="w-full p-3 bg-gray-700/75 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_admin_permission"
-                checked={newProfile.has_admin_permission}
-                onChange={handleChange}
-              />
-              Has Admin Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_buy_permission"
-                checked={newProfile.has_buy_permission}
-                onChange={handleChange}
-              />
-              Has Buy Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_sell_permission"
-                checked={newProfile.has_sell_permission}
-                onChange={handleChange}
-              />
-              Has Sell Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_listing_permission"
-                checked={newProfile.has_listing_permission}
-                onChange={handleChange}
-              />
-              Has Listing Permission
-            </label>
-            <button
-              onClick={addProfile}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Create Profile
-            </button>
-            <button
-              onClick={() => setShowModal(false)}
-              className="mt-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
+
+            {/* Permissions */}
+            <div className="space-y-3 mt-4">
+
+              <label className="flex items-center space-x-3 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="has_buy_permission"
+                  checked={newProfile.has_buy_permission}
+                  onChange={handleChange}
+                  className="w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer bg-gray-700"
+                />
+                <span>Has Buy Permission</span>
+              </label>
+
+              <label className="flex items-center space-x-3 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="has_sell_permission"
+                  checked={newProfile.has_sell_permission}
+                  onChange={handleChange}
+                  className="w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer bg-gray-700"
+                />
+                <span>Has Sell Permission</span>
+              </label>
+
+              <label className="flex items-center space-x-3 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="has_listing_permission"
+                  checked={newProfile.has_listing_permission}
+                  onChange={handleChange}
+                  className="w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer bg-gray-700"
+                />
+                <span>Has Listing Permission</span>
+              </label>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={addProfile}
+                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Create Profile
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
-      )}
+        {/* Semi-transparent overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 -z-10"></div>
+      </div>
+    )}
 
 {editingProfile && (
   <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -416,16 +508,6 @@ export default function ProfileManagement() {
           />
         </div>
         <div className="space-y-3">
-          <label className="flex items-center space-x-3 text-white">
-            <input
-              type="checkbox"
-              name="has_admin_permission"
-              checked={editingProfile.has_admin_permission}
-              onChange={handleEditChange}
-              className="w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500"
-            />
-            <span>Has Admin Permission</span>
-          </label>
           <label className="flex items-center space-x-3 text-white">
             <input
               type="checkbox"
@@ -468,6 +550,76 @@ export default function ProfileManagement() {
         <button
           onClick={() => setEditingProfile(null)}
           className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    {/* Semi-transparent overlay */}
+    <div className="absolute inset-0 bg-black bg-opacity-50 -z-10"></div>
+  </div>
+)}
+    {/* Suspend Modal */}
+{showSuspendModal && selectedUserForSuspension && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96 border border-gray-700">
+      <h2 className="text-xl font-bold mb-4 text-white">
+        Suspend {selectedUserForSuspension.name} for how long?
+      </h2>
+      
+      {/* Duration Input */}
+      <input
+        type="number"
+        min="1"
+        value={suspendDuration}
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          if (value > 0) {
+            setSuspendDuration(value);
+            setSuspendInvalidMessage('');
+          } else {
+            setSuspendDuration('');
+            setSuspendInvalidMessage('Please fill in the duration.');
+            setTimeout(() => {
+              setSuspendInvalidMessage('');
+            }, 3000);
+          }
+        }}
+        className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+        placeholder="Enter duration in days"
+      />
+      
+      {/* Reason Input */}
+      <input
+        type="text"
+        value={suspendReason}
+        onChange={(e) => setSuspendReason(e.target.value)}
+        className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+        placeholder="Enter suspension reason"
+      />
+      
+      {/* Error Message */}
+      {suspendInvalidMessage && (
+        <p className="text-red-500 mb-4">{suspendInvalidMessage}</p>
+      )}
+      
+      {/* Action Buttons */}
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={handleSuspend}
+          className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => {
+            setShowSuspendModal(false);
+            setSelectedUserForSuspension(null);
+            setSuspendDuration('');
+            setSuspendReason('');
+            setSuspendInvalidMessage('');
+          }}
+          className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
         >
           Cancel
         </button>

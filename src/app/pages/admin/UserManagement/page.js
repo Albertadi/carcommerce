@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useContext } from 'react';
+import { User, Mail, Lock, Calendar, UserCircle } from 'lucide-react';
 import { AuthContext } from '../../authorization/AuthContext';
-import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function UserManagement() {
@@ -38,14 +38,9 @@ export default function UserManagement() {
   const [rowSelectedUser, setRowSelectedUser] = useState(null);
   const [isRowModalOpen, setIsRowModalOpen] = useState(false);
 
-  const [showCustomModal, setShowCustomModal] = useState(false);
-  const [customModalContent, setCustomModalContent] = useState({ title: '', message: '' });
-
   //for token
   const {access_token, permissions} = useContext(AuthContext);
 
-  // for relogin incase 401
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
    // Fetch users function
 
@@ -71,12 +66,7 @@ export default function UserManagement() {
       );
       setUsers(response.data.account_list);
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setShowLoginModal(true); // Show login modal if 401 error occurs
-      } else {
-        setError('Failed to fetch accounts. Please try again.');
-        console.error('Error fetching accounts:', error);
-      }
+      console.error('Error fetching users:', error);
     } finally {
       setIsLoading(false);
     }
@@ -138,35 +128,34 @@ export default function UserManagement() {
   };
 
   const handleSuspend = async () => {
-    // Input validation
     if (!duration) {
       setInvalidMessage('Please enter a valid suspension duration.');
       setTimeout(() => {
-        setInvalidMessage('');
+        setInvalidMessage(''); // Clear the message after 3 seconds
       }, 3000);
-      return;
+      return;  // Exit the function early
     }
-  
+
+    // Check if reason is provided
     if (!suspendReason) {
       setInvalidMessage('Please fill in the reason.');
+      
+      // Clear the invalid message after 3 seconds
       setTimeout(() => {
-        setInvalidMessage('');
+        setInvalidMessage(''); // Clear the message after 3 seconds
       }, 3000);
-      return;
+      return; 
     }
-  
+
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
     setInvalidMessage('');
-  
+
     try {
-      // First, check if user is already suspended
-      const checkResponse = await axios.post(
-        'http://localhost:5000/api/suspension/check_user',
-        {
-          email: selectedUser.email
-        },
+      await axios.post(
+        `http://localhost:5000/api/suspension/suspend_user/${selectedUser.id}`,
+        { email: selectedUser.email, duration },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -174,55 +163,22 @@ export default function UserManagement() {
         }
       );
 
-  
-      if (checkResponse.data.is_suspended) {
-        // Calculate remaining days
-        const endDate = new Date(checkResponse.data.suspension_details.end_date);
-        const currentDate = new Date();
-        const remainingDays = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
-        
-        // Show modal with suspension info
-        setCustomModalContent({
-          title: 'Selected User Already Suspended',
-          message: `${selectedUser.email} is currently suspended for ${remainingDays} days`
-        });
-        setShowCustomModal(true);
-        setIsLoading(false);
-        return;
-      }
-  
-      // If user is not suspended, proceed with suspension
-      await axios.post(
-        'http://localhost:5000/api/suspension/suspend_user',
-        {
-          email: selectedUser.email,
-          days: parseInt(duration),
-          reason: suspendReason
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
-  
-      setSuccessMessage("User ${selectedUser.email} has been suspended for ${duration} days.");
+      setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
       setTimeout(() => {
-        setSuccessMessage('');
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
       }, 3000);
-      fetchUsers();
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setShowLoginModal(true); // Show login modal if 401 error occurs
-      } else {
-        const errorMessage = error.response?.data?.message || 'Failed to suspend the user. Please try again.';
-        setError(errorMessage);
-        setTimeout(() => {
-          setError('');
-        }, 3000);
-        console.error('Error suspending user:', error);
-      }
+      fetchUsers(); // Refresh the user list after suspension
     } 
+
+    catch (error) {
+      setError('Failed to suspend the user. Please try again.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+      console.error('Error suspending user:', error);
+
+    } 
+
     finally {
       setIsLoading(false);
       setShowSuspendModal(false);
@@ -261,17 +217,13 @@ export default function UserManagement() {
       }, 3000);
     } 
     
-   catch (error) {
-    if (error.response && error.response.status === 401) {
-        setShowLoginModal(true); // Show login modal if 401 error occurs
-    } else {
+    catch (error) {
       setError('Failed to update user. Please try again.');
       // Timer to clear success message after 3 seconds
       setTimeout(() => {
         setError('');
       }, 3000);
     } 
-  }
     
     finally {
       setIsLoading(false);
@@ -433,8 +385,8 @@ export default function UserManagement() {
       setUserProfile('');
       setSuccessMessage('User added successfully!');
       setTimeout(() => {
-        setSuccessMessage(''); // Timer to clear success message after 7 seconds
-      }, 7000);
+        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+      }, 3000);
     } 
     catch (error) {
       setError('Failed to add user. Please try again.');
@@ -450,11 +402,6 @@ export default function UserManagement() {
 
   return (
     <div className="min-h-screen bg-gray-500 p-6">
-
-      {showLoginModal && (
-        <ReloginModal onClose={() => setShowLoginModal(false)} />
-      )}
-
       {/* Error display */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -477,73 +424,122 @@ export default function UserManagement() {
         )}
 
       {/* Add new account section */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg mb-8">
-        <h2 className="text-4xl text-center font-bold mb-6 text-white">Add new account</h2>
-        <div className="flex flex-col space-y-4 items-center">
-          <input
-            type="text"
-            placeholder="First name"
-            value={firstname}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          />
-          <input
-            type="text"
-            placeholder="Last name"
-            value={lastname}
-            onChange={(e) => setLastName(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          />
-          
-          <input
-            type="text"
-            placeholder="YYYY-MM-DD"
-            value={dob}
-            onChange={handleDobChange}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          />
-          <input
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          />
-          <select
-            value={userProfile}
-            onChange={(e) => setUserProfile(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/3 focus:outline-none text-black"
-            disabled={isLoading}
-          >
-            <option value="">Select User Profile</option>
-            <option value="buyer">Buyer</option>
-            <option value="seller">Seller</option>
-            <option value="used car agent">Used Car Agent</option>
-          </select>
+      <div className="h-100 bg-gradient-to-br from-gray-900 to-gray-800 p-8 flex items-center rounded-2xl justify-center">
+      <div className="w-full max-w-xl bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
+        <h2 className="text-4xl font-bold text-white text-center mb-8">
+          Create New Account
+        </h2>
+        
+        <div className="space-y-6">
+          {/* Name Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="First name"
+                value={firstname}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastname}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Date of Birth */}
+          <div className="relative">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="YYYY-MM-DD"
+              value={dob}
+              onChange={handleDobChange}
+              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Password */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* User Profile */}
+          <div className="relative">
+            <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <select 
+              value={userProfile}
+              onChange={(e) => setUserProfile(e.target.value)}
+              className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 appearance-none cursor-pointer"
+              disabled={isLoading}
+              style={{
+                background: 'rgb(31, 41, 55)',
+                borderRadius: '0.5rem'
+              }}
+            >
+              <option value="" className="bg-gray-300 text-gray-900">Select User Profile</option>
+              <option value="buyer" className="bg-gray-300 text-gray-900">Buyer</option>
+              <option value="seller" className="bg-gray-300 text-gray-900">Seller</option>
+              <option value="used car agent" className="bg-gray-300 text-gray-900">Used Car Agent</option>
+            </select>
+            <style jsx>{`
+              select option:checked {
+                background: #3b82f6 !important;
+                color: white !important;
+              }
+              select option:hover {
+                background: #3b82f6 !important;
+                color: white !important;
+              }
+            `}</style>
+          </div>
+
+          {/* Submit Button */}
           <button
             onClick={handleAddUser}
-            className={`bg-blue-500 text-white p-2 rounded-md w-full md:w-1/3 ${isLoading ? 'opacity-50' : ''}`}
+            className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-[1.02] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Adding...' : 'Add User'}
+            {isLoading ? 'Adding...' : 'Create Account'}
           </button>
         </div>
       </div>
+    </div>
 
       {/* User List section */}
-      <h2 className="text-4xl text-center font-bold mb-6 text-white">User List</h2>
+      <h2 className="text-4xl p-8 text-center font-bold mb-6 text-white">User List</h2>
 
       {/* search section */}
       <div className="flex justify-center mb-4 gap-4">
@@ -658,7 +654,12 @@ export default function UserManagement() {
                   </tr>
                 )}
               </tbody>
-            </table>              
+            </table>
+
+
+            {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
+            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+              
           </div>
       )}
       
@@ -785,50 +786,20 @@ export default function UserManagement() {
     {isRowModalOpen && rowSelectedUser && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-          <h2 className="text-xl font-bold mb-4">Account Details</h2>
-          <div className="space-y-3">
-            <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Email:</span> 
-              <span>{rowSelectedUser.email}</span>
-            </p>
-            <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Full name:</span> 
-              <span>{rowSelectedUser.first_name} {rowSelectedUser.last_name}</span>
-            </p>
-            <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Date of Birth:</span> 
-              <span>{rowSelectedUser.dob}</span>
-            </p>
-            <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">User Profile:</span> 
-              <span>{rowSelectedUser.user_profile}</span>
-            </p>
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button 
-              onClick={() => setIsRowModalOpen(false)} 
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-    {showCustomModal && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-          <h2 className="text-xl font-bold mb-4">{customModalContent.title}</h2>
-          <p className="mb-4">{customModalContent.message}</p>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={() => setShowCustomModal(false)}
-          >
+          <h2 className="text-xl font-bold mb-4">User Details</h2>
+          <p>First Name: {rowSelectedUser.first_name}</p>
+          <p>Last Name: {rowSelectedUser.last_name}</p>
+          <p>Email: {rowSelectedUser.email}</p>
+          <p>DOB: {rowSelectedUser.dob}</p>
+          <p>User Profile: {rowSelectedUser.user_profile}</p>
+          {/* Other user details */}
+          <button onClick={() => setIsRowModalOpen(false)} className="bg-red-500 text-white p-2 rounded mt-4">
             Close
           </button>
         </div>
       </div>
     )}
+
     </div>
   );
 }
