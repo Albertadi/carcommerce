@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
+import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function UserManagement() {
@@ -37,9 +38,14 @@ export default function UserManagement() {
   const [rowSelectedUser, setRowSelectedUser] = useState(null);
   const [isRowModalOpen, setIsRowModalOpen] = useState(false);
 
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customModalContent, setCustomModalContent] = useState({ title: '', message: '' });
+
   //for token
   const {access_token, permissions} = useContext(AuthContext);
 
+  // for relogin incase 401
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
    // Fetch users function
 
@@ -65,7 +71,12 @@ export default function UserManagement() {
       );
       setUsers(response.data.account_list);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      if (error.response && error.response.status === 401) {
+        setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        setError('Failed to fetch accounts. Please try again.');
+        console.error('Error fetching accounts:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -127,34 +138,35 @@ export default function UserManagement() {
   };
 
   const handleSuspend = async () => {
+    // Input validation
     if (!duration) {
       setInvalidMessage('Please enter a valid suspension duration.');
       setTimeout(() => {
-        setInvalidMessage(''); // Clear the message after 3 seconds
+        setInvalidMessage('');
       }, 3000);
-      return;  // Exit the function early
+      return;
     }
-
-    // Check if reason is provided
+  
     if (!suspendReason) {
       setInvalidMessage('Please fill in the reason.');
-      
-      // Clear the invalid message after 3 seconds
       setTimeout(() => {
-        setInvalidMessage(''); // Clear the message after 3 seconds
+        setInvalidMessage('');
       }, 3000);
-      return; 
+      return;
     }
-
+  
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
     setInvalidMessage('');
-
+  
     try {
-      await axios.post(
-        `http://localhost:5000/api/suspension/suspend_user/${selectedUser.id}`,
-        { email: selectedUser.email, duration },
+      // First, check if user is already suspended
+      const checkResponse = await axios.post(
+        'http://localhost:5000/api/suspension/check_user',
+        {
+          email: selectedUser.email
+        },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -162,22 +174,55 @@ export default function UserManagement() {
         }
       );
 
-      setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
+  
+      if (checkResponse.data.is_suspended) {
+        // Calculate remaining days
+        const endDate = new Date(checkResponse.data.suspension_details.end_date);
+        const currentDate = new Date();
+        const remainingDays = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+        
+        // Show modal with suspension info
+        setCustomModalContent({
+          title: 'Selected User Already Suspended',
+          message: `${selectedUser.email} is currently suspended for ${remainingDays} days`
+        });
+        setShowCustomModal(true);
+        setIsLoading(false);
+        return;
+      }
+  
+      // If user is not suspended, proceed with suspension
+      await axios.post(
+        'http://localhost:5000/api/suspension/suspend_user',
+        {
+          email: selectedUser.email,
+          days: parseInt(duration),
+          reason: suspendReason
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+  
+      setSuccessMessage("User ${selectedUser.email} has been suspended for ${duration} days.");
       setTimeout(() => {
-        setSuccessMessage(''); // Timer to clear success message after 3 seconds
+        setSuccessMessage('');
       }, 3000);
-      fetchUsers(); // Refresh the user list after suspension
+      fetchUsers();
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        const errorMessage = error.response?.data?.message || 'Failed to suspend the user. Please try again.';
+        setError(errorMessage);
+        setTimeout(() => {
+          setError('');
+        }, 3000);
+        console.error('Error suspending user:', error);
+      }
     } 
-
-    catch (error) {
-      setError('Failed to suspend the user. Please try again.');
-      setTimeout(() => {
-        setError('');
-      }, 3000);
-      console.error('Error suspending user:', error);
-
-    } 
-
     finally {
       setIsLoading(false);
       setShowSuspendModal(false);
@@ -216,13 +261,17 @@ export default function UserManagement() {
       }, 3000);
     } 
     
-    catch (error) {
+   catch (error) {
+    if (error.response && error.response.status === 401) {
+        setShowLoginModal(true); // Show login modal if 401 error occurs
+    } else {
       setError('Failed to update user. Please try again.');
       // Timer to clear success message after 3 seconds
       setTimeout(() => {
         setError('');
       }, 3000);
     } 
+  }
     
     finally {
       setIsLoading(false);
@@ -384,8 +433,8 @@ export default function UserManagement() {
       setUserProfile('');
       setSuccessMessage('User added successfully!');
       setTimeout(() => {
-        setSuccessMessage(''); // Timer to clear success message after 3 seconds
-      }, 3000);
+        setSuccessMessage(''); // Timer to clear success message after 7 seconds
+      }, 7000);
     } 
     catch (error) {
       setError('Failed to add user. Please try again.');
@@ -401,6 +450,11 @@ export default function UserManagement() {
 
   return (
     <div className="min-h-screen bg-gray-500 p-6">
+
+      {showLoginModal && (
+        <ReloginModal onClose={() => setShowLoginModal(false)} />
+      )}
+
       {/* Error display */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -604,12 +658,7 @@ export default function UserManagement() {
                   </tr>
                 )}
               </tbody>
-            </table>
-
-
-            {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
-            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-              
+            </table>              
           </div>
       )}
       
@@ -736,20 +785,50 @@ export default function UserManagement() {
     {isRowModalOpen && rowSelectedUser && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-          <h2 className="text-xl font-bold mb-4">User Details</h2>
-          <p>First Name: {rowSelectedUser.first_name}</p>
-          <p>Last Name: {rowSelectedUser.last_name}</p>
-          <p>Email: {rowSelectedUser.email}</p>
-          <p>DOB: {rowSelectedUser.dob}</p>
-          <p>User Profile: {rowSelectedUser.user_profile}</p>
-          {/* Other user details */}
-          <button onClick={() => setIsRowModalOpen(false)} className="bg-red-500 text-white p-2 rounded mt-4">
+          <h2 className="text-xl font-bold mb-4">Account Details</h2>
+          <div className="space-y-3">
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Email:</span> 
+              <span>{rowSelectedUser.email}</span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Full name:</span> 
+              <span>{rowSelectedUser.first_name} {rowSelectedUser.last_name}</span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Date of Birth:</span> 
+              <span>{rowSelectedUser.dob}</span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">User Profile:</span> 
+              <span>{rowSelectedUser.user_profile}</span>
+            </p>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <button 
+              onClick={() => setIsRowModalOpen(false)} 
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    {showCustomModal && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+          <h2 className="text-xl font-bold mb-4">{customModalContent.title}</h2>
+          <p className="mb-4">{customModalContent.message}</p>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            onClick={() => setShowCustomModal(false)}
+          >
             Close
           </button>
         </div>
       </div>
     )}
-
     </div>
   );
 }
