@@ -28,7 +28,6 @@ class SearchListingController:
             print("Missing fields in request:", missing_fields)
             return jsonify({"error": "Missing required fields", "missing_fields": missing_fields}), 422
 
-<<<<<<< HEAD
         # Extract values from the request
         make = data.get('make')
         model = data.get('model')
@@ -52,8 +51,3 @@ class SearchListingController:
         except Exception as e:
             print("Error while searching listings:", str(e))
             return jsonify({"error": "An error occurred while searching listings", "details": str(e)}), 500
-=======
-        listing_list = Listing.searchListing(make, model, year, min_price, max_price, min_mileage, max_mileage, transmission, fuel_type, is_sold, seller_email, agent_email)
-
-        return jsonify({"message": "Success", "listing_list": listing_list})
->>>>>>> db28114b1ead0a1b4b62fb1dd84140322747d2f0
