@@ -107,7 +107,7 @@ const SellerRatingPage = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 text-red-400">Search Agents</h1>
+      <h1 className="text-2xl font-bold mb-6 text-red-400">Review Agents</h1>
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -160,7 +160,7 @@ const SellerRatingPage = () => {
           )}
         </div>
       )}
-      {/* Submit Rating Modal */}
+      {/* Rating Modal */}
       {showRatingModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[700px]">
