@@ -39,7 +39,6 @@ export default function ListingsPage() {
     const [mileageError, setMileageError] = useState({ min: '', max: '' });
     const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-<<<<<<< HEAD
     const buildSearchFilters = () => ({
         make,
         model,
@@ -54,62 +53,6 @@ export default function ListingsPage() {
         seller_email: sellerEmail,
         agent_email: agentEmail,
     });
-=======
-    const buildSearchFilters = () => {
-        const filters = {};
-        
-        // Text fields (trim and only add if not empty)
-        if (make?.trim()) filters.make = make.trim();
-        if (model?.trim()) filters.model = model.trim();
-        if (transmission?.trim()) filters.transmission = transmission.trim();
-        if (fuelType?.trim()) filters.fuel_type = fuelType.trim();
-        if (sellerEmail?.trim()) filters.seller_email = sellerEmail.trim();
-        if (agentEmail?.trim()) filters.agent_email = agentEmail.trim();
-        
-        // Numeric fields - ensure they're numbers and not formatted strings
-        if (year) {
-            const yearNum = parseInt(year.toString().replace(/[^0-9]/g, ''));
-            if (!isNaN(yearNum)) filters.year = yearNum;
-        }
-        
-        if (minPrice) {
-            const minPriceNum = parseFloat(minPrice.toString().replace(/[^0-9.]/g, ''));
-            if (!isNaN(minPriceNum)) filters.min_price = minPriceNum;
-        }
-        
-        if (maxPrice) {
-            const maxPriceNum = parseFloat(maxPrice.toString().replace(/[^0-9.]/g, ''));
-            if (!isNaN(maxPriceNum)) filters.max_price = maxPriceNum;
-        }
-        
-        if (minMileage) {
-            const minMileageNum = parseInt(minMileage.toString().replace(/[^0-9]/g, ''));
-            if (!isNaN(minMileageNum)) filters.min_mileage = minMileageNum;
-        }
-        
-        if (maxMileage) {
-            const maxMileageNum = parseInt(maxMileage.toString().replace(/[^0-9]/g, ''));
-            if (!isNaN(maxMileageNum)) filters.max_mileage = maxMileageNum;
-        }
-        
-        // Boolean field
-        if (typeof isSold === 'boolean') filters.is_sold = isSold;
-        
-        return filters;
-    };
-
-    const handleSearch = () => {
-        const priceValid = validatePrices(); 
-        const mileageValid = validateMileages(); 
-    
-        if (!priceValid || !mileageValid) {
-            return;
-        }
-    
-        fetchListings(); // Add this line
-        setFilterModalOpen(false);
-    };
->>>>>>> 68616eabea164802415c747108c694e2f04d6353
 
 
     const fetchListings = async () => {
@@ -121,13 +64,8 @@ export default function ListingsPage() {
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
-<<<<<<< HEAD
                 buildSearchFilters(),
                 { headers: { Authorization: `Bearer ${access_token}` } }
-=======
-                filters,
-                { headers: { Authorization: `Bearer ${token}` } }
->>>>>>> 68616eabea164802415c747108c694e2f04d6353
             );
             setListings(response.data.listing_list);
         } catch (error) {
@@ -136,12 +74,7 @@ export default function ListingsPage() {
             console.error('Error fetching listings:', error);
         } finally {
             setIsLoading(false);
-<<<<<<< HEAD
         }
-=======
-            setShowFilters(false);
-        }
->>>>>>> 68616eabea164802415c747108c694e2f04d6353
     };
 
     useEffect(() => {
@@ -156,7 +89,6 @@ export default function ListingsPage() {
 
     const handleInputChange = (setter, errorSetter, field) => (e) => {
         let value = e.target.value;
-<<<<<<< HEAD
     
         // Apply numeric restriction only for price and mileage fields
         if (['minPrice', 'maxPrice'].includes(field)) {
@@ -186,38 +118,6 @@ export default function ListingsPage() {
     
         // Clear the error for the specific field
         errorSetter((prev) => ({ ...prev, [field]: '' }));
-=======
-        
-        // Remove non-numeric characters, keeping decimals for price
-        if (field.includes("Price")) {
-            value = value.replace(/[^0-9.]/g, '');
-            // Ensure only one decimal point
-            const parts = value.split('.');
-            if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
-        } else {
-            value = value.replace(/[^0-9]/g, '');
-        }
-        
-        // Convert to number for validation
-        let numValue = field.includes("Price") ? parseFloat(value) : parseInt(value);
-        
-        // Handle NaN case
-        if (isNaN(numValue)) numValue = 0;
-        
-        // Enforce limits
-        if (field.includes("Price")) {
-            numValue = Math.max(0, Math.min(numValue, 9999999));
-        } else if (field.includes("Mileage")) {
-            numValue = Math.max(0, Math.min(numValue, 1000000));
-        }
-        
-        // Format for display
-        const displayValue = numValue.toLocaleString();
-        
-        // Store the actual numeric value
-        setter(numValue.toString());
-        errorSetter((prev) => ({ ...prev, [field]: '' }));
->>>>>>> 68616eabea164802415c747108c694e2f04d6353
     };
     
     
@@ -338,7 +238,6 @@ export default function ListingsPage() {
         setShowDeleteConfirmation(true);
     };
 
-<<<<<<< HEAD
     const handleSearch = () => {
         const priceValid = validatePrices(); 
         const mileageValid = validateMileages(); 
@@ -348,8 +247,6 @@ export default function ListingsPage() {
         fetchListings();
     };
 
-=======
->>>>>>> 68616eabea164802415c747108c694e2f04d6353
     
     return (
         <div className="min-h-screen bg-gray-100 p-6">
