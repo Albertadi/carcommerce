@@ -7,148 +7,207 @@ import { useRouter } from "next/navigation";
 import axios from 'axios'; // Import Axios for API requests
 
 export default function BuyerPage() {
-  const { user, token } = useContext(AuthContext); // Access user and token from context
+  const { access_token } = useContext(AuthContext); // Access token from context
   const [searchInput, setSearchInput] = useState(''); // State for search input
   const [carListings, setCarListings] = useState([]); // State for car listings
   const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered car listings
   const [selectedFilters, setSelectedFilters] = useState({}); // State for selected filters (price, mileage, etc.)
   const [dropdownVisibility, setDropdownVisibility] = useState({}); // State to track visibility of each dropdown
+  const [errorMessage, setErrorMessage] = useState(''); // State to store error message for invalid response
+  const [isLoading, setIsLoading] = useState(false); // State for loading
   const router = useRouter(); // Initialize router
 
-  useEffect(() => {
-    // Fetch car listings from your backend (adjust URL and request logic as needed)
-    const fetchCarListings = async () => {
-      try {
-        const response = await axios.get('/api/cars'); // Replace with your API endpoint
-        setCarListings(response.data); // Assuming the API returns an array of car listings
-        setFilteredCarListings(response.data); // Set filtered listings to be the same as the full list initially
-      } catch (error) {
-        console.error("Error fetching car listings:", error);
+  // Dynamic year filter options
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  // Build search filters (based on selected filters)
+  const buildSearchFilters = () => {
+    const filters = {};
+    if (searchInput) filters.search = searchInput;
+    if (selectedFilters.Price) filters.price = selectedFilters.Price;
+    if (selectedFilters.Mileage) filters.mileage = selectedFilters.Mileage;
+    if (selectedFilters.year) filters.year = selectedFilters.year;
+    if (selectedFilters.Availability) filters.availability = selectedFilters.Availability;
+    return filters;
+  };
+
+  // Fetch listings from API
+  const fetchListings = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    const filters = buildSearchFilters(); // Get current filters
+    console.log('Sending filters to API:', filters); // Log for debugging
+    
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/listing/search_listing',
+        filters, // Send filters to API
+        {
+          headers: { Authorization: `Bearer ${access_token}` }, // Authorization header
+        }
+      );
+
+      // Check if response contains valid data
+      if (Array.isArray(response.data.listing_list)) {
+        setCarListings(response.data.listing_list);
+        setFilteredCarListings(response.data.listing_list);
+      } else {
+        setErrorMessage('Failed to load car listings. Please try again later.');
       }
-    };
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+      setErrorMessage(error.response?.data?.error || 'An error occurred while fetching car listings.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchCarListings();
-  }, []); // Empty dependency array means this runs once when the component mounts
+  // Run fetchListings when access_token is available
+  useEffect(() => {
+    if (access_token) {
+      fetchListings();
+    } else {
+      setErrorMessage("You need to log in to view listings.");
+    }
+  }, [access_token]);
 
-  // Dropdown options
+  // Dropdown options for filters
   const filterData = {
     Mileage: ["Under 20,000 km", "20,000 - 50,000 km", "50,000 - 100,000 km", "Over 100,000 km"],
-    "Brand & Model": ["Toyota", "Honda", "Ford", "BMW", "Mercedes"],
     Price: ["Under $10,000", "$10,000 - $20,000", "$20,000 - $30,000", "Over $30,000"],
-    Year: ["2024", "2023", "2022", "2021", "2020", "Older"],
+    year: [...yearOptions, "Older"], // Dynamic years plus the 'Older' option
     Availability: ["Available", "Sold Out"],
   };
 
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
-    filterCarListings(e.target.value, selectedFilters); // Call filtering on input change
+    filterCarListings(e.target.value, selectedFilters); // Filter on input change
   };
 
-  // Handle dropdown option change (filtering)
+  // Handle filter option change
   const handleFilterChange = (filterCategory, value) => {
     const updatedFilters = { ...selectedFilters, [filterCategory]: value };
     setSelectedFilters(updatedFilters); // Update selected filters
-    filterCarListings(searchInput, updatedFilters); // Apply the filter based on selected filters and search input
-    toggleDropdownVisibility(filterCategory); // Close the dropdown after selection
+    filterCarListings(searchInput, updatedFilters); // Apply filters
+    toggleDropdownVisibility(filterCategory); // Close dropdown after selection
   };
 
-  // Toggle visibility of dropdown
-  const toggleDropdownVisibility = (filterCategory) => {
-    setDropdownVisibility((prevVisibility) => ({
-      ...prevVisibility,
-      [filterCategory]: !prevVisibility[filterCategory], // Toggle visibility of the dropdown
-    }));
-  };
-
-  // Function to filter car listings based on search input and selected filters
-  const filterCarListings = (searchKeyword, filters) => {
-    let filtered = carListings;
-
-    // Filter by search keyword (car model matching)
-    if (searchKeyword) {
-      filtered = filtered.filter(car => car.model.toLowerCase().includes(searchKeyword.toLowerCase()));
-    }
-
-    // Filter by selected filters (price, mileage, etc.)
-    Object.keys(filters).forEach((filterCategory) => {
-      const filterValue = filters[filterCategory];
-      if (filterValue) {
-        filtered = filtered.filter(car => {
-          if (filterCategory === "Price") {
-            // Handle price range filtering
-            if (filterValue === "Under $10,000" && car.price < 10000) return true;
-            if (filterValue === "$10,000 - $20,000" && car.price >= 10000 && car.price <= 20000) return true;
-            if (filterValue === "$20,000 - $30,000" && car.price >= 20000 && car.price <= 30000) return true;
-            if (filterValue === "Over $30,000" && car.price > 30000) return true;
-          }
-          if (filterCategory === "Mileage") {
-            // Handle mileage range filtering
-            if (filterValue === "Under 20,000 km" && car.mileage < 20000) return true;
-            if (filterValue === "20,000 - 50,000 km" && car.mileage >= 20000 && car.mileage <= 50000) return true;
-            if (filterValue === "50,000 - 100,000 km" && car.mileage >= 50000 && car.mileage <= 100000) return true;
-            if (filterValue === "Over 100,000 km" && car.mileage > 100000) return true;
-          }
-          if (filterCategory === "Year") {
-            // Handle year filtering
-            if (filterValue === car.year) return true;
-          }
-          if (filterCategory === "Availability") {
-            // Handle availability filtering
-            if (filterValue === car.availability) return true;
-          }
-          return false;
-        });
+ // Toggle visibility of filter dropdown
+const toggleDropdownVisibility = (filterCategory) => {
+  setDropdownVisibility((prevVisibility) => {
+    // Create a new object to ensure immutability
+    const newVisibility = { ...prevVisibility };
+    
+    // Hide all dropdowns and show only the selected one
+    Object.keys(newVisibility).forEach((key) => {
+      if (key !== filterCategory) {
+        newVisibility[key] = false; // Hide other dropdowns
       }
     });
+    
+    // Toggle the visibility of the selected dropdown
+    newVisibility[filterCategory] = !newVisibility[filterCategory];
+    
+    return newVisibility;
+  });
+};
 
-    setFilteredCarListings(filtered); // Update filtered car listings
-  };
 
-  // Handle car image or view details click
+ // Updated filterCarListings function with fixes
+const filterCarListings = (searchKeyword, filters) => {
+  let filtered = carListings;
+
+  // Filter by search keyword (case-insensitive match on any part of make or model)
+  if (searchKeyword) {
+    const keywordLower = searchKeyword.toLowerCase();
+    filtered = filtered.filter(car =>
+      car.model.toLowerCase().includes(keywordLower) ||
+      car.make.toLowerCase().includes(keywordLower)
+    );
+  }
+
+  // Apply additional filters (price, mileage, year, availability)
+  Object.keys(filters).forEach((filterCategory) => {
+    const filterValue = filters[filterCategory];
+    if (filterValue) {
+      filtered = filtered.filter(car => {
+        if (filterCategory === "Price") {
+          if (filterValue === "Under $10,000" && car.price < 10000) return true;
+          if (filterValue === "$10,000 - $20,000" && car.price >= 10000 && car.price <= 20000) return true;
+          if (filterValue === "$20,000 - $30,000" && car.price >= 20000 && car.price <= 30000) return true;
+          if (filterValue === "Over $30,000" && car.price > 30000) return true;
+        }
+        if (filterCategory === "Mileage") {
+          if (filterValue === "Under 20,000 km" && car.mileage < 20000) return true;
+          if (filterValue === "20,000 - 50,000 km" && car.mileage >= 20000 && car.mileage <= 50000) return true;
+          if (filterValue === "50,000 - 100,000 km" && car.mileage >= 50000 && car.mileage <= 100000) return true;
+          if (filterValue === "Over 100,000 km" && car.mileage > 100000) return true;
+        }
+        if (filterCategory === "Year") {
+          // Handle the "Older" filter
+          if (filterValue === "Older" && car.year < currentYear - 5) return true;
+
+          // Otherwise, compare the selected year to the car's year
+          const filterYear = parseInt(filterValue, 10);
+          if (!isNaN(filterYear) && car.year === filterYear) return true;
+        }
+        if (filterCategory === "Availability") {
+          // Assuming `is_sold` is the field for availability
+          if (filterValue === "Available" && !car.is_sold) return true;
+          if (filterValue === "Sold Out" && car.is_sold) return true;
+        }
+        return false; // If none of the conditions match, exclude the car
+      });
+    }
+  });
+
+  // Ensure filteredCarListings is always an array
+  setFilteredCarListings(filtered.length ? filtered : []);
+};
+
+
+  // Handle car image or details click
   const handleCarClick = (id) => {
-    if (!token) {
-      // Redirect to login page if not authenticated
-      window.location.href = '/pages/login';
+    if (!access_token) {
+      window.location.href = '/pages/login'; // Redirect to login page if not authenticated
     } else {
-      // Navigate to car details page (assuming you have a route for this)
-      router.push(`/pages/car/${id}`); // Adjust the path as needed
+      router.push(`/buyer/listing/${id}`); // Navigate to car details page
     }
   };
 
   return (
     <div className="bg-[#f0f0f7] font-rajdhaniSemiBold min-h-screen">
-      {/* Hero Section */}
       <div className="flex flex-col items-center justify-center text-center p-8 bg-orange-100">
         <h1 className="text-4xl font-rajdhaniBold text-[#f75049]">WELCOME TO THE BUYER PAGE</h1>
         <p className="mt-2 text-lg text-[#f75049]">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
       </div>
 
-      {/* Search and Filter Section */}
       <div className="flex flex-col items-center mt-8 px-4">
         <input
           type="text"
           placeholder="What car are you searching for?"
           className="w-full max-w-lg p-2 mb-4 border border-gray-300 rounded text-black"
-          value={searchInput} // Set the value of the input
-          onChange={handleSearchChange} // Handle input change
+          value={searchInput}
+          onChange={handleSearchChange}
         />
         <div className="flex space-x-2">
           {Object.keys(filterData).map((filter) => (
             <div key={filter} className="relative group">
               <button 
                 className="bg-gray-200 px-3 py-1 rounded" 
-                onClick={() => toggleDropdownVisibility(filter)} // Toggle dropdown visibility
+                onClick={() => toggleDropdownVisibility(filter)}
               >
                 {filter}
               </button>
-              {dropdownVisibility[filter] && ( // Show dropdown only if visible
+              {dropdownVisibility[filter] && (
                 <div className="absolute z-10 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg">
                   {filterData[filter].map((option) => (
                     <div 
                       key={option} 
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleFilterChange(filter, option)} // Apply filter on click
+                      className="px-3 py-2 cursor-pointer hover:bg-gray-100" 
+                      onClick={() => handleFilterChange(filter, option)}
                     >
                       {option}
                     </div>
@@ -158,33 +217,51 @@ export default function BuyerPage() {
             </div>
           ))}
         </div>
+
+        {isLoading && (
+          <div className="flex justify-center items-center mt-4">
+            <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 rounded-full border-solid border-gray-300 border-t-[#f75049]"></div>
+          </div>
+        )}
       </div>
 
-      {/* Car Listings Section */}
-      <div className="overflow-y-auto h-[600px]"> {/* Fixed height and scrolling */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-          {filteredCarListings.length === 0 ? (
-            <p className="text-center text-xl">No car listings available.</p>
-          ) : (
-            filteredCarListings.map(car => (
-              <div key={car.id} className="bg-white p-4 rounded shadow">
-                <img 
-                  src={car.imageUrl} 
-                  alt={car.model} 
-                  className="w-full h-48 object-cover rounded"
-                />
-                <h2 className="text-xl font-bold mt-2">{car.model} ({car.year})</h2>
-                <p className="text-gray-600">Price: ${car.price}</p>
-                <p className="text-gray-600">Mileage: {car.mileage} km</p>
-                <Link 
-                  href={`/car/${car.id}`} 
-                  onClick={() => handleCarClick(car.id)} 
-                  className="text-blue-500 underline">View Details</Link>
+      <div className="mt-8 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {errorMessage ? (
+          // This error message will display if there's a failure fetching listings
+          <div className="w-full text-center text-red-500">{errorMessage}</div>
+        ) : filteredCarListings.length === 0 ? (
+          // This message will display if there are no listings after applying filters or on initial load
+          <div className="w-full text-center text-gray-500">No car listings found.</div>
+        ) : (
+          filteredCarListings.map((car) => (
+            <div key={car.id} className="bg-white border rounded shadow-md overflow-hidden">
+              <img
+                className="w-full h-48 object-cover"
+                src={car.imageUrl}
+                alt={car.model}
+                onClick={() => handleCarClick(car.id)}
+              />
+              <div className="p-4">
+                <h3 className="text-lg text-black font-bold">{car.make} {car.model} ({car.year})</h3>
+                <div className="mt-2 text-sm text-gray-500">
+                  Price: ${car.price.toLocaleString()}
+                  <br />
+                  Mileage: {car.mileage.toLocaleString()} km
+                </div>
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    className="bg-[#f75049] text-white py-1 px-4 rounded"
+                    onClick={() => handleCarClick(car.id)}
+                  >
+                    View Details
+                  </button>
+                </div>
               </div>
-            ))
-          )}
-        </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
+
 }
