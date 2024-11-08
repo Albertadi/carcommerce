@@ -42,26 +42,7 @@ class SearchListingController:
         seller_email = data.get('seller_email')
         agent_email = data.get('agent_email')
 
-        # Validate data types (for example, make sure price and mileage are numbers)
         try:
-            if min_price and not isinstance(min_price, (int, float)):
-                raise ValueError("min_price must be a number.")
-            if max_price and not isinstance(max_price, (int, float)):
-                raise ValueError("max_price must be a number.")
-            if min_mileage and not isinstance(min_mileage, (int, float)):
-                raise ValueError("min_mileage must be a number.")
-            if max_mileage and not isinstance(max_mileage, (int, float)):
-                raise ValueError("max_mileage must be a number.")
-            if year and not isinstance(year, int):
-                raise ValueError("year must be an integer.")
-
-        except ValueError as e:
-            print("Validation error:", e)
-            return jsonify({"error": str(e)}), 422
-
-        # Perform the search based on the provided filters
-        try:
-            # This assumes the Listing.searchListing method is correctly implemented to handle these filters
             listing_list = Listing.searchListing(
                 make, model, year, min_price, max_price, min_mileage, max_mileage,
                 transmission, fuel_type, is_sold, seller_email, agent_email
