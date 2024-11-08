@@ -1,12 +1,11 @@
 # Libraries
 from flask import Blueprint, request, jsonify
-from src.entity.loancalc import LoanCalculator  # Importing the LoanCalculator entity
 
 # Blueprint for the loan calculator
 loan_calculator_blueprint = Blueprint('loan_calculator', __name__)
 
 class LoanCalculatorController:
-    @loan_calculator_blueprint.route('/api/loan/estimate', methods=['POST'])
+    @loan_calculator_blueprint.route('/api/loan_calculator', methods=['POST'])
     def calculate_loan():
         # Parse JSON data from the request
         data = request.get_json()
@@ -26,9 +25,23 @@ class LoanCalculatorController:
             interest_rate = float(interest_rate)
             years = int(years)
 
-            # Initialize LoanCalculator and calculate monthly payment
-            loan_calculator = LoanCalculator(principal, interest_rate, years)
-            monthly_payment = loan_calculator.calculate_monthly_payment()
+            """
+            Calculate the monthly payment using the formula:
+            M = P[r(1 + r)^n] / [(1 + r)^n – 1]
+            where:
+            - M is the total monthly payment
+            - P is the principal loan amount
+            - r is the monthly interest rate
+            - n is the number of payments (months)
+            """
+
+            monthly_interest_rate = interest_rate / 100 / 12
+            number_of_payments = years * 12
+
+            if monthly_interest_rate == 0:  # No interest scenario
+                return principal / number_of_payments
+
+            monthly_payment = (principal * monthly_interest_rate * (1 + monthly_interest_rate) ** number_of_payments) / ((1 + monthly_interest_rate) ** number_of_payments - 1)
 
             # Prepare and return response
             response = {
