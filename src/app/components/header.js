@@ -15,6 +15,22 @@ export default function Header() {
   const { access_token, permissions, logout } = useContext(AuthContext);
   const router = useRouter();
 
+  const handleAccount = () => {
+    if (permissions) {
+      if (permissions.sub.has_admin_permission) {
+        router.push('/pages/admin/dashboard');
+      } else if (permissions.sub.has_listing_permission) {
+        router.push('/pages/agent/dashboard');
+      } else if (permissions.sub.has_sell_permission) {
+        router.push('/pages/seller/dashboard');
+      } else if (permissions.sub.has_buy_permission) {
+        router.push('/pages/buyer/dashboard');
+      } else {
+        setError('Invalid permissions. Please contact IT administrator.');
+      }
+    }
+  }
+
   // Handle login redirection
   const handleLogin = () => {
     router.push("/pages/login");
@@ -68,10 +84,17 @@ export default function Header() {
             }`}
           >
             {/* Account link */}
-            <a href="#" className="nav-link hover:text-[#f75049] font-rajdhaniSemiBold text-lg">
+            {access_token ? (
+              <button
+              onClick={handleAccount} // Redirect to login page
+              className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
+            >
               Account
-            </a>
-
+            </button>
+            ) : (
+              <></>
+            )}
+            
             {/* Login/Logout Button */}
             {access_token ? (
               <button

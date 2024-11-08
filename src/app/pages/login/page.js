@@ -1,36 +1,37 @@
 "use client";
 
 import { useState, useContext, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { AuthContext } from '../authorization/AuthContext'; // Adjust path as needed
+import { AuthContext } from '../authorization/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login, permissions } = useContext(AuthContext);
   const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/login', { email, password });
       const { access_token } = response.data;
       if (response.data.success) {
-        // Login and set the token and permissions in context
         login(access_token);
       } else {
         setError('Invalid email or password');
       }
     } catch (error) {
       setError('Invalid email or password');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    // Redirect based on permissions once they’re available
     if (permissions) {
       if (permissions.sub.has_admin_permission) {
         router.push('/pages/admin/dashboard');
@@ -44,43 +45,106 @@ export default function LoginPage() {
         setError('Invalid permissions. Please contact IT administrator.');
       }
     }
-  }, [permissions, router]); // Watch for permissions to change and redirect
-  
+  }, [permissions, router]);
+
   return (
-    <div className='flex justify-center items-center h-screen bg-[#f0f0f7] font-rajdhaniSemiBold'>
-      <div className='w-96 p-6 border-solid border-4 border-[#f75049]'>
-        <h1 className='text-[#f75049] text-2xl'>LOGIN</h1>
-        <form onSubmit={handleLogin}>
-          <div className='mt-4'>
-            <div className='flex justify-between items-center mb-4'>
-              <label htmlFor="email" className='text-[#f75049] mr-4'>EMAIL </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className='border px-2 py-1 focus:outline-none bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3'
-              />
-            </div>
-            <div className='flex justify-between items-center mb-4'>
-              <label htmlFor="password" className='text-[#f75049] mr-4'>PASSWORD </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className='border px-2 py-1 focus:outline-none bg-[#f75049] placeholder-[#f0f0f7] text-[#f0f0f7] border-[#f75049] w-2/3'
-              />
-            </div>
-            <button type="submit" className='bg-[#f75049]/60 text-[#f75049] py-1 px-2 hover:bg-[#f75049] hover:text-[#f0f0f7] border-solid border-2 border-[#f75049]'>Login</button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50/30">
+      <div className="w-full max-w-[440px] p-8">
+        <div className="bg-white rounded shadow-lg overflow-hidden relative">
+          {/* Red Accent Bar */}
+          <div className="h-2 bg-gradient-to-r from-[#ff3e32] to-[#ff5b52]"></div>
+          
+          {/* Form Content */}
+          <div className="p-8">
+            <h2 className="text-[#ff3e32] text-4xl font-bold mb-2 text-center tracking-tight">
+              LOGIN
+            </h2>
+            <p className="text-gray-400 text-center mb-8 text-sm">
+              Enter your credentials to continue
+            </p>
+            
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-1">
+                <label className="block text-[#ff3e32] text-sm font-semibold pl-1">
+                  EMAIL
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="enter email"
+                    className="w-full px-4 py-3.5 bg-gray-50/50 text-gray-700 border-2 border-transparent rounded
+                             focus:outline-none focus:border-[#ff3e32]/20 focus:bg-white
+                             transition-all duration-200 placeholder-gray-400"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[#ff3e32] text-sm font-semibold pl-1">
+                  PASSWORD
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="enter password"
+                    className="w-full px-4 py-3.5 bg-gray-50/50 text-gray-700 border-2 border-transparent rounded
+                             focus:outline-none focus:border-[#ff3e32]/20 focus:bg-white
+                             transition-all duration-200 placeholder-gray-400"
+                  />
+                </div>
+              </div>
+              {error && (
+                <div className="bg-red-50 border-l-4 border-[#ff3e32] p-4 rounded">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-[#ff3e32]" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-[#ff3e32]">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 bg-gradient-to-r from-[#ff3e32] to-[#ff5b52] text-white rounded
+                         hover:from-[#ff5b52] hover:to-[#ff3e32] transition-all duration-300
+                         focus:outline-none focus:ring-2 focus:ring-[#ff3e32] focus:ring-offset-2
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         font-semibold text-lg shadow-md"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Logging in...
+                  </div>
+                ) : (
+                  'Login'
+                )}
+              </button>
+            </form>
           </div>
-        </form>
-        {error && <p className='text-red-500 mt-4'>{error}</p>}
-        <p className='absolute bottom-0 left-0 p-4 text-[#f75049]'>THIS PAGE IS UNDER DEVELOPMENT</p>
+        </div>
+
+        {/* Development Message */}
+        <div className="mt-6 text-center">
+          <p className="text-[#ff3e32]/60 text-sm font-medium">
+            THIS PAGE IS UNDER DEVELOPMENT
+          </p>
+        </div>
       </div>
     </div>
   );

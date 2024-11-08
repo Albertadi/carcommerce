@@ -25,7 +25,7 @@ export default function Dashboard() {
                 }`}
                 onClick={() => handleOptionClick("option1")}
               >
-                Profile
+                Seller Profile
               </button>
             </li>
             <li>
