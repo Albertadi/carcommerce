@@ -54,7 +54,6 @@ export default function ListingsPage() {
         agent_email: agentEmail,
     });
 
-
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
@@ -119,7 +118,6 @@ export default function ListingsPage() {
         // Clear the error for the specific field
         errorSetter((prev) => ({ ...prev, [field]: '' }));
     };
-    
     
     // Validate prices
     const validatePrices = () => {
@@ -198,6 +196,10 @@ export default function ListingsPage() {
         setViewDetailsModal(true);
     };
 
+    const handleUpdateListing = (listing) => {
+        
+    };
+
     const closeModal = () => {
         setViewDetailsModal(false);
         setSelectedListing(null);
@@ -247,10 +249,9 @@ export default function ListingsPage() {
         fetchListings();
     };
 
-    
     return (
-        <div className="min-h-screen bg-gray-100 p-6">
-            <h1 className="text-3xl font-bold mb-6">Car Listings</h1>
+        <div className="min-h-screen bg-[#e2e2ef] p-6">
+            <h1 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6">Car Listings</h1>
 
             {/* Error message */}
             {error && (
@@ -263,7 +264,7 @@ export default function ListingsPage() {
                 className="flex items-center justify-between bg-white p-4 rounded-md shadow-md cursor-pointer"
                 onClick={() => setShowFilters(!showFilters)}
             >
-                <span className="text-xl text-black font-bold">Filters</span>
+                <span className="text-xl text-[#0e0e17] font-rajdhaniBold">Filters</span>
                 <span className={`transform ${showFilters ? 'rotate-180' : 'rotate-0'}`}>
                     ▼
                 </span>
@@ -346,18 +347,16 @@ export default function ListingsPage() {
             </div>
         )}
 
-
-
             {/* Listings */}
             {isLoading ? (
                 <div className="flex justify-center items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#f75049]"></div>
                 </div>
             ) : (
                 <div className="grid gap-8 mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {listings.length > 0 ? (
                     listings.map((listing) => (
-                    <div key={listing.id} className="relative border rounded-lg shadow-lg overflow-hidden">
+                    <div key={listing.id} className="relative bg-white border rounded shadow-lg overflow-hidden">
                         <img
                             src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
                             alt={`${listing.make} ${listing.model}`}
@@ -365,32 +364,38 @@ export default function ListingsPage() {
                         />
 
                         <div className="p-4">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                            {listing.make} {listing.model} ({listing.year})
+                        <h3 className="text-xl font-rajdhaniSemiBold text-[#0e0e17] mb-2">
+                        {listing.year} {listing.make} {listing.model}
                         </h3>
-                        <p className="text-gray-600 mb-1">
-                            <span className="font-semibold">Mileage:</span> {listing.mileage.toLocaleString()} km
+                        <p className="text-[#0e0e17] mb-1">
+                            <span className="font-rajdhaniBold">Mileage:</span> <span className='font-rajdhaniSemiBold'>{listing.mileage.toLocaleString()}</span> km
                         </p>
-                        <p className="text-gray-600 mb-1">
-                            <span className="font-semibold">Transmission:</span> {listing.transmission}
+                        <p className="text-[#0e0e17] mb-1">
+                            <span className="font-rajdhaniBold">Transmission:</span> <span className='font-rajdhaniSemiBold'>{listing.transmission}</span>
                         </p>
-                        <p className="text-gray-600 mb-1">
-                            <span className="font-semibold">Fuel Type:</span> {listing.fuel_type}
+                        <p className="text-[#0e0e17] mb-1">
+                            <span className="font-rajdhaniBold">Fuel Type:</span> <span className='font-rajdhaniSemiBold'>{listing.fuel_type}</span>
                         </p>
-                        <p className="text-lg font-semibold text-red-600 mt-2">
+                        <p className="text-lg font-rajdhaniBold text-[#f75049] mt-2">
                             ${listing.price.toLocaleString()}
                         </p>
 
                         <div className="flex justify-between mt-4">
                             <button
                             onClick={() => handleViewDetails(listing)}
-                            className="bg-blue-500 text-white py-1 px-3 rounded-lg"
+                            className="bg-[#2570d4] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
                             >
-                            View Details
+                            Details
+                            </button>
+                            <button
+                            onClick={() => handleUpdateListing(listing)}
+                            className="bg-[#1DED83] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
+                            >
+                            Update
                             </button>
                             <button
                             onClick={() => handleDeleteClick(listing)}
-                            className="bg-red-500 text-white py-1 px-3 rounded-lg"
+                            className="bg-[#f75049] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
                             >
                             Delete
                             </button>
@@ -404,21 +409,19 @@ export default function ListingsPage() {
                 </div>
             )}
 
-
             {/* View Details Modal */}
             {showViewDetails && selectedListing && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
                         <h2 className="text-2xl font-bold mb-4">Car Details</h2>
                         <div className="text-black">
-                            <p><strong>Make:</strong> {selectedListing.make}</p>
-                            <p><strong>Model:</strong> {selectedListing.model}</p>
-                            <p><strong>Year:</strong> {selectedListing.year}</p>
-                            <p><strong>Price:</strong> ${selectedListing.price}</p>
-                            <p><strong>Mileage:</strong> {selectedListing.mileage} km</p>
-                            <p><strong>Transmission:</strong> {selectedListing.transmission}</p>
-                            <p><strong>Fuel Type:</strong> {selectedListing.fuel_type}</p>
-                            <p><strong>Description:</strong> {selectedListing.description}</p>
+                            <p className='font-rajdhaniBold'>Make: <span className='font-rajdhaniSemiBold'>{selectedListing.make}</span></p>
+                            <p className='font-rajdhaniBold'>Model: <span className='font-rajdhaniSemiBold'>{selectedListing.model}</span></p>
+                            <p className='font-rajdhaniBold'>Year: <span className='font-rajdhaniSemiBold'>{selectedListing.year}</span></p>
+                            <p className='font-rajdhaniBold'>Price: <span className='font-rajdhaniSemiBold'>${selectedListing.price}</span></p>
+                            <p className='font-rajdhaniBold'>Mileage: <span className='font-rajdhaniSemiBold'>{selectedListing.mileage}</span></p>
+                            <p className='font-rajdhaniBold'>Transmission: <span className='font-rajdhaniSemiBold'>{selectedListing.transmission}</span></p>
+                            <p className='font-rajdhaniBold'>Fuel Type: <span className='font-rajdhaniSemiBold'>{selectedListing.fuel_type}</span></p>
                             {/* Add any other details you want to display */}
                         </div>
                         <div className="mt-4">
