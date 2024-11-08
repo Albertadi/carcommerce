@@ -4,98 +4,100 @@ import axios from 'axios';
 import { AuthContext } from "../../authorization/AuthContext";
 
 const SellerRatingPage = () => {
-  const { access_token, user } = useContext(AuthContext); // Retrieve access token and user from AuthContext
-  const [agents, setAgents] = useState([]); // Store fetched agents
-  const [selectedAgent, setSelectedAgent] = useState(null); // Currently selected agent for rating
-  const [rating, setRating] = useState(0); // Rating value
-  const [feedback, setFeedback] = useState(''); // Feedback text
-  const [showModal, setShowModal] = useState(false); // Modal state
-  const [ratings, setRatings] = useState([]); // Store submitted ratings
-  const [searchTerm, setSearchTerm] = useState(''); // Search term for agent first name
+  const { access_token } = useContext(AuthContext);
 
-  // Fetch agents on component mount or when search term changes
+  const [agents, setAgents] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
+  const [ratingsByAgent, setRatingsByAgent] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Fetch the agents from the backend API
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/users/search_agent?first_name=${searchTerm}`,
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          }
-        );
-        setAgents(response.data.account_list); // Populate agents with fetched data
+        const response = await fetch('/api/reviewRating/<agent_email>'); // Modify with your actual API
+        const data = await response.json();
+        setAgents(data.agents); // Assuming response returns an array of agents
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching agents:", error);
       }
     };
 
-    if (access_token) {
-      fetchAgents();
-    }
-  }, [access_token, searchTerm]);
+    fetchAgents();
+  }, []);
 
-  // Function to fetch ratings for the selected agent
-  const fetchAgentRatings = async (agentEmail) => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/reviewRating/${agentEmail}`);
-      setRatings(response.data.reviews); // Set fetched ratings for the agent
-    } catch (error) {
-      console.error("Error fetching ratings:", error);
+  // Fetch agents on component mount or when search term changes
+  useEffect(() => {
+    if (searchTerm) {
+      setAgents((prevAgents) =>
+        prevAgents.filter((agent) =>
+          agent.first_name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
     }
-  };
+  }, [searchTerm]);
 
-  // Function to handle agent selection and fetch their ratings
+  // Handle agent selection and show rating modal
   const handleAgentSelect = (agent) => {
     setSelectedAgent(agent);
     setShowModal(true);
     fetchAgentRatings(agent.email); // Fetch ratings when an agent is selected
   };
 
-  // Function to handle review submission
-  const submitRating = async () => {
-    if (!selectedAgent) {
-      alert('Please select an agent.');
-      return;
-    }
+  // Handle submitting the review
+  const handleSubmitRating = async () => {
+    const newReview = { review: feedback, timestamp: new Date().toISOString().split('T')[0] };
 
-    const newRating = {
-      rating,
-      review: feedback,
-      agent_email: selectedAgent.email,
-      reviewer_email: user.email // Assuming you have the reviewer's email from context
-    };
-
+    // Send the review and rating to the backend API
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/reviewRating/create_reviewRating',
-        newRating,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
+      const response = await fetch('/api/create_reviewRating', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access_token}`,
+        },
+        body: JSON.stringify({
+          rating: rating,
+          review: feedback,
+          agent_email: selectedAgent.email,
+        }),
+      });
 
-      if (response.data.success) {
-        alert('Rating submitted successfully!');
-        // Fetch the updated ratings after submission
-        fetchAgentRatings(selectedAgent.email);
+      const data = await response.json();
+
+      // Update the UI with the new review and the average rating
+      if (data.success) {
+        setRatingsByAgent((prevRatings) => {
+          const updatedRatings = { ...prevRatings };
+          updatedRatings[selectedAgent.email] = {
+            reviews: [{ review: feedback, rating, timestamp: newReview.timestamp }, ...(updatedRatings[selectedAgent.email]?.reviews || [])],
+            avgRating: data.average_rating,
+          };
+          return updatedRatings;
+        });
+      } else {
+        console.error("Error submitting review:", data.error);
       }
+
+      setRating(0);
+      setFeedback('');
+      setShowModal(false);
+      setShowAllReviewsModal(true);
     } catch (error) {
       console.error("Error submitting rating:", error);
-    } finally {
-      setShowModal(false); // Close modal
-      setRating(0); // Reset rating
-      setFeedback(''); // Reset feedback
-      setSelectedAgent(null); // Reset selected agent
     }
   };
 
-  // Function to handle star click for rating
-  const handleStarClick = (star) => {
-    setRating(star);
+  // Handle viewing all reviews for selected agent
+  const handleViewAllReviews = (agent) => {
+    setSelectedAgent(agent);
+    setShowAllReviewsModal(true);
   };
 
   return (
@@ -113,16 +115,17 @@ const SellerRatingPage = () => {
         />
       </div>
 
-      {/* Display each agent's description and overall rating */}
+      {/* Loading State */}
+      {loading && <p>Loading agents...</p>}
+
+      {/* Display agents */}
       <div className="space-y-4">
         {agents.length > 0 ? (
           agents.map((agent) => (
             <div key={agent.id} className="bg-gray-100 p-4 rounded-lg shadow-md">
               <h2 className="font-semibold">Agent Name: {agent.first_name} {agent.last_name}</h2>
-              <p className="text-gray-600">{agent.description}</p>
-              <p className="text-gray-600">
-                Overall Rating: {agent.overallRating || 'No ratings yet'} ({agent.overallRating ? `${agent.overallRating} / 5` : ''})
-              </p>
+              <p className="text-gray-600">{agent.user_profile}</p>
+              <p className="text-yellow-500 font-semibold">Average Rating: {ratingsByAgent[agent.email]?.avgRating || '0'} / 5</p>
               <button
                 onClick={() => handleAgentSelect(agent)} // Use the new select handler
                 className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
@@ -147,10 +150,8 @@ const SellerRatingPage = () => {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
-                    onClick={() => handleStarClick(star)}
-                    className={`cursor-pointer text-2xl ${
-                      star <= rating ? 'text-yellow-500' : 'text-gray-300'
-                    }`}
+                    onClick={() => setRating(star)}
+                    className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
                   >
                     ★
                   </span>
@@ -184,23 +185,30 @@ const SellerRatingPage = () => {
         </div>
       )}
 
-      {/* Display submitted ratings */}
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">Ratings for {selectedAgent?.first_name} {selectedAgent?.last_name}</h2>
-        <div className="space-y-4">
-          {ratings.length > 0 ? (
-            ratings.map((rating, index) => (
-              <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-md flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">Rating: {Array(rating.rating).fill('★').join('')} ({rating.rating} / 5)</p>
-                  <p className="text-gray-600">Feedback: {rating.review}</p>
-                </div>
-                <p className="text-gray-500 text-sm">{rating.timestamp}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No ratings submitted yet.</p>
-          )}
+      {/* Modal for viewing all reviews */}
+      {showAllReviewsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-lg font-bold mb-4">All Reviews for {selectedAgent?.first_name} {selectedAgent?.last_name}</h2>
+            <div className="space-y-4">
+              {ratingsByAgent[selectedAgent?.email]?.reviews?.length > 0 ? (
+                ratingsByAgent[selectedAgent?.email].reviews.map((rating, index) => (
+                  <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                    <p className="text-gray-600">Feedback: {rating.review}</p>
+                    <p className="text-gray-500 text-sm">{rating.timestamp}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No reviews yet.</p>
+              )}
+            </div>
+            <button
+              onClick={() => setShowAllReviewsModal(false)}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
