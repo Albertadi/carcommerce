@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState, useContext } from 'react';
+import { useRouter } from 'next/navigation';
 import { AuthContext } from '../../authorization/AuthContext';
 import axios from 'axios';
 
 export default function ListingsPage() {
+    const router = useRouter();
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -354,6 +356,19 @@ export default function ListingsPage() {
                 </div>
             ) : (
                 <div className="grid gap-8 mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                 
+                <div 
+                    onClick={() => {
+                        router.push('../agent/createListing');
+                    }} 
+                    className="relative bg-[#f75049]/40 border-4 border-[#f75049] border-dashed rounded shadow-lg 
+                        overflow-hidden flex items-center justify-center cursor-pointer group
+                        hover:bg-[#f0b537]/40 hover:border-[#f0b537] hover:text-[#f0b537]"
+                    style={{ height: 'fit-content', minHeight: '100%' }}
+                    >
+                    <p className="text-6xl text-[#f75049] font-rajdhaniBold group-hover:text-[#f0b537]"> + </p>
+                </div>
+                    
                 {listings.length > 0 ? (
                     listings.map((listing) => (
                     <div key={listing.id} className="relative bg-white border rounded shadow-lg overflow-hidden">
@@ -364,42 +379,42 @@ export default function ListingsPage() {
                         />
 
                         <div className="p-4">
-                        <h3 className="text-xl font-rajdhaniSemiBold text-[#0e0e17] mb-2">
-                        {listing.year} {listing.make} {listing.model}
-                        </h3>
-                        <p className="text-[#0e0e17] mb-1">
-                            <span className="font-rajdhaniBold">Mileage:</span> <span className='font-rajdhaniSemiBold'>{listing.mileage.toLocaleString()}</span> km
-                        </p>
-                        <p className="text-[#0e0e17] mb-1">
-                            <span className="font-rajdhaniBold">Transmission:</span> <span className='font-rajdhaniSemiBold'>{listing.transmission}</span>
-                        </p>
-                        <p className="text-[#0e0e17] mb-1">
-                            <span className="font-rajdhaniBold">Fuel Type:</span> <span className='font-rajdhaniSemiBold'>{listing.fuel_type}</span>
-                        </p>
-                        <p className="text-lg font-rajdhaniBold text-[#f75049] mt-2">
-                            ${listing.price.toLocaleString()}
-                        </p>
+                            <h3 className="text-xl font-rajdhaniSemiBold text-[#0e0e17] mb-2">
+                            {listing.year} {listing.make} {listing.model}
+                            </h3>
+                            <p className="text-[#0e0e17] mb-1">
+                                <span className="font-rajdhaniBold">Mileage:</span> <span className='font-rajdhaniSemiBold'>{listing.mileage.toLocaleString()}</span> km
+                            </p>
+                            <p className="text-[#0e0e17] mb-1">
+                                <span className="font-rajdhaniBold">Transmission:</span> <span className='font-rajdhaniSemiBold'>{listing.transmission}</span>
+                            </p>
+                            <p className="text-[#0e0e17] mb-1">
+                                <span className="font-rajdhaniBold">Fuel Type:</span> <span className='font-rajdhaniSemiBold'>{listing.fuel_type}</span>
+                            </p>
+                            <p className="text-lg font-rajdhaniBold text-[#f75049] mt-2">
+                                ${listing.price.toLocaleString()}
+                            </p>
 
-                        <div className="flex justify-between mt-4">
-                            <button
-                            onClick={() => handleViewDetails(listing)}
-                            className="bg-[#2570d4] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
-                            >
-                            Details
-                            </button>
-                            <button
-                            onClick={() => handleUpdateListing(listing)}
-                            className="bg-[#1DED83] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
-                            >
-                            Update
-                            </button>
-                            <button
-                            onClick={() => handleDeleteClick(listing)}
-                            className="bg-[#f75049] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
-                            >
-                            Delete
-                            </button>
-                        </div>
+                            <div className="flex justify-between mt-4">
+                                <button
+                                onClick={() => handleViewDetails(listing)}
+                                className="bg-[#2570d4] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
+                                >
+                                Details
+                                </button>
+                                <button
+                                onClick={() => handleUpdateListing(listing)}
+                                className="bg-[#1DED83] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
+                                >
+                                Update
+                                </button>
+                                <button
+                                onClick={() => handleDeleteClick(listing)}
+                                className="bg-[#f75049] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
+                                >
+                                Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                     ))
