@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AgentPage from '../agents/page';
 import ListingPage from '../listings/page';
+import SellerProfilePage from '../sellerProfile/page'
 
 export default function Dashboard() {
   const [selectedOption, setSelectedOption] = useState("option1");
@@ -53,11 +54,13 @@ export default function Dashboard() {
 
         {/* Right Column: Content Based on Selected Option */}
         <div className="w-3/4 p-4 h-full overflow-auto">
-          {selectedOption === "option1" && (
-            <div>
-              <h2 className="text-2xl font-semibold">Content for Option 1</h2>
-              <p>This is the content that shows for Option 1.</p>
-            </div>
+        {selectedOption === "option1" && (
+          <SellerProfilePage
+            email="seller@example.com"
+            firstName="John"
+            lastName="Doe"
+            dob="dob"
+          />
           )}
           {selectedOption === "option2" && <AgentPage />}
           {selectedOption === "option3" && <ListingPage />}

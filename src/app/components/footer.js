@@ -14,43 +14,60 @@ function Footer() {
 							TECH<span className="text-[#f75049]">Quest</span>
 						</p>
 						<div className="flex gap-6 pb-5">
-							<FaInstagram className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
-							<FaTwitter className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
-							<FaLinkedin className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
-							<FaYoutube className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
+							<a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+								<FaInstagram className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
+							</a>
+							<a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+								<FaTwitter className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
+							</a>
+							<a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+								<FaLinkedin className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
+							</a>
+							<a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+								<FaYoutube className="text-2xl cursor-pointer hover:text-[#5ef6ff]" />
+							</a>
 						</div>
 					</ul>
 				</div>
 				<div className="p-5">
 					<ul>
-						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Directories</p>
+						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Company</p>
 						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
+							About Us
 						</li>
 						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
-						</li>
-					</ul>
-				</div>
-				<div className="p-5">
-					<ul>
-						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Directories</p>
-						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
+							Careers
 						</li>
 						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
+							Press
 						</li>
 					</ul>
 				</div>
 				<div className="p-5">
 					<ul>
-						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Directories</p>
+						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Resources</p>
 						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
+							Blog
 						</li>
 						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
-							Placeholder
+							Help Center
+						</li>
+						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
+							Privacy Policy
+						</li>
+					</ul>
+				</div>
+				<div className="p-5">
+					<ul>
+						<p className="text-[#f75049] font-rajdhaniSemiBold text-2xl pb-4">Contact</p>
+						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
+							Contact Us
+						</li>
+						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
+							Support
+						</li>
+						<li className="text-[#e2e2ef] text-md pb-2 font-rajdhaniMedium hover:text-[#5ef6ff] cursor-pointer">
+							FAQ
 						</li>
 					</ul>
 				</div>

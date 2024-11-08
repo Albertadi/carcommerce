@@ -60,7 +60,11 @@ export default function ProfileManagement() {
           setProfiles(response.data.profile_list);
         }
       } catch (error) {
-        console.error("Error fetching profiles:", error);
+        if (error.response && error.response.status === 401) {
+          setShowLoginModal(true); // Show login modal if 401 error occurs
+        } else {
+          console.error("Error fetching profiles:", error);
+        }
       }
     }
 
@@ -120,12 +124,16 @@ export default function ProfileManagement() {
       });
   
     } catch (error) {
-      console.error("Error adding profile:", error);
-      // Show error message to user
-      setError('Failed to create profile. Please try again.');
-      setTimeout(() => {
-        setError('');
-      }, 3000);
+        if (error.response && error.response.status === 401) {
+          setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        console.error("Error adding profile:", error);
+        // Show error message to user
+        setError('Failed to create profile. Please try again.');
+        setTimeout(() => {
+          setError('');
+        }, 3000);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -175,8 +183,12 @@ export default function ProfileManagement() {
         fetchProfiles();
       }
     } catch (error) {
-      console.error("Error saving profile:", error);
-      alert(error.response?.data?.error || "An error occurred while saving the profile.");
+      if (error.response && error.response.status === 401) {
+          setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        console.error("Error saving profile:", error);
+        alert(error.response?.data?.error || "An error occurred while saving the profile.");
+      }
     }
   };
   
@@ -210,13 +222,17 @@ export default function ProfileManagement() {
         setProfiles(response.data.profile_list || []);
       }
     } catch (error) {
-      console.error("Error fetching profiles:", error);
-      setError('Failed to fetch profiles. Please try again.');
-      setTimeout(() => {
-        setError('');
-      }, 3000);
+      if (error.response && error.response.status === 401) {
+        setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        console.error("Error fetching profiles:", error);
+        setError('Failed to fetch profiles. Please try again.');
+        setTimeout(() => {
+          setError('');
+        }, 3000);
+      }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
   
@@ -272,8 +288,12 @@ export default function ProfileManagement() {
         setSuspendInvalidMessage(response.data.message || 'Failed to suspend Profile');
       }
     } catch (error) {
-      console.error('Error suspending Profile:', error);
-      setSuspendInvalidMessage(error.response?.data?.message || 'An error occurred while suspending the Profile');
+      if (error.response && error.response.status === 401) {
+        setShowLoginModal(true); // Show login modal if 401 error occurs
+      } else {
+        console.error('Error suspending Profile:', error);
+        setSuspendInvalidMessage(error.response?.data?.message || 'An error occurred while suspending the Profile');
+      }
     }
   };
 

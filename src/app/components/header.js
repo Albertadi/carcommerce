@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useContext } from "react";
-import { AuthContext } from "../pages/authorization/AuthContext"; // Ensure this path is correct
+import { AuthContext } from "../pages/authorization/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  // State for controlling mobile menu visibility
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Access the AuthContext and router
   const { access_token, permissions, logout } = useContext(AuthContext);
   const router = useRouter();
 
@@ -31,7 +29,6 @@ export default function Header() {
     }
   }
 
-  // Handle login redirection
   const handleLogin = () => {
     router.push("/pages/login");
   };
@@ -41,19 +38,16 @@ export default function Header() {
     router.push("/")
   }
 
-  // Render the header
   return (
     <div className="sticky top-0 bg-white h-16 shadow-xl w-full flex items-center z-10">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
-          <a
-            href="/"
-            className="text-5xl text-[#e2e2ef] font-rajdhaniBold"
-          >
-            <p>
-							TECH<span className="text-[#f75049]">Quest</span>
-						</p>
+          <a href="/" className="flex items-center">
+            <p className="text-5xl font-rajdhaniBold">
+              <span className="text-[#e2e2ef]">TECH</span>
+              <span className="text-[#f75049]">Quest</span>
+            </p>
           </a>
 
           {/* Navbar toggle (for small screens) */}
@@ -86,27 +80,50 @@ export default function Header() {
             {/* Account link */}
             {access_token ? (
               <button
-              onClick={handleAccount} // Redirect to login page
-              className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
-            >
-              Account
-            </button>
+                onClick={handleAccount}
+                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Account
+              </button>
             ) : (
               <></>
             )}
-            
-            {/* Login/Logout Button */}
-            {access_token ? (
+{/* Login/Logout Button */}
+{access_token ? (
               <button
-                onClick={handleLogout} // Use the logout function from AuthContext
-                className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
                 Logout
               </button>
             ) : (
               <button
-                onClick={handleLogin} // Redirect to login page
-                className="text-[#f75049] font-semibold hover:text-red-700 font-rajdhaniBold text-lg"
+                onClick={handleLogin}
+                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 Login
               </button>

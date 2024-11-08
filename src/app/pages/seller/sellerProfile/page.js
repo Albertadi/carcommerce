@@ -6,7 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../../authorization/AuthContext';
 import { EnvelopeIcon, UserIcon, CakeIcon } from '@heroicons/react/24/outline';
 
-export default function AdminProfile() {
+export default function SellerProfile() {
     const { access_token } = useContext(AuthContext); // Access the JWT token from context
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -37,11 +37,7 @@ export default function AdminProfile() {
                     setError('User not found');
                 }
             } catch (err) {
-                if (error.response && error.response.status === 401) {
-                    setShowLoginModal(true); // Show login modal if 401 error occurs
-                } else {
                 setError(err.message);
-                }
             } finally {
                 setLoading(false); // Set loading to false once data is fetched
             }
@@ -62,7 +58,7 @@ export default function AdminProfile() {
         <div className="p-8 bg-white shadow-lg">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center space-x-2">
                 <UserIcon className="h-8 w-8 text-blue-500" />
-                <span>Admin Profile</span>
+                <span>Seller Profile</span>
             </h2>
 
             {loading ? (
