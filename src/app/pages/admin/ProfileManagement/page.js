@@ -247,58 +247,6 @@ export default function ProfileManagement() {
     setEditingProfile({ ...editingProfile, [name]: val });
   };
 
-  const handleSuspend = async () => {
-    // Validate inputs
-    if (!suspendDuration) {
-      setSuspendInvalidMessage('Please fill in the duration.');
-      return;
-    }
-    if (!suspendReason) {
-      setSuspendInvalidMessage('Please provide a reason for suspension.');
-      return;
-    }
-    
-    try {
-      const response = await axios.post(
-        'http://localhost:5000/api/suspension/suspend_profile',
-        {
-          profile: selectedUserForSuspension.name,
-          days: suspendDuration,
-          reason: suspendReason
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
-  
-      if (response.data.success) {
-        setSuccessMessage('Profile suspended successfully');
-        
-        // Close modal and reset state
-        setShowSuspendModal(false);
-        setSelectedUserForSuspension(null);
-        setSuspendDuration('');
-        setSuspendReason('');
-        
-        // Refresh the profiles list
-        fetchProfiles();
-      } else {
-        setSuspendInvalidMessage(response.data.message || 'Failed to suspend Profile');
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setShowLoginModal(true); // Show login modal if 401 error occurs
-      } else {
-        console.error('Error suspending Profile:', error);
-        setSuspendInvalidMessage(error.response?.data?.message || 'An error occurred while suspending the Profile');
-      }
-    }
-  };
-
-  
-
   return (
     <div className="flex flex-col items-center p-8 bg-gray-900 text-neon-red">
     {/* Add the success message here, right after the opening div */}
