@@ -93,8 +93,22 @@ export default function HomePage() {
     }
   };
 
+  const carLogos = [
+    { id: 1, src: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png', alt: 'Tesla' },
+    { id: 2, src: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg', alt: 'Ford' },
+    { id: 3, src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg', alt: 'BMW' },
+    { id: 4, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Audi-Logo_2016.svg/640px-Audi-Logo_2016.svg.png', alt: 'Audi' },
+    { id: 5, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cars_Logo_Black.svg/640px-Cars_Logo_Black.svg.png', alt: 'Cars' },
+    { id: 6, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Honda_Logo.svg/640px-Honda_Logo.svg.png', alt: 'Honda' },
+    { id: 7, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Volkswagen_Logo_till_1995.svg/640px-Volkswagen_Logo_till_1995.svg.png', alt: 'Volkswagen' },
+    { id: 8, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/DSC00458_%287614921264%29.jpg/640px-DSC00458_%287614921264%29.jpg', alt: 'Ferrari' },
+    { id: 9, src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Toyota_logo_%28Red%29.svg/640px-Toyota_logo_%28Red%29.svg.png', alt: 'Toyota' },
+
+  ];
+
   return (
     <div className="bg-[#f0f0f7] font-rajdhaniSemiBold min-h-screen">
+
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center text-center p-8 bg-orange-100">
         <h1 className="text-4xl font-rajdhaniBold text-[#f75049]">WELCOME TO THE HOME PAGE</h1>
@@ -117,11 +131,15 @@ export default function HomePage() {
               key={filter} 
               className="relative group"
               onMouseEnter={() => handleMouseEnter(filter)}
-              onMouseLeave={() => handleMouseLeave(filter)}
+              onMouseLeave={() => handleMouseLeave(filter)} // Trigger mouse leave only on the container
             >
               <button className="bg-gray-200 px-3 py-1 rounded">{filter}</button>
+              
               {filterOptions[filter] && (
-                <div className="absolute z-10 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                <div 
+                  className="absolute z-10 w-48 bg-white border border-gray-300 rounded shadow-lg pt-2" // Added padding-top for buffer
+                  style={{ top: '100%' }} // Position dropdown directly below the button
+                >
                   {filterData[filter].map((option) => (
                     <div 
                       key={option} 
@@ -136,6 +154,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+
       </div>
 
       {/* Car Listings Section */}
@@ -161,6 +180,33 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        
+
+      {/* Infinite Scrolling Logo Section */}
+      <div className="overflow-hidden py-6 mt-8">
+        <div className="flex animate-scroll space-x-12">
+          {[...carLogos, ...carLogos, ...carLogos].map((logo, index) => ( // Duplicate logos multiple times for seamless loop
+            <img
+              key={index}
+              src={logo.src}
+              alt={logo.alt}
+              className="w-36 h-36 object-contain mx-4" // Adjust spacing between logos
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* CSS for Infinite Scrolling Animation */}
+      <style jsx>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-scroll {
+          animation: scroll 60s linear infinite;
+          display: flex;
+        }
+      `}</style>
       </div>
     </div>
   );
