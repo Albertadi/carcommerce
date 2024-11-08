@@ -1,18 +1,29 @@
 "use client"; // Mark as Client Component
 
 import { useContext, useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { AuthContext } from '../authorization/AuthContext'; // Corrected import path
+=======
+import { AuthContext } from '../../authorization/AuthContext';
+>>>>>>> 68616ea (edit buyer page(havent worked))
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import axios from 'axios'; // Import Axios for API requests
 
 export default function BuyerPage() {
   const { user, token } = useContext(AuthContext); // Access user and token from context
+<<<<<<< HEAD
   const [searchInput, setSearchInput] = useState(''); // State for search input
   const [carListings, setCarListings] = useState([]); // State for car listings
   const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered car listings
   const [selectedFilters, setSelectedFilters] = useState({}); // State for selected filters (price, mileage, etc.)
   const [dropdownVisibility, setDropdownVisibility] = useState({}); // State to track visibility of each dropdown
+=======
+  const [filterOptions, setFilterOptions] = useState({});
+  const [searchInput, setSearchInput] = useState(''); // State for search input
+  const [carListings, setCarListings] = useState([]); // State for car listings
+  const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered listings
+>>>>>>> 68616ea (edit buyer page(havent worked))
   const router = useRouter(); // Initialize router
 
   useEffect(() => {
@@ -21,7 +32,11 @@ export default function BuyerPage() {
       try {
         const response = await axios.get('/api/cars'); // Replace with your API endpoint
         setCarListings(response.data); // Assuming the API returns an array of car listings
+<<<<<<< HEAD
         setFilteredCarListings(response.data); // Set filtered listings to be the same as the full list initially
+=======
+        setFilteredCarListings(response.data); // Initially show all car listings
+>>>>>>> 68616ea (edit buyer page(havent worked))
       } catch (error) {
         console.error("Error fetching car listings:", error);
       }
