@@ -1,35 +1,48 @@
 "use client";
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from "../../authorization/AuthContext";
+import { FaStar, FaUserCircle } from "react-icons/fa";
 
 const SellerRatingPage = () => {
   const { access_token } = useContext(AuthContext);
 
   const [agents, setAgents] = useState([]);
-  const [selectedAgent, setSelectedAgent] = useState(null);
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
-  const [ratingsByAgent, setRatingsByAgent] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedAgentReviews, setSelectedAgentReviews] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [newRating, setNewRating] = useState({
+    rating: 0,
+    review: "",
+    agent_email: "",
+  });
 
-  // Fetch the agents from the backend API
+  // Fetch agents from the backend API based on searchTerm
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await fetch('/api/reviewRating/<agent_email>'); // Modify with your actual API
-        const data = await response.json();
-        setAgents(data.agents); // Assuming response returns an array of agents
+        const response = await axios.get(
+          `http://localhost:5000/api/users/search_agent`,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+              first_name: searchTerm,
+            },
+          }
+        );
+        setAgents(response.data.account_list); // Assuming 'account_list' contains agents
         setLoading(false);
       } catch (error) {
         console.error("Error fetching agents:", error);
+        setLoading(false);
       }
     };
 
     fetchAgents();
-  }, []);
+  }, [searchTerm, access_token]);
 
   // Fetch agents on component mount or when search term changes
   useEffect(() => {
@@ -48,47 +61,36 @@ const SellerRatingPage = () => {
     setShowModal(true);
   };
 
-  // Handle submitting the review
-  const handleSubmitRating = async () => {
-    const newReview = { review: feedback, timestamp: new Date().toISOString().split('T')[0] };
+  // Show the rating form and set agent email
+  const handleSubmitNewRating = (agentEmail) => {
+    setShowRatingModal(true);
+    setNewRating((prev) => ({ ...prev, agent_email: agentEmail }));
+  };
 
-    // Send the review and rating to the backend API
+  // Submit the new rating
+  const handleRatingSubmit = async () => {
     try {
-      const response = await fetch('/api/create_reviewRating', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
-        },
-        body: JSON.stringify({
-          rating: rating,
-          review: feedback,
-          agent_email: selectedAgent.email,
-        }),
-      });
+      const response = await axios.post(
+        `http://localhost:5000/api/reviewRating/create_reviewRating`, // Ensure endpoint matches the Flask route
+        newRating,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      const data = await response.json();
-
-      // Update the UI with the new review and the average rating
-      if (data.success) {
-        setRatingsByAgent((prevRatings) => {
-          const updatedRatings = { ...prevRatings };
-          updatedRatings[selectedAgent.email] = {
-            reviews: [{ review: feedback, rating, timestamp: newReview.timestamp }, ...(updatedRatings[selectedAgent.email]?.reviews || [])],
-            avgRating: data.average_rating,
-          };
-          return updatedRatings;
-        });
-      } else {
-        console.error("Error submitting review:", data.error);
+      if (response.data.success) {
+        alert("Rating submitted successfully!");
+        setShowRatingModal(false);
+        setNewRating({ rating: 0, review: "", agent_email: "" });
+        // Optionally refresh the agent's ratings
+        handleViewAllRatings(newRating.agent_email);
       }
-
-      setRating(0);
-      setFeedback('');
-      setShowModal(false);
-      setShowAllReviewsModal(true);
     } catch (error) {
       console.error("Error submitting rating:", error);
+      alert("Failed to submit rating.");
     }
   };
 
@@ -126,8 +128,7 @@ const SellerRatingPage = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Rate Agents</h1>
-
+      <h1 className="text-2xl font-bold mb-6 text-red-400">Review Agents</h1>
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -135,10 +136,9 @@ const SellerRatingPage = () => {
           placeholder="Search by first name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border rounded px-2 py-1 w-full"
+          className="border rounded px-2 py-1 w-full text-black"
         />
       </div>
-
       {/* Loading State */}
       {loading && <p>Loading agents...</p>}
 
@@ -191,10 +191,11 @@ const SellerRatingPage = () => {
             <div className="mb-4">
               <label className="block mb-1">Feedback:</label>
               <textarea
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                className="border rounded px-2 py-1 w-full"
-                rows="3"
+                value={newRating.review}
+                onChange={(e) =>
+                  setNewRating({ ...newRating, review: e.target.value })
+                }
+                className="border rounded px-2 py-1 w-full text-black"
               />
             </div>
             <div className="flex justify-between">
@@ -215,22 +216,42 @@ const SellerRatingPage = () => {
         </div>
       )}
 
-      {/* Modal for viewing all reviews */}
-      {showAllReviewsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-bold mb-4">All Reviews for {selectedAgent?.first_name} {selectedAgent?.last_name}</h2>
-            <div className="space-y-4">
-              {ratingsByAgent[selectedAgent?.email]?.reviews?.length > 0 ? (
-                ratingsByAgent[selectedAgent?.email].reviews.map((rating, index) => (
-                  <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
-                    <p className="text-gray-600">Feedback: {rating.review}</p>
-                    <p className="text-gray-500 text-sm">{rating.timestamp}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No reviews yet.</p>
-              )}
+      {/* View Rating Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-xl font-semibold text-orange-500">
+              Ratings for {selectedAgentReviews?.email}
+            </h2>
+
+            <h3 className="mt-4 text-lg font-bold text-orange-500">
+              Average Rating: {selectedAgentReviews?.averageRating}
+            </h3>
+
+            {/* Scrollable container for reviews */}
+            <div className="mt-4 max-h-60 overflow-y-auto">
+              <ul className="space-y-4">
+                {selectedAgentReviews?.reviews.map((review, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center p-4 bg-gray-200 rounded-lg shadow-md w-full"
+                  >
+                    <FaUserCircle className="text-red-700 text-5xl mr-4" />
+                    <div className="flex-1">
+                      <p className="text-black font-semibold">
+                        {review.reviewerEmail}
+                      </p>
+                      <p className="text-gray-700">{review.review}</p>
+                    </div>
+                    <div className="flex items-center ml-4">
+                      <FaStar className="text-black text-xl" />
+                      <span className="text-red-600 text-lg ml-2">
+                        {review.rating} Stars
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
             <button
               onClick={() => setShowAllReviewsModal(false)}
