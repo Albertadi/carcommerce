@@ -7,6 +7,10 @@ import axios from "axios";
 export default function ProfileManagement() {
   const { access_token } = useContext(AuthContext); // Access the token and user data
   const [profiles, setProfiles] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [rowSelectedProfile, setRowSelectedProfile] = useState(null);
+  const [isRowModalOpen, setIsRowModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newProfile, setNewProfile] = useState({
     name: "",
@@ -60,6 +64,12 @@ export default function ProfileManagement() {
     const { name, value, type, checked } = e.target;
     const val = type === "checkbox" ? checked : value;
     setNewProfile({ ...newProfile, [name]: val });
+  };
+
+
+  const toggleProfileDetails = (profile) => {
+    setRowSelectedProfile(profile);
+    setIsRowModalOpen(true);
   };
 
   const addProfile = async () => {
@@ -149,50 +159,93 @@ export default function ProfileManagement() {
         className="mb-4 p-2 border rounded"
       />
 
-      <table className="min-w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-700 text-white">
-            <th className="border px-4 py-2">Profile Name</th>
-            <th className="border px-4 py-2">Description</th>
-            <th className="border px-4 py-2">Buy Permission</th>
-            <th className="border px-4 py-2">Sell Permission</th>
-            <th className="border px-4 py-2">Listing Permission</th>
-            <th className="border px-4 py-2">Actions</th>
+{isLoading ? (
+  // Loading State Table
+  <div className="overflow-x-auto">
+    <table className="min-w-full bg-gray-800 border border-gray-600">
+      <thead>
+        <tr>
+          <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
+          <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colSpan="6" className="py-16 text-center">
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+) : (
+  <div className="overflow-x-auto">
+  <table className="min-w-full bg-gray-800 border border-gray-600">
+    <thead>
+      <tr>
+        <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
+        <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+      </tr>
+    </thead>
+    <tbody>
+      {profiles && profiles.length > 0 ? (
+        profiles.map((profile) => (
+          <tr 
+            key={profile.name} 
+            className="hover:bg-gray-700 cursor-pointer"
+            onClick={() => toggleProfileDetails(profile)}
+          >
+            <td className="py-2 px-4 border border-gray-600 text-white">{profile.name}</td>
+            <td className="py-2 px-4 border border-gray-600 text-white">{profile.description}</td>
+            <td className="py-2 px-4 border border-gray-600 text-white">
+              {profile.has_buy_permission ? "✓" : "✕"}
+            </td>
+            <td className="py-2 px-4 border border-gray-600 text-white">
+              {profile.has_sell_permission ? "✓" : "✕"}
+            </td>
+            <td className="py-2 px-4 border border-gray-600 text-white">
+              {profile.has_listing_permission ? "✓" : "✕"}
+            </td>
+            <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="bg-red-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+              >
+                🚫
+              </button>
+            </td>
+            <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => startEditing(profile)}
+                className="bg-green-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+              >
+                ✎
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {(profiles || []).map((profile) => (
-            <tr key={profile.name} className="bg-gray-800 text-white">
-              <td className="border px-4 py-2">{profile.name}</td>
-              <td className="border px-4 py-2">{profile.description}</td>
-              <td className="border px-4 py-2">
-                {profile.has_buy_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2">
-                {profile.has_sell_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2">
-                {profile.has_listing_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2 flex justify-around">
-                <button
-                  onClick={() => startEditing(profile)}
-                  className="bg-yellow-500 text-black px-2 py-1 rounded hover:bg-yellow-600 mr-2"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteProfile(profile.name)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+        ))
+      ) : (
+        <tr>
+          <td colSpan="7" className="py-2 px-4 border border-gray-600 text-center text-white">
+            No profiles found.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+)}
       <button
         onClick={() => setShowModal(true)}
         className="mt-5 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
@@ -341,6 +394,51 @@ export default function ProfileManagement() {
           </div>
         </div>
       )}
+
+    {/*Profile Details Modal*/}
+{isRowModalOpen && rowSelectedProfile && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+      <h2 className="text-xl font-bold mb-4">Profile Details</h2>
+      <div className="space-y-3">
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Name:</span> 
+          <span>{rowSelectedProfile.name}</span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Description:</span> 
+          <span>{rowSelectedProfile.description}</span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Buy Permission:</span> 
+          <span className={rowSelectedProfile.has_buy_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_buy_permission ? "✓" : "✕"}
+          </span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Sell Permission:</span> 
+          <span className={rowSelectedProfile.has_sell_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_sell_permission ? "✓" : "✕"}
+          </span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Listing Permission:</span> 
+          <span className={rowSelectedProfile.has_listing_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_listing_permission ? "✓" : "✕"}
+          </span>
+        </p>
+      </div>
+      <div className="mt-6 flex justify-end">
+        <button 
+          onClick={() => setIsRowModalOpen(false)} 
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
