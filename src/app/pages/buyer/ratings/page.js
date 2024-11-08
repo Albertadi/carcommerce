@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import { AuthContext } from "../../authorization/AuthContext";
 import { FaStar, FaUserCircle } from "react-icons/fa";
 
@@ -44,21 +45,26 @@ const SellerRatingPage = () => {
     fetchAgents();
   }, [searchTerm, access_token]);
 
-  // Fetch agents on component mount or when search term changes
-  useEffect(() => {
-    if (searchTerm) {
-      setAgents((prevAgents) =>
-        prevAgents.filter((agent) =>
-          agent.first_name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+  // Fetch reviews and average rating for a specific agent
+  const handleViewAllRatings = async (agentEmail) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/reviewRating/${agentEmail}`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
       );
+      setSelectedAgentReviews({
+        email: agentEmail,
+        reviews: response.data.average_rating || [],
+        averageRating: response.data.reviews || "No rating available",
+      });
+      setShowReviewModal(true); // Show the review modal
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
     }
-  }, [searchTerm]);
-
-  // Handle agent selection and show rating modal
-  const handleAgentSelect = (agent) => {
-    setSelectedAgent(agent);
-    setShowModal(true);
   };
 
   // Show the rating form and set agent email
@@ -94,41 +100,14 @@ const SellerRatingPage = () => {
     }
   };
 
-  // Handle viewing all reviews for selected agent
-  const handleViewAllReviews = (agent) => {
-    setSelectedAgent(agent);
-    setShowAllReviewsModal(true);
-  };
-
-  const handleSubmitRating = () => {
-    const newReview = { review: feedback, timestamp: new Date().toISOString().split('T')[0] };
-    
-    // Update the ratings for the selected agent
-    setRatingsByAgent((prevRatings) => {
-      const updatedRatings = { ...prevRatings };
-      const agentEmail = selectedAgent.email;
-
-      // If the agent already has ratings, add the new one to the list
-      if (updatedRatings[agentEmail]) {
-        updatedRatings[agentEmail] = [newReview, ...updatedRatings[agentEmail]];
-      } else {
-        // If this agent doesn't have any ratings yet, create a new entry
-        updatedRatings[agentEmail] = [newReview];
-      }
-
-      return updatedRatings;
-    });
-
-    // Clear input fields and close modal
-    setRating(0);
-    setFeedback('');
-    setShowModal(false);
-    setShowAllReviewsModal(true);  // Open the 'view all reviews' modal with updated ratings
+  // Handle star click to set rating
+  const handleStarClick = (index) => {
+    setNewRating((prev) => ({ ...prev, rating: index + 1 }));
   };
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 text-red-400">Review Agents</h1>
+      <h1 className="text-2xl font-bold mb-6 text-red-400">Search Agents</h1>
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -140,56 +119,75 @@ const SellerRatingPage = () => {
         />
       </div>
       {/* Loading State */}
-      {loading && <p>Loading agents...</p>}
-
-      {/* Display agents */}
-      <div className="space-y-4">
-        {agents.length > 0 ? (
-          agents.map((agent) => (
-            <div key={agent.email} className="bg-gray-100 p-4 rounded-lg shadow-md">
-              <h2 className="font-semibold">Agent Name: {agent.first_name} {agent.last_name}</h2>
-              <p className="text-gray-600">{agent.user_profile}</p>
-              <p className="text-yellow-500 font-semibold">Average Rating: {ratingsByAgent[agent.email]?.avgRating || '0'} / 5</p>
-              <button
-                onClick={() => handleAgentSelect(agent)}
-                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+      {loading ? (
+        <p>Loading agents...</p>
+      ) : (
+        <div className="space-y-4">
+          {agents.length > 0 ? (
+            agents.map((agent) => (
+              <div
+                key={agent.id}
+                className="bg-gray-100 p-4 rounded-lg shadow-md"
               >
-                Submit New Rating
-              </button>
-              <button
-                onClick={() => handleViewAllReviews(agent)}
-                className="mt-2 ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
-              >
-                View All Reviews
-              </button>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No agents found.</p>
-        )}
-      </div>
+                <div className="flex items-center">
+                  <FaUserCircle className="text-red-700 text-5xl mr-4" />
+                  <div className="flex-1">
+                    <p className="text-black font-semibold">
+                      {agent.first_name} {agent.last_name}
+                    </p>
+                  </div>
+                </div>
 
-      {/* Modal for submitting new rating */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-bold mb-4">Rate {selectedAgent?.first_name} {selectedAgent?.last_name}</h2>
-            <div className="mb-4">
-              <label className="block mb-1">Rating:</label>
-              <div className="flex space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
-                  >
-                    ★
-                  </span>
-                ))}
+                {/* View All Ratings Button */}
+                <button
+                  onClick={() => handleViewAllRatings(agent.email)}
+                  className="mt-2 mr-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  View All Ratings
+                </button>
+
+                {/* Submit a New Rating Button */}
+                <button
+                  onClick={() => handleSubmitNewRating(agent.email)}
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Submit a New Rating
+                </button>
               </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No agents found.</p>
+          )}
+        </div>
+      )}
+      {/* Submit Rating Modal */}
+      {showRatingModal && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-[700px]">
+            <h2 className="text-xl font-semibold text-orange-500">
+              Submit a New Rating
+            </h2>
+
+            {/* Star Rating */}
+            <div className="mt-4 flex justify-center">
+              {[...Array(5)].map((_, index) => (
+                <span
+                  key={index}
+                  onClick={() => handleStarClick(index)}
+                  className={`cursor-pointer text-3xl ${
+                    index < newRating.rating
+                      ? "text-yellow-500"
+                      : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
             </div>
-            <div className="mb-4">
-              <label className="block mb-1">Feedback:</label>
+
+            {/* Review Textarea */}
+            <div className="mt-4">
+              <label className="block font-medium">Review:</label>
               <textarea
                 value={newRating.review}
                 onChange={(e) =>
@@ -198,16 +196,17 @@ const SellerRatingPage = () => {
                 className="border rounded px-2 py-1 w-full text-black"
               />
             </div>
-            <div className="flex justify-between">
+
+            <div className="mt-4 flex justify-end space-x-4">
               <button
-                onClick={handleSubmitRating}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
+                onClick={handleRatingSubmit}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Submit Rating
               </button>
               <button
-                onClick={() => setShowModal(false)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
+                onClick={() => setShowRatingModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
                 Cancel
               </button>
@@ -253,12 +252,16 @@ const SellerRatingPage = () => {
                 ))}
               </ul>
             </div>
-            <button
-              onClick={() => setShowAllReviewsModal(false)}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
-            >
-              Close
-            </button>
+
+            {/* Close Button */}
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
