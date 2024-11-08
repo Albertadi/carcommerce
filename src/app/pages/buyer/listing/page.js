@@ -1,33 +1,71 @@
-// pages/car/[id].js
+// src/app/pages/buyer/listing/page.js
+// v1.1
 
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation'; // For accessing query parameters
 
 const CarDetails = () => {
+  const id = "fa7515b0-a1db-45d6-b913-d610873483a8"; // Get listing ID from URL query
+  const [carData, setCarData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (id) {
+      // Fetch the car listing from the API
+      fetch(`/api/listing/view_listing?id=${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authorization token if needed
+          // 'Authorization': `Bearer ${token}`
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch listing');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setCarData(data);
+      })
+      .catch(error => {
+        console.error(error);
+        setError("Could not load listing details.");
+      });
+    }
+  }, [id]);
+
+  if (error) {
+    return <div className="text-red-500 text-center mt-4">{error}</div>;
+  }
+
+  if (!carData) {
+    return <div className="text-gray-500 text-center mt-4">Loading...</div>;
+  }
+
   return (
-    <div className="bg-gray-100 py-10 px-6">
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg">
+    <div className="bg-[#e2e2ef] py-10 px-6">
+      <div className="max-w-5xl mx-auto bg-white rounded shadow-lg">
         {/* Car Images Section */}
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <img
-              src="/car-main.jpg" // Replace with main car image URL
-              alt="Main car view"
+              src={carData.imageUrl || "/default-car-image.jpg"} // Use car image URL or a default
+              alt="Car Image"
               className="w-full h-72 object-cover rounded-lg"
             />
-            <div className="grid grid-cols-2 gap-2">
-              <img src="/car-side.jpg" alt="Side view" className="h-36 object-cover rounded-lg" />
-              <img src="/car-interior.jpg" alt="Interior view" className="h-36 object-cover rounded-lg" />
-              <img src="/car-back.jpg" alt="Back view" className="h-36 object-cover rounded-lg" />
-              <img src="/car-engine.jpg" alt="Engine view" className="h-36 object-cover rounded-lg" />
-            </div>
           </div>
         </div>
 
         {/* Car Details Section */}
         <div className="px-6 py-4 border-t">
-          <h2 className="text-3xl font-semibold text-gray-800">Nissan Skyline GTR 1999</h2>
-          <p className="text-lg text-gray-600 mt-2">2023 | 20,000 km | Manual</p>
-          <p className="text-xl font-bold text-gray-900 mt-4">$187,000</p>
+          <h2 className="text-3xl font-semibold text-gray-800">{`${carData.make} ${carData.model} ${carData.variant} ${carData.year}`}</h2>
+          <p className="text-lg text-gray-600 mt-2">{`${carData.year} | ${carData.mileage} km | ${carData.transmission}`}</p>
+          <p className="text-xl font-bold text-gray-900 mt-4">${carData.price}</p>
         </div>
 
         {/* Specifications Section */}
@@ -35,16 +73,16 @@ const CarDetails = () => {
           <h3 className="text-2xl font-semibold text-gray-800">Specifications</h3>
           <div className="grid grid-cols-2 gap-4 mt-4 text-gray-700">
             <div>
-              <p><strong>Make:</strong> Nissan</p>
-              <p><strong>Model:</strong> Skyline</p>
-              <p><strong>Variant:</strong> GTR</p>
-              <p><strong>Year:</strong> 1999</p>
+              <p><strong>Make:</strong> {carData.make}</p>
+              <p><strong>Model:</strong> {carData.model}</p>
+              <p><strong>Variant:</strong> {carData.variant}</p>
+              <p><strong>Year:</strong> {carData.year}</p>
             </div>
             <div>
-              <p><strong>Mileage:</strong> 20,000 km</p>
-              <p><strong>Transmission:</strong> Manual</p>
-              <p><strong>Fuel Type:</strong> Petrol</p>
-              <p><strong>Engine Capacity:</strong> 2.0L</p>
+              <p><strong>Mileage:</strong> {carData.mileage} km</p>
+              <p><strong>Transmission:</strong> {carData.transmission}</p>
+              <p><strong>Fuel Type:</strong> {carData.fuelType}</p>
+              <p><strong>Engine Capacity:</strong> {carData.engineCapacity}L</p>
             </div>
           </div>
         </div>

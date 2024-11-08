@@ -1,10 +1,12 @@
 "use client";
 import { useContext, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AuthContext } from '../../authorization/AuthContext';
 import React from 'react';
 
 export default function CreateListing() {
   const { access_token } = useContext(AuthContext);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     vin: '',
     make: '',
@@ -58,6 +60,7 @@ export default function CreateListing() {
     }
 
     const formSubmissionData = new FormData();
+
     Object.entries(formData).forEach(([key, value]) => {
       formSubmissionData.append(key, value);
     });
@@ -89,6 +92,7 @@ export default function CreateListing() {
           seller_email: ''
         });
         setImage(null);
+        router.push('../agent/dashboard');  // Redirect to the dashboard page
       } else {
         const error = await response.json();
         console.error('Error details:', error);
@@ -99,6 +103,7 @@ export default function CreateListing() {
       alert('An unexpected error occurred.');
     }
   };
+
 
   const years = Array.from({ length: 2024 - 1980 + 1 }, (_, i) => 1980 + i);
 
