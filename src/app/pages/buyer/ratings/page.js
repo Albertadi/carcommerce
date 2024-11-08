@@ -19,6 +19,9 @@ const SellerRatingPage = () => {
     agent_email: "",
   });
 
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState("");
+
   // Fetch agents from the backend API based on searchTerm
   useEffect(() => {
     const fetchAgents = async () => {
@@ -88,15 +91,17 @@ const SellerRatingPage = () => {
       );
 
       if (response.data.success) {
-        alert("Rating submitted successfully!");
+        // Set success message and start 7 second timer
+        setSuccessMessage("Rating submitted successfully!");
         setShowRatingModal(false);
         setNewRating({ rating: 0, review: "", agent_email: "" });
-        // Optionally refresh the agent's ratings
-        handleViewAllRatings(newRating.agent_email);
+
+        // Hide the success message after 7 seconds
+        setTimeout(() => setSuccessMessage(""), 7000);
       }
     } catch (error) {
       console.error("Error submitting rating:", error);
-      alert("Failed to submit rating.");
+      setSuccessMessage(""); // Hide success message if error occurs
     }
   };
 
@@ -160,6 +165,14 @@ const SellerRatingPage = () => {
           )}
         </div>
       )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mt-4 text-center text-green-500">
+          <p>{successMessage}</p>
+        </div>
+      )}
+
       {/* Rating Modal */}
       {showRatingModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
@@ -245,7 +258,7 @@ const SellerRatingPage = () => {
                     <div className="flex items-center ml-4">
                       <FaStar className="text-black text-xl" />
                       <span className="text-red-600 text-lg ml-2">
-                        {review.rating} Stars
+                        {review.rating}
                       </span>
                     </div>
                   </li>
@@ -253,15 +266,12 @@ const SellerRatingPage = () => {
               </ul>
             </div>
 
-            {/* Close Button */}
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowReviewModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              >
-                Close
-              </button>
-            </div>
+            <button
+              onClick={() => setShowReviewModal(false)}
+              className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
