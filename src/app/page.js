@@ -40,7 +40,6 @@ export default function HomePage() {
   // Dropdown options
   const filterData = {
     Mileage: ["Under 20,000 km", "20,000 - 50,000 km", "50,000 - 100,000 km", "Over 100,000 km"],
-    "Brand & Model": ["Toyota", "Honda", "Ford", "BMW", "Mercedes"],
     Price: ["Under $10,000", "$10,000 - $20,000", "$20,000 - $30,000", "Over $30,000"],
     Year: ["2024", "2023", "2022", "2021", "2020", "Older"],
     Availability: ["Available", "Sold Out"],

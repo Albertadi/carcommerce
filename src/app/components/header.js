@@ -13,7 +13,7 @@ export default function Header() {
   const { access_token, permissions, logout } = useContext(AuthContext);
   const router = useRouter();
 
-  const handleAccount = () => {
+  const handleClick = (element) => {
     if (permissions) {
       if (permissions.sub.has_admin_permission) {
         router.push('/pages/admin/dashboard');
@@ -22,9 +22,13 @@ export default function Header() {
       } else if (permissions.sub.has_sell_permission) {
         router.push('/pages/seller/dashboard');
       } else if (permissions.sub.has_buy_permission) {
-        router.push('/pages/buyer/dashboard');
+        if (element == "logo") {
+          router.push('/pages/buyer');
+        } else if (element == "account") {
+          router.push('/pages/buyer/dashboard');
+        }
       } else {
-        setError('Invalid permissions. Please contact IT administrator.');
+        router.push('/');
       }
     }
   }
@@ -43,7 +47,7 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
-          <a href="/" className="flex items-center">
+          <a onClick={() => handleClick("logo")} className="flex items-center cursor-pointer">
             <p className="text-5xl font-rajdhaniBold">
               <span className="text-[#e2e2ef]">TECH</span>
               <span className="text-[#f75049]">Quest</span>
@@ -80,7 +84,7 @@ export default function Header() {
             {/* Account link */}
             {access_token ? (
               <button
-                onClick={handleAccount}
+                onClick={() => handleClick("account")} 
                 className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 <svg

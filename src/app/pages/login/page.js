@@ -40,7 +40,7 @@ export default function LoginPage() {
       } else if (permissions.sub.has_sell_permission) {
         router.push('/pages/seller/dashboard');
       } else if (permissions.sub.has_buy_permission) {
-        router.push('/pages/buyer/dashboard');
+        router.push('/pages/buyer');
       } else {
         setError('Invalid permissions. Please contact IT administrator.');
       }

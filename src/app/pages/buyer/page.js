@@ -235,12 +235,12 @@ const filterCarListings = (searchKeyword, filters) => {
         ) : (
           filteredCarListings.map((car) => (
             <div key={car.id} className="bg-white border rounded shadow-md overflow-hidden">
-              <img
-                className="w-full h-48 object-cover"
-                src={car.imageUrl}
-                alt={car.model}
-                onClick={() => handleCarClick(car.id)}
-              />
+                <img
+                    src={car.image_url ? `http://localhost:5000/uploads/${car.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                    alt={`${car.make} ${car.model}`}
+                    className="w-full h-48 object-cover"
+                    onClick={() => handleCarClick(car.id)}
+                />
               <div className="p-4">
                 <h3 className="text-lg text-black font-bold">{car.make} {car.model} ({car.year})</h3>
                 <div className="mt-2 text-sm text-gray-500">
