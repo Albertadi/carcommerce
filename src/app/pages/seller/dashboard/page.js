@@ -4,6 +4,7 @@ import { useState } from "react";
 import AgentPage from '../agents/page';
 import ListingPage from '../listings/page';
 import SellerProfilePage from '../sellerProfile/page'
+import RatingsPage from '../ratings/page'
 
 export default function Dashboard() {
   const [selectedOption, setSelectedOption] = useState("option1");
@@ -49,6 +50,16 @@ export default function Dashboard() {
                 My Listings
               </button>
             </li>
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded hover:bg-gray-200 ${
+                  selectedOption === "option4" ? "bg-gray-300" : ""
+                }`}
+                onClick={() => handleOptionClick("option4")}
+              >
+                Rate Agents
+              </button>
+            </li>
           </ul>
         </div>
 
@@ -64,6 +75,7 @@ export default function Dashboard() {
           )}
           {selectedOption === "option2" && <AgentPage />}
           {selectedOption === "option3" && <ListingPage />}
+          {selectedOption === "option4" && <RatingsPage />}
         </div>
       </div>
     </div>
