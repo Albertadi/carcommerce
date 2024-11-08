@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
-import { ListingCard } from '../../../components/ListingCard';
 import axios from 'axios';
 
 export default function ListingsPage() {
@@ -59,6 +58,9 @@ export default function ListingsPage() {
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
+        const filters = buildSearchFilters();
+        console.log('Sending filters to API:', filters);
+        
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
@@ -67,7 +69,8 @@ export default function ListingsPage() {
             );
             setListings(response.data.listing_list);
         } catch (error) {
-            setError('Failed to fetch listings. Please try again.');
+            console.error('Error response:', error.response?.data);
+            setError(error.response?.data?.error || 'Failed to fetch listings. Please try again.');
             console.error('Error fetching listings:', error);
         } finally {
             setIsLoading(false);
