@@ -7,6 +7,10 @@ import axios from "axios";
 export default function ProfileManagement() {
   const { access_token } = useContext(AuthContext); // Access the token and user data
   const [profiles, setProfiles] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [rowSelectedProfile, setRowSelectedProfile] = useState(null);
+  const [isRowModalOpen, setIsRowModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newProfile, setNewProfile] = useState({
     name: "",
@@ -62,6 +66,12 @@ export default function ProfileManagement() {
     setNewProfile({ ...newProfile, [name]: val });
   };
 
+
+  const toggleProfileDetails = (profile) => {
+    setRowSelectedProfile(profile);
+    setIsRowModalOpen(true);
+  };
+
   const addProfile = async () => {
     try {
       // Make API call to create the new profile
@@ -101,7 +111,6 @@ export default function ProfileManagement() {
 
   const saveProfile = async () => {
     try {
-      // Prepare the data to send in the request body
       const updatedProfile = {
         name: editingProfile.name,
         description: editingProfile.description,
@@ -109,23 +118,79 @@ export default function ProfileManagement() {
         has_sell_permission: editingProfile.has_sell_permission,
         has_listing_permission: editingProfile.has_listing_permission,
       };
-
-      // Send a POST request to the update profile API
+  
       const response = await axios.post(
         "http://localhost:5000/api/profiles/update_profile",
         updatedProfile,
         {
           headers: {
-            Authorization: `Bearer ${access_token}`, // Include JWT token for authorization
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
-      setShowModal(false);
+  
+      if (response.status === 200) {
+        // Update the local state with the updated profile
+        setProfiles(profiles.map(profile => 
+          profile.name === editingProfile.name ? {
+            ...profile,
+            ...updatedProfile
+          } : profile
+        ));
+  
+        // Show success message
+        setSuccessMessage('Profile updated successfully');
+        setTimeout(() => setSuccessMessage(''), 3000); // Clear message after 3 seconds
+        
+        // Close the edit modal
+        setEditingProfile(null);
+  
+        // Refresh the profiles list
+        fetchProfiles();
+      }
     } catch (error) {
       console.error("Error saving profile:", error);
-      alert("An error occurred while saving the profile."); // Optional: notify the user
+      alert(error.response?.data?.error || "An error occurred while saving the profile.");
     }
   };
+  
+  // Add fetchProfiles function outside of useEffect
+  const fetchProfiles = async () => {
+    try {
+      if (searchTerm) {
+        const response = await axios.get(
+          "http://localhost:5000/api/profiles/view_profile",
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+              name: searchTerm,
+            },
+          }
+        );
+        setProfiles([response.data.profile]);
+      } else {
+        const response = await axios.post(
+          "http://localhost:5000/api/profiles/search_profile",
+          { name: "", description: "" },
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+        setProfiles(response.data.profile_list);
+      }
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    }
+  };
+  
+  // Update your useEffect to use the fetchProfiles function
+  useEffect(() => {
+    fetchProfiles();
+  }, [searchTerm, access_token]);
 
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -133,66 +198,121 @@ export default function ProfileManagement() {
     setEditingProfile({ ...editingProfile, [name]: val });
   };
 
-  const EditProfile = () => {};
+  
 
   return (
-    <div className="flex flex-col items-center p-8 bg-gray-100 text-neon-red">
-      <h1 className="text-2xl font-extrabold mb-5 uppercase tracking-widest">
-        User Profiles
-      </h1>
+    <div className="flex flex-col items-center p-8 bg-gray-900 text-neon-red">
+    {/* Add the success message here, right after the opening div */}
+    {successMessage && (
+      <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50 transition-opacity duration-500">
+        {successMessage}
+      </div>
+    )}
+
+    <h1 className="text-2xl font-extrabold mb-5 uppercase tracking-widest text-white">
+      User Profiles
+    </h1>
 
       <input
         type="text"
         placeholder="Search profiles..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4 p-2 border rounded"
+        className="mb-4 p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
       />
 
-      <table className="min-w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-700 text-white">
-            <th className="border px-4 py-2">Profile Name</th>
-            <th className="border px-4 py-2">Description</th>
-            <th className="border px-4 py-2">Buy Permission</th>
-            <th className="border px-4 py-2">Sell Permission</th>
-            <th className="border px-4 py-2">Listing Permission</th>
-            <th className="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(profiles || []).map((profile) => (
-            <tr key={profile.name} className="bg-gray-800 text-white">
-              <td className="border px-4 py-2">{profile.name}</td>
-              <td className="border px-4 py-2">{profile.description}</td>
-              <td className="border px-4 py-2">
-                {profile.has_buy_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2">
-                {profile.has_sell_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2">
-                {profile.has_listing_permission ? "Yes" : "No"}
-              </td>
-              <td className="border px-4 py-2 flex justify-around">
-                <button
-                  onClick={() => startEditing(profile)}
-                  className="bg-yellow-500 text-black px-2 py-1 rounded hover:bg-yellow-600 mr-2"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteProfile(profile.name)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+{isLoading ? (
+  // Loading State Table
+  <div className="overflow-x-auto">
+    <table className="min-w-full bg-gray-800 border border-gray-600">
+      <thead>
+        <tr>
+          <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
+          <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
+          <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colSpan="6" className="py-16 text-center">
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+) : (
+  <div className="overflow-x-auto">
+  <table className="min-w-full bg-gray-800 border border-gray-600">
+    <thead>
+      <tr>
+        <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
+        <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
+        <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+      </tr>
+    </thead>
+    <tbody>
+    {profiles && profiles.length > 0 ? (
+  profiles.map((profile) => (
+    <tr 
+      key={profile.name} 
+      className="hover:bg-gray-700 cursor-pointer"
+      onClick={() => toggleProfileDetails(profile)}
+    >
+      <td className="py-2 px-4 border border-gray-600 text-white">{profile.name}</td>
+      <td className="py-2 px-4 border border-gray-600 text-white">{profile.description}</td>
+      <td className="py-2 px-4 border border-gray-600 text-white">
+        {profile.has_buy_permission ? "✓" : "✕"}
+      </td>
+      <td className="py-2 px-4 border border-gray-600 text-white">
+        {profile.has_sell_permission ? "✓" : "✕"}
+      </td>
+      <td className="py-2 px-4 border border-gray-600 text-white">
+        {profile.has_listing_permission ? "✓" : "✕"}
+      </td>
+      <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+        {profile.name !== 'admin' && (
+          <button
+            onClick={() => showSuspendModal()}
+            className="bg-red-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+          >
+            🚫
+          </button>
+        )}
+      </td>
+      <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+        {profile.name !== 'admin' && (
+          <button
+            onClick={() => startEditing(profile)}
+            className="bg-green-500 text-white p-2 text-lg rounded w-full h-10 flex items-center justify-center"
+          >
+            ✎
+          </button>
+        )}
+      </td>
+    </tr>
+  ))
+) : (
+  <tr>
+    <td colSpan="7" className="py-2 px-4 border border-gray-600 text-center text-white">
+      No profiles found.
+    </td>
+  </tr>
+)}
+    </tbody>
+  </table>
+</div>
+)}
       <button
         onClick={() => setShowModal(true)}
         className="mt-5 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
@@ -272,75 +392,136 @@ export default function ProfileManagement() {
         </div>
       )}
 
-      {editingProfile && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-5 rounded shadow-lg">
-            <h2 className="text-xl mb-4">Edit Profile</h2>
-            <input
-              type="text"
-              name="name"
-              value={editingProfile.name}
-              onChange={handleEditChange}
-              className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-              type="text"
-              name="description"
-              value={editingProfile.description}
-              onChange={handleEditChange}
-              className="mb-2 p-2 border rounded w-full"
-            />
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_admin_permission"
-                checked={editingProfile.has_admin_permission}
-                onChange={handleEditChange}
-              />
-              Has Admin Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_buy_permission"
-                checked={editingProfile.has_buy_permission}
-                onChange={handleEditChange}
-              />
-              Has Buy Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_sell_permission"
-                checked={editingProfile.has_sell_permission}
-                onChange={handleEditChange}
-              />
-              Has Sell Permission
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                name="has_listing_permission"
-                checked={editingProfile.has_listing_permission}
-                onChange={handleEditChange}
-              />
-              Has Listing Permission
-            </label>
-            <button
-              onClick={saveProfile}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Save Profile
-            </button>
-            <button
-              onClick={() => setEditingProfile(null)}
-              className="mt-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-          </div>
+{editingProfile && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96 border border-gray-700">
+      <h2 className="text-2xl font-bold mb-6 text-white">Edit Profile</h2>
+      <div className="space-y-4">
+        <div>
+          <input
+            type="text"
+            name="name"
+            value={editingProfile.name}
+            onChange={handleEditChange}
+            className="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+          />
         </div>
-      )}
+        <div>
+          <input
+            type="text"
+            name="description"
+            value={editingProfile.description}
+            onChange={handleEditChange}
+            className="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="space-y-3">
+          <label className="flex items-center space-x-3 text-white">
+            <input
+              type="checkbox"
+              name="has_admin_permission"
+              checked={editingProfile.has_admin_permission}
+              onChange={handleEditChange}
+              className="w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500"
+            />
+            <span>Has Admin Permission</span>
+          </label>
+          <label className="flex items-center space-x-3 text-white">
+            <input
+              type="checkbox"
+              name="has_buy_permission"
+              checked={editingProfile.has_buy_permission}
+              onChange={handleEditChange}
+              className="w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500"
+            />
+            <span>Has Buy Permission</span>
+          </label>
+          <label className="flex items-center space-x-3 text-white">
+            <input
+              type="checkbox"
+              name="has_sell_permission"
+              checked={editingProfile.has_sell_permission}
+              onChange={handleEditChange}
+              className="w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500"
+            />
+            <span>Has Sell Permission</span>
+          </label>
+          <label className="flex items-center space-x-3 text-white">
+            <input
+              type="checkbox"
+              name="has_listing_permission"
+              checked={editingProfile.has_listing_permission}
+              onChange={handleEditChange}
+              className="w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500"
+            />
+            <span>Has Listing Permission</span>
+          </label>
+        </div>
+      </div>
+      <div className="flex justify-end space-x-3 mt-6">
+        <button
+          onClick={saveProfile}
+          className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          Save Profile
+        </button>
+        <button
+          onClick={() => setEditingProfile(null)}
+          className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    {/* Semi-transparent overlay */}
+    <div className="absolute inset-0 bg-black bg-opacity-50 -z-10"></div>
+  </div>
+)}
+
+    {/*Profile Details Modal*/}
+{isRowModalOpen && rowSelectedProfile && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+      <h2 className="text-xl font-bold mb-4">Profile Details</h2>
+      <div className="space-y-3">
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Name:</span> 
+          <span>{rowSelectedProfile.name}</span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Description:</span> 
+          <span>{rowSelectedProfile.description}</span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Buy Permission:</span> 
+          <span className={rowSelectedProfile.has_buy_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_buy_permission ? "✓" : "✕"}
+          </span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Sell Permission:</span> 
+          <span className={rowSelectedProfile.has_sell_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_sell_permission ? "✓" : "✕"}
+          </span>
+        </p>
+        <p className="flex justify-between border-b border-gray-600 pb-2">
+          <span className="font-medium">Listing Permission:</span> 
+          <span className={rowSelectedProfile.has_listing_permission ? "text-green-500" : "text-red-500"}>
+            {rowSelectedProfile.has_listing_permission ? "✓" : "✕"}
+          </span>
+        </p>
+      </div>
+      <div className="mt-6 flex justify-end">
+        <button 
+          onClick={() => setIsRowModalOpen(false)} 
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
