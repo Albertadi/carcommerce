@@ -36,14 +36,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="bg-gray-100 flex text-white h-[calc(100vh-64px)] overflow-hidden">
+    <div className="bg-[#e2e2ef] flex text-white h-[calc(100vh-64px)] overflow-hidden">
       {/* Left Column: Dashboard Options */}
-      <div className="w-1/2 bg-red-500 p-5 overflow-hidden h-full">
+      <div className="w-1/2 bg-[#f75049] p-5 overflow-hidden h-full">
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
-                selectedOption === "option1" ? "bg-red-300" : ""
+              className={`w-full font-rajdhaniSemiBold text-xl text-left p-2 hover:bg-[#5ef6ff] ${
+                selectedOption === "option1" ? "bg-[#5ef6ff]/60 border-2 border-[#5ef6ff]" : ""
               }`}
               onClick={() => handleOptionClick("option1")}
             >
@@ -52,8 +52,8 @@ export default function Dashboard() {
           </li>
           <li>
             <button
-              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
-                selectedOption === "option2" ? "bg-red-300" : ""
+              className={`w-full font-rajdhaniSemiBold text-xl text-left p-2 hover:bg-[#5ef6ff] ${
+                selectedOption === "option2" ? "bg-[#5ef6ff]/60 border-2 border-[#5ef6ff]" : ""
               }`}
               onClick={() => handleOptionClick("option2")}
             >
@@ -62,8 +62,8 @@ export default function Dashboard() {
           </li>
           <li>
             <button
-              className={`w-full text-left p-2 rounded hover:bg-red-200 ${
-                selectedOption === "option3" ? "bg-red-300" : ""
+              className={`w-full font-rajdhaniSemiBold text-xl text-left p-2 hover:bg-[#5ef6ff] ${
+                selectedOption === "option3" ? "bg-[#5ef6ff]/60 border-2 border-[#5ef6ff]" : ""
               }`}
               onClick={() => handleOptionClick("option3")}
             >
