@@ -31,8 +31,9 @@ class Shortlist(db.Model):
             'listing_id': self.listing_id,
             'date_added': self.date_added.isoformat(),
             'seller_email': self.seller_email,
-            'listing': Listing.queryListing(self.listing).to_dict if self.listing_id else None
+            'listing': self.listingRelation.to_dict() if self.listingRelation else None
         }
+
 
     @classmethod
     def add_to_shortlist(cls, email: str, listing_id: str, seller_email: str = "") -> tuple[bool, int, Optional[str]]:
