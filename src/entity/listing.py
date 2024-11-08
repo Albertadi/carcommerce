@@ -73,6 +73,17 @@ class Listing(db.Model):
         return cls.query.all()
     
     @classmethod
+    def viewListing (cls, id):
+        # Query the listing
+        listing = Listing.queryListing(id)
+
+        if listing is None:
+            return None, False, 404, "Listing not found"
+
+        # Return the listing as a dictionary
+        return listing.to_dict(), True, 200
+     
+    @classmethod
     def searchListing(
         cls,
         make: Optional[str] = None,

@@ -34,8 +34,8 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    logout()
     router.push("/")
+    logout()
   }
 
   return (
@@ -100,8 +100,8 @@ export default function Header() {
             ) : (
               <></>
             )}
-{/* Login/Logout Button */}
-{access_token ? (
+            {/* Login/Logout Button */}
+            {access_token ? (
               <button
                 onClick={handleLogout}
                 className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"

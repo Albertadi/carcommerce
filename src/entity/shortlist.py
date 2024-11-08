@@ -31,7 +31,7 @@ class Shortlist(db.Model):
             'listing_id': self.listing_id,
             'date_added': self.date_added.isoformat(),
             'seller_email': self.seller_email,
-            'listing': self.listing.to_dict() if self.listing else None
+            'listing': Listing.queryListing(self.listing).to_dict if self.listing_id else None
         }
 
     @classmethod
