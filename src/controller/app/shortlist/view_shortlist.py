@@ -13,8 +13,10 @@ class ViewShortlistController:
            # Get user from JWT
            user_data = get_jwt_identity()
            
+           email=user_data['email']
+
            # Call entity method
-           result = Shortlist.get_user_shortlist(email=user_data['email'])
+           result = Shortlist.get_user_shortlist(email)
            
            return jsonify(result), 200
 

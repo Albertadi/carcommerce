@@ -90,7 +90,7 @@ class Shortlist(db.Model):
             return False, 500, str(e)
 
     @classmethod
-    def get_user_shortlist(cls, email: str, include_sold: bool = False) -> dict:
+    def get_user_shortlist(cls, email: str) -> dict:
         """
         Get all shortlisted listings for a user.
         
@@ -110,9 +110,6 @@ class Shortlist(db.Model):
 
             # Build and execute query
             query = cls.query.filter_by(email=email)
-            
-            if not include_sold:
-                query = query.join(Listing).filter(Listing.is_sold == False)
                 
             shortlist_entries = query.order_by(cls.date_added.desc()).all()
             
