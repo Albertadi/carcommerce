@@ -4,24 +4,24 @@ import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../authorization/AuthContext'; // Corrected import path
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
-import axios from 'axios'; // Import Axios for API requests
+import axios from 'axios';
+import { Heart } from 'lucide-react';
 
 export default function BuyerPage() {
-  const { access_token } = useContext(AuthContext); // Access token from context
-  const [searchInput, setSearchInput] = useState(''); // State for search input
-  const [carListings, setCarListings] = useState([]); // State for car listings
-  const [filteredCarListings, setFilteredCarListings] = useState([]); // State for filtered car listings
-  const [selectedFilters, setSelectedFilters] = useState({}); // State for selected filters (price, mileage, etc.)
-  const [dropdownVisibility, setDropdownVisibility] = useState({}); // State to track visibility of each dropdown
-  const [errorMessage, setErrorMessage] = useState(''); // State to store error message for invalid response
-  const [isLoading, setIsLoading] = useState(false); // State for loading
-  const router = useRouter(); // Initialize router
+  const { access_token } = useContext(AuthContext);
+  const [searchInput, setSearchInput] = useState('');
+  const [carListings, setCarListings] = useState([]);
+  const [filteredCarListings, setFilteredCarListings] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [dropdownVisibility, setDropdownVisibility] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [shortlistedCars, setShortlistedCars] = useState(new Set());
+  const router = useRouter();
 
-  // Dynamic year filter options
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
-  // Build search filters (based on selected filters)
   const buildSearchFilters = () => {
     const filters = {};
     if (searchInput) filters.search = searchInput;
@@ -32,23 +32,53 @@ export default function BuyerPage() {
     return filters;
   };
 
-  // Fetch listings from API
+  const handleShortlist = async (listingId, sellerEmail, e) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (shortlistedCars.has(listingId)) {
+      return; // Already shortlisted
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/shortlist/saveto_shortlist',
+        {
+          listing_id: listingId,
+          seller_email: sellerEmail
+        },
+        {
+          headers: { 
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setShortlistedCars(prev => new Set([...prev, listingId]));
+        alert('Added to shortlist successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding to shortlist:', error);
+      alert(error.response?.data?.error || 'Failed to add to shortlist');
+    }
+  };
+
   const fetchListings = async () => {
     setIsLoading(true);
     setErrorMessage('');
-    const filters = buildSearchFilters(); // Get current filters
-    console.log('Sending filters to API:', filters); // Log for debugging
+    const filters = buildSearchFilters();
+    console.log('Sending filters to API:', filters);
 
     try {
       const response = await axios.post(
         'http://localhost:5000/api/listing/search_listing',
-        filters, // Send filters to API
+        filters,
         {
-          headers: { Authorization: `Bearer ${access_token}` }, // Authorization header
+          headers: { Authorization: `Bearer ${access_token}` },
         }
       );
 
-      // Check if response contains valid data
       if (Array.isArray(response.data.listing_list)) {
         setCarListings(response.data.listing_list);
         setFilteredCarListings(response.data.listing_list);
@@ -63,7 +93,6 @@ export default function BuyerPage() {
     }
   };
 
-  // Run fetchListings when access_token is available
   useEffect(() => {
     if (access_token) {
       fetchListings();
@@ -72,108 +101,87 @@ export default function BuyerPage() {
     }
   }, [access_token]);
 
-  // Dropdown options for filters
   const filterData = {
     Mileage: ["Under 20,000 km", "20,000 - 50,000 km", "50,000 - 100,000 km", "Over 100,000 km"],
     Price: ["Under $10,000", "$10,000 - $20,000", "$20,000 - $30,000", "Over $30,000"],
-    year: [...yearOptions, "Older"], // Dynamic years plus the 'Older' option
+    year: [...yearOptions, "Older"],
     Availability: ["Available", "Sold Out"],
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
-    filterCarListings(e.target.value, selectedFilters); // Filter on input change
+    filterCarListings(e.target.value, selectedFilters);
   };
 
-  // Handle filter option change
   const handleFilterChange = (filterCategory, value) => {
     const updatedFilters = { ...selectedFilters, [filterCategory]: value };
-    setSelectedFilters(updatedFilters); // Update selected filters
-    filterCarListings(searchInput, updatedFilters); // Apply filters
-    toggleDropdownVisibility(filterCategory); // Close dropdown after selection
+    setSelectedFilters(updatedFilters);
+    filterCarListings(searchInput, updatedFilters);
+    toggleDropdownVisibility(filterCategory);
   };
 
- // Toggle visibility of filter dropdown
-const toggleDropdownVisibility = (filterCategory) => {
-  setDropdownVisibility((prevVisibility) => {
-    // Create a new object to ensure immutability
-    const newVisibility = { ...prevVisibility };
+  const toggleDropdownVisibility = (filterCategory) => {
+    setDropdownVisibility((prevVisibility) => {
+      const newVisibility = { ...prevVisibility };
+      Object.keys(newVisibility).forEach((key) => {
+        if (key !== filterCategory) {
+          newVisibility[key] = false;
+        }
+      });
+      newVisibility[filterCategory] = !newVisibility[filterCategory];
+      return newVisibility;
+    });
+  };
 
-    // Hide all dropdowns and show only the selected one
-    Object.keys(newVisibility).forEach((key) => {
-      if (key !== filterCategory) {
-        newVisibility[key] = false; // Hide other dropdowns
+  const filterCarListings = (searchKeyword, filters) => {
+    let filtered = carListings;
+
+    if (searchKeyword) {
+      const keywordLower = searchKeyword.toLowerCase();
+      filtered = filtered.filter(car =>
+        car.model.toLowerCase().includes(keywordLower) ||
+        car.make.toLowerCase().includes(keywordLower)
+      );
+    }
+
+    Object.keys(filters).forEach((filterCategory) => {
+      const filterValue = filters[filterCategory];
+      if (filterValue) {
+        filtered = filtered.filter(car => {
+          if (filterCategory === "Price") {
+            if (filterValue === "Under $10,000" && car.price < 10000) return true;
+            if (filterValue === "$10,000 - $20,000" && car.price >= 10000 && car.price <= 20000) return true;
+            if (filterValue === "$20,000 - $30,000" && car.price >= 20000 && car.price <= 30000) return true;
+            if (filterValue === "Over $30,000" && car.price > 30000) return true;
+          }
+          if (filterCategory === "Mileage") {
+            if (filterValue === "Under 20,000 km" && car.mileage < 20000) return true;
+            if (filterValue === "20,000 - 50,000 km" && car.mileage >= 20000 && car.mileage <= 50000) return true;
+            if (filterValue === "50,000 - 100,000 km" && car.mileage >= 50000 && car.mileage <= 100000) return true;
+            if (filterValue === "Over 100,000 km" && car.mileage > 100000) return true;
+          }
+          if (filterCategory === "Year") {
+            if (filterValue === "Older" && car.year < currentYear - 5) return true;
+            const filterYear = parseInt(filterValue, 10);
+            if (!isNaN(filterYear) && car.year === filterYear) return true;
+          }
+          if (filterCategory === "Availability") {
+            if (filterValue === "Available" && !car.is_sold) return true;
+            if (filterValue === "Sold Out" && car.is_sold) return true;
+          }
+          return false;
+        });
       }
     });
 
-    // Toggle the visibility of the selected dropdown
-    newVisibility[filterCategory] = !newVisibility[filterCategory];
+    setFilteredCarListings(filtered.length ? filtered : []);
+  };
 
-    return newVisibility;
-  });
-};
-
-
- // Updated filterCarListings function with fixes
-const filterCarListings = (searchKeyword, filters) => {
-  let filtered = carListings;
-
-  // Filter by search keyword (case-insensitive match on any part of make or model)
-  if (searchKeyword) {
-    const keywordLower = searchKeyword.toLowerCase();
-    filtered = filtered.filter(car =>
-      car.model.toLowerCase().includes(keywordLower) ||
-      car.make.toLowerCase().includes(keywordLower)
-    );
-  }
-
-  // Apply additional filters (price, mileage, year, availability)
-  Object.keys(filters).forEach((filterCategory) => {
-    const filterValue = filters[filterCategory];
-    if (filterValue) {
-      filtered = filtered.filter(car => {
-        if (filterCategory === "Price") {
-          if (filterValue === "Under $10,000" && car.price < 10000) return true;
-          if (filterValue === "$10,000 - $20,000" && car.price >= 10000 && car.price <= 20000) return true;
-          if (filterValue === "$20,000 - $30,000" && car.price >= 20000 && car.price <= 30000) return true;
-          if (filterValue === "Over $30,000" && car.price > 30000) return true;
-        }
-        if (filterCategory === "Mileage") {
-          if (filterValue === "Under 20,000 km" && car.mileage < 20000) return true;
-          if (filterValue === "20,000 - 50,000 km" && car.mileage >= 20000 && car.mileage <= 50000) return true;
-          if (filterValue === "50,000 - 100,000 km" && car.mileage >= 50000 && car.mileage <= 100000) return true;
-          if (filterValue === "Over 100,000 km" && car.mileage > 100000) return true;
-        }
-        if (filterCategory === "Year") {
-          // Handle the "Older" filter
-          if (filterValue === "Older" && car.year < currentYear - 5) return true;
-
-          // Otherwise, compare the selected year to the car's year
-          const filterYear = parseInt(filterValue, 10);
-          if (!isNaN(filterYear) && car.year === filterYear) return true;
-        }
-        if (filterCategory === "Availability") {
-          // Assuming `is_sold` is the field for availability
-          if (filterValue === "Available" && !car.is_sold) return true;
-          if (filterValue === "Sold Out" && car.is_sold) return true;
-        }
-        return false; // If none of the conditions match, exclude the car
-      });
-    }
-  });
-
-  // Ensure filteredCarListings is always an array
-  setFilteredCarListings(filtered.length ? filtered : []);
-};
-
-
-  // Handle car image or details click
   const handleCarClick = (id) => {
     if (!access_token) {
-      window.location.href = '/pages/login'; // Redirect to login page if not authenticated
+      window.location.href = '/pages/login';
     } else {
-      router.push(`/buyer/listing/${id}`); // Navigate to car details page
+      router.push(`/buyer/listing/${id}`);
     }
   };
 
@@ -227,20 +235,31 @@ const filterCarListings = (searchKeyword, filters) => {
 
       <div className="mt-8 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {errorMessage ? (
-          // This error message will display if there's a failure fetching listings
           <div className="w-full text-center text-red-500">{errorMessage}</div>
         ) : filteredCarListings.length === 0 ? (
-          // This message will display if there are no listings after applying filters or on initial load
           <div className="w-full text-center text-gray-500">No car listings found.</div>
         ) : (
           filteredCarListings.map((car) => (
-            <div key={car.id} className="bg-white border rounded shadow-md overflow-hidden">
-                <img
-                    src={car.image_url ? `http://localhost:5000/uploads/${car.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-                    alt={`${car.make} ${car.model}`}
-                    className="w-full h-48 object-cover"
-                    onClick={() => handleCarClick(car.id)}
+            <div key={car.id} className="bg-white border rounded shadow-md overflow-hidden relative">
+              <button 
+                onClick={(e) => handleShortlist(car.id, car.seller_email, e)}
+                className={`absolute top-4 right-4 p-2 rounded-full bg-white shadow-md z-10 
+                  transition-all duration-200 hover:transform hover:scale-110
+                  ${shortlistedCars.has(car.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                disabled={shortlistedCars.has(car.id)}
+              >
+                <Heart 
+                  size={20} 
+                  className={shortlistedCars.has(car.id) ? 'fill-current' : ''}
                 />
+              </button>
+
+              <img
+                src={car.image_url ? `http://localhost:5000/uploads/${car.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                alt={`${car.make} ${car.model}`}
+                className="w-full h-48 object-cover cursor-pointer"
+                onClick={() => handleCarClick(car.id)}
+              />
               <div className="p-4">
                 <h3 className="text-lg text-black font-bold">{car.make} {car.model} ({car.year})</h3>
                 <div className="mt-2 text-sm text-gray-500">
@@ -263,5 +282,4 @@ const filterCarListings = (searchKeyword, filters) => {
       </div>
     </div>
   );
-
 }
