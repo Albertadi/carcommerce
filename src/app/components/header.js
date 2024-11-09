@@ -31,6 +31,9 @@ export default function Header() {
         router.push('/');
       }
     }
+    else {
+      router.push('/');
+    }
   }
 
   const handleLogin = () => {

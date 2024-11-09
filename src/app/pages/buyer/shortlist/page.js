@@ -5,7 +5,7 @@ import { Heart, Trash2, Mail, Search } from 'lucide-react';
 import { AuthContext } from '../../authorization/AuthContext';
 import axios from 'axios';
 
-const Shortlist = () => {
+const ShortlistPage = () => {
   const { access_token } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [shortlistedCars, setShortlistedCars] = useState([]);
@@ -197,4 +197,4 @@ const Shortlist = () => {
   );
 };
 
-export default Shortlist;
+export default ShortlistPage;
