@@ -111,10 +111,26 @@ export default function UserManagement() {
   };
 
 
-  const toggleUserDetails = (user) => {
-      setRowSelectedUser(user);
-      setIsRowModalOpen(true);
+  const toggleUserDetails = async (user) => {
+    try {
+      // Make an API call to fetch user details from the view_user endpoint
+      const response = await axios.get("http://localhost:5000/api/users/view_user", {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+        params: {
+          email: user.email,
+        },
+      });
+  
+      // Set the response data to rowSelectedUser
+      setRowSelectedUser(response.data.user);
+      setIsRowModalOpen(true); // Open the modal to display user details
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
   };
+  
 
   // Suspend function with fetchUsers call
   const openSuspendModal = (user) => {
@@ -655,11 +671,6 @@ export default function UserManagement() {
                 )}
               </tbody>
             </table>
-
-
-            {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
-            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-              
           </div>
       )}
       
@@ -784,21 +795,43 @@ export default function UserManagement() {
 
     {/*User Details Modal*/}
     {isRowModalOpen && rowSelectedUser && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-          <h2 className="text-xl font-bold mb-4">User Details</h2>
-          <p>First Name: {rowSelectedUser.first_name}</p>
-          <p>Last Name: {rowSelectedUser.last_name}</p>
-          <p>Email: {rowSelectedUser.email}</p>
-          <p>DOB: {rowSelectedUser.dob}</p>
-          <p>User Profile: {rowSelectedUser.user_profile}</p>
-          {/* Other user details */}
-          <button onClick={() => setIsRowModalOpen(false)} className="bg-red-500 text-white p-2 rounded mt-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+        <h2 className="text-xl font-bold mb-4">User Details</h2>
+        <div className="space-y-3">
+          <p className="flex justify-between border-b border-gray-600 pb-2">
+            <span className="font-medium">First Name:</span>
+            <span>{rowSelectedUser.first_name}</span>
+          </p>
+          <p className="flex justify-between border-b border-gray-600 pb-2">
+            <span className="font-medium">Last Name:</span>
+            <span>{rowSelectedUser.last_name}</span>
+          </p>
+          <p className="flex justify-between border-b border-gray-600 pb-2">
+            <span className="font-medium">Email:</span>
+            <span>{rowSelectedUser.email}</span>
+          </p>
+          <p className="flex justify-between border-b border-gray-600 pb-2">
+            <span className="font-medium">Date of Birth:</span>
+            <span>{rowSelectedUser.dob}</span>
+          </p>
+          <p className="flex justify-between border-b border-gray-600 pb-2">
+            <span className="font-medium">User Profile:</span>
+            <span>{rowSelectedUser.user_profile}</span>
+          </p>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button 
+            onClick={() => setIsRowModalOpen(false)} 
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+          >
             Close
           </button>
         </div>
       </div>
-    )}
+    </div>
+  )}
+
 
     </div>
   );

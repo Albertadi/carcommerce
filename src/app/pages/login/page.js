@@ -137,12 +137,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Development Message */}
-        <div className="mt-6 text-center">
-          <p className="text-[#f75049]/60 text-sm font-medium">
-            THIS PAGE IS UNDER DEVELOPMENT
-          </p>
-        </div>
       </div>
     </div>
   );

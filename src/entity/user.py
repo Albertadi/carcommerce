@@ -62,6 +62,15 @@ class User(db.Model):
         return cls.query.all()
     
     @classmethod
+    def viewUserAccount(cls, email:str) -> dict:
+        user = cls.queryUserAccount(email)
+
+        if user is None:
+            return None, 404
+        
+        return user.to_dict(), 200
+    
+    @classmethod
     def searchUserAccount(cls, email, first_name, user_profile):
         query = cls.query
 

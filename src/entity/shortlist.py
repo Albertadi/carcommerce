@@ -90,7 +90,7 @@ class Shortlist(db.Model):
             return False, 500, str(e)
 
     @classmethod
-    def get_user_shortlist(cls, email: str) -> dict:
+    def get_user_shortlist(cls, email: str, include_sold: bool = False) -> dict:
         """
         Get all shortlisted listings for a user.
         
@@ -110,6 +110,9 @@ class Shortlist(db.Model):
 
             # Build and execute query
             query = cls.query.filter_by(email=email)
+            
+            if not include_sold:
+                query = query.join(Listing).filter(Listing.is_sold == False)
                 
             shortlist_entries = query.order_by(cls.date_added.desc()).all()
             
@@ -125,15 +128,13 @@ class Shortlist(db.Model):
             }
 
     @classmethod
-    def search_in_shortlist(cls, email: str, search_term: Optional[str] = None, min_price: Optional[float] = None, max_price: Optional[float] = None) -> dict:
+    def search_in_shortlist(cls, email: str, search_term: Optional[str] = None) -> dict:
         """
-        Search within a user's shortlisted listings by brand/make name and price range.
+        Search within a user's shortlisted listings by brand/make name.
         
         Args:
             email: User's email
             search_term: Brand/make name to search for (case-insensitive)
-            min_price: Minimum price filter
-            max_price: Maximum price filter
         """
         try:
             query = cls.query.filter_by(email=email).join(Listing)
@@ -141,12 +142,6 @@ class Shortlist(db.Model):
             if search_term:
                 search_term = f"%{search_term}%"
                 query = query.filter(Listing.make.ilike(search_term))
-                
-            if min_price is not None:
-                query = query.filter(Listing.price >= min_price)
-                
-            if max_price is not None:
-                query = query.filter(Listing.price <= max_price)
 
             shortlist_entries = query.order_by(cls.date_added.desc()).all()
             return {

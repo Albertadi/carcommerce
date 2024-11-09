@@ -13,19 +13,12 @@ class SearchShortlistController:
             # Get user from JWT and search parameters
             user_data = get_jwt_identity()
             search_term = request.args.get('search')
-            min_price = request.args.get('min_price')
-            max_price = request.args.get('max_price')
-            
-            # Convert price strings to float if they exist
-            min_price = float(min_price) if min_price else None
-            max_price = float(max_price) if max_price else None
+            mail = user_data['email']
             
             # Call entity method
             search_results = Shortlist.search_in_shortlist(
-                email=user_data['email'],
+                email=mail,
                 search_term=search_term,
-                min_price=min_price,
-                max_price=max_price
             )
 
             return jsonify(search_results), 200

@@ -21,6 +21,7 @@ const SellerRatingPage = () => {
 
   // Success message state
   const [successMessage, setSuccessMessage] = useState("");
+  const [invalidMessage, setInvalidMessage] = useState("");
 
   // Fetch agents from the backend API based on searchTerm
   useEffect(() => {
@@ -139,7 +140,7 @@ const SellerRatingPage = () => {
         setTimeout(() => setSuccessMessage(""), 7000);
       }
     } catch (error) {
-      console.error("Error submitting rating:", error);
+      setInvalidMessage("Error submitting rating:", error);
       setSuccessMessage(""); // Hide success message if error occurs
     }
   };
@@ -152,12 +153,20 @@ const SellerRatingPage = () => {
   return (
     <div className="p-8">
 
-      {/* Success Message */}
+      {/* Success message display */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
           {successMessage}
         </div>
       )}
+
+      {/* Invalid message display */}
+      {invalidMessage && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          {invalidMessage}
+        </div>
+      )}
+
 
       <h1 className="text-2xl font-bold mb-6 text-red-400">Review Agents</h1>
       {/* Search Bar */}
@@ -213,7 +222,7 @@ const SellerRatingPage = () => {
         </div>
       )}
 
-      {/* Rating Modal */}
+      {/* Create Rating Modal */}
       {showCreateRatingModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[700px]">

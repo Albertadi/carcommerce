@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -41,9 +42,10 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    router.push("/")
-    logout()
-  }
+    router.push("/");
+    logout();
+    setIsLogoutModalOpen(false);
+  };
 
   return (
     <div className="sticky top-0 bg-white h-16 shadow-xl w-full flex items-center z-10">
@@ -110,7 +112,7 @@ export default function Header() {
             {/* Login/Logout Button */}
             {access_token ? (
               <button
-                onClick={handleLogout}
+                onClick={() => setIsLogoutModalOpen(true)}
                 className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 <svg
@@ -138,6 +140,30 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-semibold mb-4">Confirm Logout</h2>
+            <p className="text-gray-700 mb-6">Are you sure you want to logout?</p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Yes, Logout
+              </button>
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

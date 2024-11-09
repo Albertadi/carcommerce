@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { AuthContext } from "../../authorization/AuthContext"; // Adjust path as needed
+import { AuthContext } from "../../authorization/AuthContext";
 import axios from "axios";
 
 export default function ProfileManagement() {
@@ -46,7 +46,6 @@ export default function ProfileManagement() {
 
   const toggleProfileDetails = async (profile) => {
     try {
-      // Make an API call to fetch the profile details from the 'view_profile' endpoint
       const response = await axios.get("http://localhost:5000/api/profiles/view_profile", {
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -546,7 +545,7 @@ export default function ProfileManagement() {
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3">
         <button
-          onClick={handleSuspend}
+          onClick={handleShowSuspendModal}
           className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
         >
           Confirm
@@ -571,49 +570,49 @@ export default function ProfileManagement() {
 )}
 
     {/*Profile Details Modal*/}
-{isRowModalOpen && rowSelectedProfile && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-      <h2 className="text-xl font-bold mb-4">Profile Details</h2>
-      <div className="space-y-3">
-        <p className="flex justify-between border-b border-gray-600 pb-2">
-          <span className="font-medium">Name:</span> 
-          <span>{rowSelectedProfile.name}</span>
-        </p>
-        <p className="flex justify-between border-b border-gray-600 pb-2">
-          <span className="font-medium">Description:</span> 
-          <span>{rowSelectedProfile.description}</span>
-        </p>
-        <p className="flex justify-between border-b border-gray-600 pb-2">
-          <span className="font-medium">Buy Permission:</span> 
-          <span className={rowSelectedProfile.has_buy_permission ? "text-green-500" : "text-red-500"}>
-            {rowSelectedProfile.has_buy_permission ? "✓" : "✕"}
-          </span>
-        </p>
-        <p className="flex justify-between border-b border-gray-600 pb-2">
-          <span className="font-medium">Sell Permission:</span> 
-          <span className={rowSelectedProfile.has_sell_permission ? "text-green-500" : "text-red-500"}>
-            {rowSelectedProfile.has_sell_permission ? "✓" : "✕"}
-          </span>
-        </p>
-        <p className="flex justify-between border-b border-gray-600 pb-2">
-          <span className="font-medium">Listing Permission:</span> 
-          <span className={rowSelectedProfile.has_listing_permission ? "text-green-500" : "text-red-500"}>
-            {rowSelectedProfile.has_listing_permission ? "✓" : "✕"}
-          </span>
-        </p>
+    {isRowModalOpen && rowSelectedProfile && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+          <h2 className="text-xl font-bold mb-4">Profile Details</h2>
+          <div className="space-y-3">
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Name:</span> 
+              <span>{rowSelectedProfile.name}</span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Description:</span> 
+              <span>{rowSelectedProfile.description}</span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Buy Permission:</span> 
+              <span className={rowSelectedProfile.has_buy_permission ? "text-green-500" : "text-red-500"}>
+                {rowSelectedProfile.has_buy_permission ? "✓" : "✕"}
+              </span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Sell Permission:</span> 
+              <span className={rowSelectedProfile.has_sell_permission ? "text-green-500" : "text-red-500"}>
+                {rowSelectedProfile.has_sell_permission ? "✓" : "✕"}
+              </span>
+            </p>
+            <p className="flex justify-between border-b border-gray-600 pb-2">
+              <span className="font-medium">Listing Permission:</span> 
+              <span className={rowSelectedProfile.has_listing_permission ? "text-green-500" : "text-red-500"}>
+                {rowSelectedProfile.has_listing_permission ? "✓" : "✕"}
+              </span>
+            </p>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <button 
+              onClick={() => setIsRowModalOpen(false)} 
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       </div>
-      <div className="mt-6 flex justify-end">
-        <button 
-          onClick={() => setIsRowModalOpen(false)} 
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+    )}
     </div>
   );
 }
