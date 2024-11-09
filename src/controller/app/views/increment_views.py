@@ -11,7 +11,7 @@ class IncrementViewsController:
         listing_id = data.get('listing_id')
 
         # Increment and retrieve the number of views for the listing
-        increment_views_response, status_code = Views.increment_views(listing_id)
+        increment_views_response, status_code = Views.incrementViews(listing_id)
 
         return jsonify({
             'success': increment_views_response
