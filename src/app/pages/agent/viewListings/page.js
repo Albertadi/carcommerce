@@ -3,6 +3,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '../../authorization/AuthContext';
+import { ListingCard } from '../../../components/ListingCard';
+import { Filter, Calendar, Clock, Fuel, Settings, X } from 'lucide-react';
 import axios from 'axios';
 
 export default function ListingsPage() {
@@ -56,12 +58,10 @@ export default function ListingsPage() {
         agent_email: agentEmail,
     });
 
+
     const fetchListings = async () => {
         setIsLoading(true);
         setError('');
-        const filters = buildSearchFilters();
-        console.log('Sending filters to API:', filters);
-        
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/listing/search_listing',
@@ -70,8 +70,7 @@ export default function ListingsPage() {
             );
             setListings(response.data.listing_list);
         } catch (error) {
-            console.error('Error response:', error.response?.data);
-            setError(error.response?.data?.error || 'Failed to fetch listings. Please try again.');
+            setError('Failed to fetch listings. Please try again.');
             console.error('Error fetching listings:', error);
         } finally {
             setIsLoading(false);
@@ -120,6 +119,7 @@ export default function ListingsPage() {
         // Clear the error for the specific field
         errorSetter((prev) => ({ ...prev, [field]: '' }));
     };
+    
     
     // Validate prices
     const validatePrices = () => {
@@ -199,7 +199,7 @@ export default function ListingsPage() {
     };
 
     const handleUpdateListing = (listing) => {
-        
+        router.push(`../agent/updateListing/${listing.id}`);
     };
 
     const closeModal = () => {
@@ -251,225 +251,309 @@ export default function ListingsPage() {
         fetchListings();
     };
 
+    
     return (
-        <div className="min-h-screen bg-[#e2e2ef] p-6">
-            <h1 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6">Car Listings</h1>
-
-            {/* Error message */}
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                    {error}
-                </div>
-            )}
-
-            <div 
-                className="flex items-center justify-between bg-white p-4 rounded-md shadow-md cursor-pointer"
-                onClick={() => setShowFilters(!showFilters)}
-            >
-                <span className="text-xl text-[#0e0e17] font-rajdhaniBold">Filters</span>
-                <span className={`transform ${showFilters ? 'rotate-180' : 'rotate-0'}`}>
-                    ▼
-                </span>
-            </div>
-
-            {showFilters && (
-            <div className="bg-white p-4 rounded-md shadow-md mt-4 max-h-96 overflow-y-auto">
-                <div className="space-y-4">
-                    <input
-                        value={make}
-                        onChange={handleInputChange(setMake, () => {}, 'make')}
-                        placeholder="Make"
-                        className="border p-2 rounded w-full text-black"
-                    />
-                    <input
-                        value={model}
-                        onChange={handleInputChange(setModel, () => {}, 'model')}
-                        placeholder="Model"
-                        className="border p-2 rounded w-full text-black"
-                    />
-                    <input
-                        value={year}
-                        onChange={handleInputChange(setYear, () => {}, 'year')}
-                        placeholder="Year"
-                        className="border p-2 rounded w-full text-black"
-                    />
-
-                    {/* Price Filter Section */}
-                    <div>
-                        <div className="flex space-x-2">
-                            <div className="w-full">
-                                <input
-                                    value={minPrice}
-                                    onChange={handleInputChange(setMinPrice, setPriceError, 'minPrice')}
-                                    placeholder="Min Price"
-                                    className={`border p-2 rounded w-full text-black ${priceError.min ? 'border-red-500' : ''}`}
-                                />
-                                {priceError.min && <p className="text-red-500 text-sm mt-1">{priceError.min}</p>}
-                            </div>
-                            <div className="w-full">
-                                <input
-                                    value={maxPrice}
-                                    onChange={handleInputChange(setMaxPrice, setPriceError, 'maxPrice')}
-                                    placeholder="Max Price"
-                                    className={`border p-2 rounded w-full text-black ${priceError.max ? 'border-red-500' : ''}`}
-                                />
-                                {priceError.max && <p className="text-red-500 text-sm mt-1">{priceError.max}</p>}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Mileage Filter Section */}
-                    <div>
-                        <div className="flex space-x-2">
-                            <div className="w-full">
-                                <input
-                                    value={minMileage}
-                                    onChange={handleInputChange(setMinMileage, setMileageError, 'minMileage')}
-                                    placeholder="Min Mileage"
-                                    className={`border p-2 rounded w-full text-black ${mileageError.min ? 'border-red-500' : ''}`}
-                                />
-                                {mileageError.min && <p className="text-red-500 text-sm mt-1">{mileageError.min}</p>}
-                            </div>
-                            <div className="w-full">
-                                <input
-                                    value={maxMileage}
-                                    onChange={handleInputChange(setMaxMileage, setMileageError, 'maxMileage')}
-                                    placeholder="Max Mileage"
-                                    className={`border p-2 rounded w-full text-black ${mileageError.max ? 'border-red-500' : ''}`}
-                                />
-                                {mileageError.max && <p className="text-red-500 text-sm mt-1">{mileageError.max}</p>}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex space-x-4">
-                        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-            {/* Listings */}
-            {isLoading ? (
-                <div className="flex justify-center items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#f75049]"></div>
-                </div>
-            ) : (
-                <div className="grid gap-8 mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                 
-                <div 
-                    onClick={() => {
-                        router.push('../agent/createListing');
-                    }} 
-                    className="relative bg-[#f75049]/40 border-4 border-[#f75049] border-dashed rounded shadow-lg 
-                        overflow-hidden flex items-center justify-center cursor-pointer group
-                        hover:bg-[#f0b537]/40 hover:border-[#f0b537] hover:text-[#f0b537]"
-                    style={{ height: 'fit-content', minHeight: '100%' }}
-                    >
-                    <p className="text-6xl text-[#f75049] font-rajdhaniBold group-hover:text-[#f0b537]"> + </p>
-                </div>
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm py-6">
+                <div className="max-w-7xl mx-auto px-6">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">My Listings</h1>
                     
-                {listings.length > 0 ? (
-                    listings.map((listing) => (
-                    <div key={listing.id} className="relative bg-white border rounded shadow-lg overflow-hidden">
-                        <img
-                            src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-                            alt={`${listing.make} ${listing.model}`}
-                            className="w-full h-48 object-cover"
-                        />
-
-                        <div className="p-4">
-                            <h3 className="text-xl font-rajdhaniSemiBold text-[#0e0e17] mb-2">
-                            {listing.year} {listing.make} {listing.model}
-                            </h3>
-                            <p className="text-[#0e0e17] mb-1">
-                                <span className="font-rajdhaniBold">Mileage:</span> <span className='font-rajdhaniSemiBold'>{listing.mileage.toLocaleString()}</span> km
-                            </p>
-                            <p className="text-[#0e0e17] mb-1">
-                                <span className="font-rajdhaniBold">Transmission:</span> <span className='font-rajdhaniSemiBold'>{listing.transmission}</span>
-                            </p>
-                            <p className="text-[#0e0e17] mb-1">
-                                <span className="font-rajdhaniBold">Fuel Type:</span> <span className='font-rajdhaniSemiBold'>{listing.fuel_type}</span>
-                            </p>
-                            <p className="text-lg font-rajdhaniBold text-[#f75049] mt-2">
-                                ${listing.price.toLocaleString()}
-                            </p>
-
-                            <div className="flex justify-between mt-4">
+                    {/* Search and Filter Bar */}
+                    <div className="bg-white rounded shadow-sm p-4 border border-gray-100">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1">
+                                <input
+                                    value={make}
+                                    onChange={handleInputChange(setMake, () => {}, 'make')}
+                                    placeholder="Search by make or model..."
+                                    className="w-full px-4 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-[#f75049] focus:border-[#f75049] text-gray-800"
+                                />
+                            </div>
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 gap-2 transition-colors duration-75"
+                            >
+                                <Filter className="h-5 w-5" />
+                                {showFilters ? 'Hide Filters' : 'Show Filters'}
+                            </button>
+                        </div>
+    
+                        {/* Filter Panel */}
+                        {showFilters && (
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* Price Range */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            value={minPrice}
+                                            onChange={handleInputChange(setMinPrice, setPriceError, 'minPrice')}
+                                            placeholder="Min"
+                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                                priceError.min ? 'border-[#f75049]' : 'border-gray-200'
+                                            }`}
+                                        />
+                                        <input
+                                            value={maxPrice}
+                                            onChange={handleInputChange(setMaxPrice, setPriceError, 'maxPrice')}
+                                            placeholder="Max"
+                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                                priceError.max ? 'border-[#f75049]' : 'border-gray-200'
+                                            }`}
+                                        />
+                                    </div>
+                                    {(priceError.min || priceError.max) && (
+                                        <p className="text-[#f75049] text-xs mt-1">
+                                            {priceError.min || priceError.max}
+                                        </p>
+                                    )}
+                                </div>
+    
+                                {/* Mileage Range */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Mileage Range</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            value={minMileage}
+                                            onChange={handleInputChange(setMinMileage, setMileageError, 'minMileage')}
+                                            placeholder="Min"
+                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                                mileageError.min ? 'border-[#f75049]' : 'border-gray-200'
+                                            }`}
+                                        />
+                                        <input
+                                            value={maxMileage}
+                                            onChange={handleInputChange(setMaxMileage, setMileageError, 'maxMileage')}
+                                            placeholder="Max"
+                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                                mileageError.max ? 'border-[#f75049]' : 'border-gray-200'
+                                            }`}
+                                        />
+                                    </div>
+                                    {(mileageError.min || mileageError.max) && (
+                                        <p className="text-[#f75049] text-xs mt-1">
+                                            {mileageError.min || mileageError.max}
+                                        </p>
+                                    )}
+                                </div>
+    
+                                {/* Year */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                                    <input
+                                        value={year}
+                                        onChange={handleInputChange(setYear, () => {}, 'year')}
+                                        placeholder="Enter year"
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800"
+                                    />
+                                </div>
+    
+                                {/* Model */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                    <input
+                                        value={model}
+                                        onChange={handleInputChange(setModel, () => {}, 'model')}
+                                        placeholder="Enter model"
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800"
+                                    />
+                                </div>
+                            </div>
+                        )}
+    
+                        {showFilters && (
+                            <div className="mt-4 flex justify-end">
                                 <button
-                                onClick={() => handleViewDetails(listing)}
-                                className="bg-[#2570d4] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
+                                    onClick={handleSearch}
+                                    className="px-6 py-2 bg-[#f75049] text-white rounded-lg hover:bg-red-600 transition-colors"
                                 >
-                                Details
-                                </button>
-                                <button
-                                onClick={() => handleUpdateListing(listing)}
-                                className="bg-[#1DED83] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
-                                >
-                                Update
-                                </button>
-                                <button
-                                onClick={() => handleDeleteClick(listing)}
-                                className="bg-[#f75049] font-rajdhaniSemiBold text-white py-1 px-3 hover:bg-[#5ef6ff] rounded"
-                                >
-                                Delete
+                                    Search Cars
                                 </button>
                             </div>
-                        </div>
+                        )}
                     </div>
-                    ))
-                ) : (
-                    <p className="text-gray-500">No listings found.</p>
-                )}
+                </div>
+            </div>
+    
+            {/* Error Message */}
+            {error && (
+                <div className="max-w-7xl mx-auto px-6 mt-4">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        {error}
+                    </div>
                 </div>
             )}
+    
+            {/* Listings Grid */}
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                {isLoading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#f75049]"></div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+                        {/* Create Listing */}
+                        <div 
+                            onClick={() => {
+                                router.push('../agent/createListing');
+                            }} 
+                            className="relative bg-[#f75049]/40 border-4 border-[#f75049] border-dashed rounded shadow-lg 
+                                overflow-hidden flex items-center justify-center cursor-pointer group
+                                hover:bg-[#f0b537]/40 hover:border-[#f0b537] hover:text-[#f0b537] transition-colors duration-75"
+                            style={{ height: 'fit-content', minHeight: '100%' }}
+                        >
+                            <p className="text-6xl text-[#f75049] font-rajdhaniBold group-hover:text-[#f0b537]"> + </p>
+                        </div>
+
+                        {listings.length > 0 ? (
+                            listings.map((listing) => (
+                                <div key={listing.id} className="bg-white rounded shadow-sm overflow-hidden hover:shadow-md transition-all duration-75">
+                                    <div className="relative">
+                                        <img
+                                            src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                                            alt={`${listing.make} ${listing.model}`}
+                                            className="w-full h-52 object-cover"
+                                        />
+                                        <div className="absolute top-4 right-4">
+                                            <button
+                                                onClick={() => handleDeleteClick(listing)}
+                                                className="p-2 bg-white/90 rounded hover:bg-red-50 transition-colors duration-75"
+                                                title="Delete listing"
+                                            >
+                                                <X className="h-5 w-5 text-[#f75049]" />
+                                            </button>
+                                        </div>
+                                    </div>
+    
+                                    <div className="p-4">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                {listing.make} {listing.model}
+                                            </h3>
+                                            <p className="text-xl font-bold text-[#f75049]">
+                                                ${listing.price.toLocaleString()}
+                                            </p>
+                                        </div>
+    
+                                        <div className="space-y-2 mb-4">
+                                            <div className="flex items-center text-gray-600 text-sm">
+                                                <Calendar className="h-4 w-4 mr-2" />
+                                                Year: {listing.year}
+                                            </div>
+                                            <div className="flex items-center text-gray-600 text-sm">
+                                                <Clock className="h-4 w-4 mr-2" />
+                                                Mileage: {listing.mileage.toLocaleString()} km
+                                            </div>
+                                            <div className="flex items-center text-gray-600 text-sm">
+                                                <Settings className="h-4 w-4 mr-2" />
+                                                {listing.transmission}
+                                            </div>
+                                            <div className="flex items-center text-gray-600 text-sm">
+                                                <Fuel className="h-4 w-4 mr-2" />
+                                                {listing.fuel_type}
+                                            </div>
+                                        </div>
+    
+                                        <div className='grid grid-cols-2 gap-2'>
+                                            <button
+                                                onClick={() => handleViewDetails(listing)}
+                                                className="w-full px-4 py-2 bg-[#f75049] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
+                                            >
+                                                View Details
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleUpdateListing(listing)}
+                                                className="w-full px-4 py-2 bg-[#2570d4] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
+                                            >
+                                                Update
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-12">
+                                <p className="text-gray-500 text-lg">No listings found</p>
+                                <p className="text-gray-400 mt-2">Try adjusting your search filters</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+    
             {/* View Details Modal */}
             {showViewDetails && selectedListing && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
-                        <h2 className="text-2xl font-bold mb-4">Car Details</h2>
-                        <div className="text-black">
-                            <p className='font-rajdhaniBold'>Make: <span className='font-rajdhaniSemiBold'>{selectedListing.make}</span></p>
-                            <p className='font-rajdhaniBold'>Model: <span className='font-rajdhaniSemiBold'>{selectedListing.model}</span></p>
-                            <p className='font-rajdhaniBold'>Year: <span className='font-rajdhaniSemiBold'>{selectedListing.year}</span></p>
-                            <p className='font-rajdhaniBold'>Price: <span className='font-rajdhaniSemiBold'>${selectedListing.price}</span></p>
-                            <p className='font-rajdhaniBold'>Mileage: <span className='font-rajdhaniSemiBold'>{selectedListing.mileage}</span></p>
-                            <p className='font-rajdhaniBold'>Transmission: <span className='font-rajdhaniSemiBold'>{selectedListing.transmission}</span></p>
-                            <p className='font-rajdhaniBold'>Fuel Type: <span className='font-rajdhaniSemiBold'>{selectedListing.fuel_type}</span></p>
-                            {/* Add any other details you want to display */}
-                        </div>
-                        <div className="mt-4">
-                            <button 
-                                className="bg-red-600 text-white px-4 py-2 rounded-md"
-                                onClick={closeModal}
-                            >
-                                Close
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-white rounded p-6 max-w-lg w-full mx-4">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-gray-900">Car Details</h2>
+                            <button onClick={closeModal} className="p-2 hover:bg-gray-100 rounded">
+                                <X className="h-5 w-5 text-gray-500" />
                             </button>
+                        </div>
+                        <div className="space-y-3 text-gray-700">
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Make:</span> {selectedListing.make}
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Model:</span> {selectedListing.model}
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Year:</span> {selectedListing.year}
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Price:</span> ${selectedListing.price.toLocaleString()}
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Mileage:</span> {selectedListing.mileage.toLocaleString()} km
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Transmission:</span> {selectedListing.transmission}
+                            </p>
+                            <p className="flex justify-between border-b pb-2">
+                                <span className="font-medium">Fuel Type:</span> {selectedListing.fuel_type}
+                            </p>
+                            <div className="pt-2">
+                                <p className="font-medium mb-2">Description:</p>
+                                <p className="text-gray-600">{selectedListing.description}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-
+    
             {/* Delete Confirmation Modal */}
             {showDeleteConfirmation && listingToDelete && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white border-2 border-red-600 rounded-lg p-6 max-w-lg mx-auto">
-                        <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
-                        <p className="text-black">Are you sure that you want to delete {listingToDelete.make} {listingToDelete.model}, {listingToDelete.year}?</p>
-                        <div className="mt-4 flex justify-between">
-                            <button 
-                                className="bg-red-600 text-white px-4 py-2 rounded-md"
-                                onClick={handleDelete}
-                            >
-                                Yes, Delete
-                            </button>
-                            <button 
-                                className="bg-gray-300 text-black px-4 py-2 rounded-md"
-                                onClick={() => setShowDeleteConfirmation(false)}
-                            >
-                                Cancel
-                            </button>
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-white rounded p-6 max-w-md w-full mx-4">
+                        <div className="text-center">
+                            <div className="w-12 h bg-red-100 flex items-center justify-center mx-auto mb-4">
+                                <X className="h-6 w-6 text-red-600" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirm Deletion</h2>
+                            <p className="text-gray-600 mb-6">
+                                Are you sure you want to delete this listing?<br />
+                                <span className="font-medium">
+                                    {listingToDelete.make} {listingToDelete.model}, {listingToDelete.year}
+                                </span>
+                            </p>
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setShowDeleteConfirmation(false)}
+                                    className="flex-1 px-6 py-2.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors duration-75 font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleDelete}
+                                    className="flex-1 px-6 py-2.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-75 font-medium"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
