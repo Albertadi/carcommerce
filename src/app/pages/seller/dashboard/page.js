@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import AgentPage from '../agents/page';
 import ListingPage from '../listings/page';
 import SellerProfilePage from '../sellerProfile/page'
 import RatingsPage from '../ratings/page'
@@ -37,7 +36,7 @@ export default function Dashboard() {
                 }`}
                 onClick={() => handleOptionClick("option2")}
               >
-                Used Car Agents
+                Rate Agents
               </button>
             </li>
             <li>
@@ -48,16 +47,6 @@ export default function Dashboard() {
                 onClick={() => handleOptionClick("option3")}
               >
                 My Listings
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded hover:bg-gray-200 ${
-                  selectedOption === "option4" ? "bg-gray-300" : ""
-                }`}
-                onClick={() => handleOptionClick("option4")}
-              >
-                Rate Agents
               </button>
             </li>
           </ul>
@@ -73,9 +62,8 @@ export default function Dashboard() {
             dob="dob"
           />
           )}
-          {selectedOption === "option2" && <AgentPage />}
+          {selectedOption === "option2" && <RatingsPage />}
           {selectedOption === "option3" && <ListingPage />}
-          {selectedOption === "option4" && <RatingsPage />}
         </div>
       </div>
     </div>
