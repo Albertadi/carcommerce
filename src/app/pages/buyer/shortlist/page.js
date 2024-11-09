@@ -45,25 +45,6 @@ const ShortlistPage = () => {
     }
   }, [access_token]);
 
-  const removeFromShortlist = async (listingId) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/shortlist/remove_from_shortlist/${listingId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`
-          }
-        }
-      );
-
-      if (response.status === 200) {
-        setShortlistedCars(prevCars => prevCars.filter(car => car.listing_id !== listingId));
-      }
-    } catch (error) {
-      console.error('Error removing from shortlist:', error);
-      alert(error.response?.data?.error || 'Failed to remove from shortlist');
-    }
-  };
 
   const filteredCars = shortlistedCars.filter(car => {
     if (!searchQuery) return true;
