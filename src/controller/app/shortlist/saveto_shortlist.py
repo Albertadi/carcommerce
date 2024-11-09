@@ -34,7 +34,7 @@ class SaveToShortlistController:
 
             return jsonify({
                 "message": "Listing successfully added to shortlist",
-                "listing_id": listing_id
+                "success": success
             }), 200
 
         except Exception as e:

@@ -15,6 +15,8 @@ export default function BuyerPage() {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [dropdownVisibility, setDropdownVisibility] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [invalidMessage, setInvalidMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [shortlistedCars, setShortlistedCars] = useState(new Set());
   const router = useRouter();
@@ -56,11 +58,17 @@ export default function BuyerPage() {
 
       if (response.status === 200) {
         setShortlistedCars(prev => new Set([...prev, listingId]));
-        alert('Added to shortlist successfully!');
+        setSuccessMessage('Added to shortlist successfully!');
+        setTimeout(() => {
+          setSuccessMessage(''); // Clear the message after 3 seconds
+        }, 3000);
       }
     } catch (error) {
       console.error('Error adding to shortlist:', error);
-      alert(error.response?.data?.error || 'Failed to add to shortlist');
+      setInvalidMessage(error.response?.data?.error || 'Failed to add to shortlist');
+      setTimeout(() => {
+        setInvalidMessage(''); // Clear the message after 3 seconds
+      }, 3000);
     }
   };
 
@@ -211,7 +219,19 @@ export default function BuyerPage() {
         <h1 className="text-4xl font-rajdhaniBold text-[#f75049]">WELCOME TO THE BUYER PAGE</h1>
         <p className="mt-2 text-lg text-[#f75049]">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
       </div>
+      {/* Success message display */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+            {successMessage}
+          </div>
+        )}
 
+        {/* Info message display */}
+        {invalidMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            {invalidMessage}
+          </div>
+        )}
       <div className="flex flex-col items-center mt-8 px-4">
         <input
           type="text"
