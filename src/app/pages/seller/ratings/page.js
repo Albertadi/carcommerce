@@ -11,7 +11,7 @@ const SellerRatingPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedAgentReviews, setSelectedAgentReviews] = useState(null);
-  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showCreateRatingModal, setShowCreateRatingModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [newRating, setNewRating] = useState({
     rating: 0,
@@ -111,7 +111,7 @@ const SellerRatingPage = () => {
   
   // Show the rating form and set agent email
   const handleSubmitNewRating = (agentEmail) => {
-    setShowRatingModal(true);
+    setShowCreateRatingModal(true);
     setNewRating((prev) => ({ ...prev, agent_email: agentEmail }));
   };
 
@@ -132,7 +132,7 @@ const SellerRatingPage = () => {
       if (response.data.success) {
         // Set success message and start 7 second timer
         setSuccessMessage("Rating submitted successfully!");
-        setShowRatingModal(false);
+        setShowCreateRatingModal(false);
         setNewRating({ rating: 0, review: "", agent_email: "" });
 
         // Hide the success message after 7 seconds
@@ -214,7 +214,7 @@ const SellerRatingPage = () => {
       )}
 
       {/* Rating Modal */}
-      {showRatingModal && (
+      {showCreateRatingModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[700px]">
             <h2 className="text-xl font-semibold text-orange-500">
@@ -258,7 +258,7 @@ const SellerRatingPage = () => {
                 Submit Rating
               </button>
               <button
-                onClick={() => setShowRatingModal(false)}
+                onClick={() => setShowCreateRatingModal(false)}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
                 Cancel
