@@ -4,7 +4,7 @@ import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../authorization/AuthContext';
 import { ListingCard } from '../../../components/ListingCard';
 import { ReloginModal } from '../../../components/ReloginModal';
-import { BarChart2, X } from 'lucide-react';
+import { BarChart2, X, Eye } from 'lucide-react';
 import axios from 'axios';
 
 export default function ListingsPage() {
@@ -15,26 +15,33 @@ export default function ListingsPage() {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
     const [shortlistCounts, setShortlistCounts] = useState({});
+    const [viewCounts, setViewCounts] = useState({});
     const [agentEmail, setAgentEmail] = useState('');
 
     const sellerEmail = permissions?.sub.email || '';
 
-    const fetchShortlistCounts = async () => {
+    const fetchViewCount = async (listingId) => {
         try {
-            const response = await axios.get(
-                'http://localhost:5000/api/shortlist/see_num_car_shortlist',
+            const response = await axios.post(
+                'http://localhost:5000/api/views/get_views',
+                { listing_id: listingId },
                 {
                     headers: {
-                        Authorization: `Bearer ${access_token}`,
+                        Authorization: `Bearer ${access_token}`
                     }
                 }
             );
 
             if (response.data && response.data.success) {
-                setShortlistCounts(response.data.total_shortlists);
+                // Ensure we're storing the views_count as a number
+                const viewCount = parseInt(response.data.views_count) || 0;
+                setViewCounts(prev => ({
+                    ...prev,
+                    [listingId]: viewCount
+                }));
             }
         } catch (error) {
-            console.error('Error fetching shortlist counts:', error);
+            console.error('Error fetching view count:', error);
         }
     };
 
@@ -62,7 +69,7 @@ export default function ListingsPage() {
             console.error('Error fetching listing count:', error);
         }
     };
-
+    
     const buildSearchFilters = () => {
         const filters = {};
         if (sellerEmail) filters.seller_email = sellerEmail;
@@ -85,15 +92,17 @@ export default function ListingsPage() {
                 }
             );
 
-            setListings(response.data.listing_list);
-            
-            // Fetch shortlist counts for each listing
-            response.data.listing_list.forEach(listing => {
-                fetchSpecificListingCount(listing.id);
-            });
-
+            if (Array.isArray(response.data.listing_list)) {
+                setListings(response.data.listing_list);
+                
+                // Fetch both metrics for each listing
+                response.data.listing_list.forEach(listingItem => {
+                    fetchSpecificListingCount(listingItem.id);
+                    fetchViewCount(listingItem.id);
+                });
+            }
         } catch (error) {
-            if (error.response && error.response.status === 401) {
+            if (error.response?.status === 401) {
                 setShowLoginModal(true);
             } else {
                 setError('Failed to fetch listings. Please try again.');
@@ -105,15 +114,16 @@ export default function ListingsPage() {
     };
   
     useEffect(() => {
-        fetchListings();
+        if (access_token) {
+            fetchListings();
+        }
     }, [access_token]);
 
-    // Analytics Modal Component
     const AnalyticsModal = () => (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Shortlist Analytics</h2>
+                    <h2 className="text-xl font-bold text-gray-800">Listing Analytics</h2>
                     <button 
                         onClick={() => setShowAnalyticsModal(false)}
                         className="text-gray-500 hover:text-gray-700"
@@ -123,30 +133,59 @@ export default function ListingsPage() {
                 </div>
                 
                 <div className="max-h-96 overflow-y-auto">
-                    {listings.map(listing => {
-                        const shortlistCount = shortlistCounts[listing.id] || 0;
+                    {listings.map((listingItem) => {
+                        const shortlistCount = shortlistCounts[listingItem.id] || 0;
+                        const viewCount = viewCounts[listingItem.id] || 0;
                         
                         return (
-                            <div key={listing.id} className="py-3 border-b last:border-0">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <p className="font-medium text-gray-800">
-                                            {listing.make} {listing.model} ({listing.year})
-                                        </p>
-                                        <p className="text-sm text-gray-600">
-                                            Shortlisted {shortlistCount} time{shortlistCount !== 1 ? 's' : ''}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
+                            <div key={listingItem.id} className="py-3 border-b last:border-0">
+                                <div className="space-y-3">
+                                    <p className="font-medium text-gray-800">
+                                        {listingItem.make} {listingItem.model} ({listingItem.year})
+                                    </p>
+                                    
+                                    {/* Views Stats */}
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <Eye size={16} className="text-blue-500" />
+                                            <span className="text-sm text-gray-600">
+                                                {viewCount} views
+                                            </span>
+                                        </div>
                                         <div className="w-24 bg-gray-200 rounded-full h-2">
                                             <div 
-                                                className="bg-red-500 rounded-full h-2" 
+                                                className="bg-blue-500 rounded-full h-2" 
                                                 style={{ 
-                                                    width: `${Math.min((shortlistCount / Math.max(...Object.values(shortlistCounts))) * 100, 100)}%` 
+                                                    width: `${Math.min((viewCount / Math.max(...Object.values(viewCounts), 1)) * 100, 100)}%` 
                                                 }}
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Shortlist Stats */}
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <BarChart2 size={16} className="text-red-500" />
+                                            <span className="text-sm text-gray-600">
+                                                {shortlistCount} shortlists
+                                            </span>
+                                        </div>
+                                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                                            <div 
+                                                className="bg-red-500 rounded-full h-2" 
+                                                style={{ 
+                                                    width: `${Math.min((shortlistCount / Math.max(...Object.values(shortlistCounts), 1)) * 100, 100)}%` 
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Conversion Rate */}
+                                    {viewCount > 0 && (
+                                        <div className="text-sm text-gray-600">
+                                            Shortlist Rate: {((shortlistCount / viewCount) * 100).toFixed(1)}%
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -186,25 +225,32 @@ export default function ListingsPage() {
             ) : (
                 <div className="grid gap-4">
                     {listings.length > 0 ? (
-                        listings.map((listing) => {
-                            const shortlistCount = shortlistCounts[listing.id] || 0;
+                        listings.map((listingItem) => {
+                            const shortlistCount = shortlistCounts[listingItem.id] || 0;
+                            const viewCount = viewCounts[listingItem.id] || 0;
                             
                             return (
                                 <ListingCard
-                                    key={listing.id}
-                                    imageSrc={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-                                    make={listing.make}
-                                    model={listing.model}
-                                    year={listing.year}
-                                    price={listing.price}
-                                    mileage={listing.mileage}
-                                    transmission={listing.transmission}
-                                    fuelType={listing.fuel_type}
+                                    key={listingItem.id}
+                                    imageSrc={listingItem.image_url ? `http://localhost:5000/uploads/${listingItem.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+                                    make={listingItem.make}
+                                    model={listingItem.model}
+                                    year={listingItem.year}
+                                    price={listingItem.price}
+                                    mileage={listingItem.mileage}
+                                    transmission={listingItem.transmission}
+                                    fuelType={listingItem.fuel_type}
                                     dashboardType={"seller"}
                                     analyticsBadge={
-                                        <div className="ml-2 inline-flex items-center text-sm bg-red-100 text-red-600 px-2 py-1 rounded">
-                                            <BarChart2 size={14} className="mr-1" />
-                                            {shortlistCount} shortlist{shortlistCount !== 1 ? 's' : ''}
+                                        <div className="ml-2 inline-flex items-center gap-2">
+                                            <span className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded flex items-center gap-1">
+                                                <Eye size={14} />
+                                                {viewCount} views
+                                            </span>
+                                            <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded flex items-center gap-1">
+                                                <BarChart2 size={14} />
+                                                {shortlistCount} shortlists
+                                            </span>
                                         </div>
                                     }
                                 />
