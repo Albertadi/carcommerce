@@ -14,9 +14,6 @@ class ViewProfileController:
         if not profile_name:
             return jsonify({"success": False, "error": "Name parameter not provided"}), 400
         
-        profile = Profile.queryUserProfile(profile_name)
+        profile, view_response, status_code = Profile.viewUserProfile(profile_name)
 
-        if profile is None:
-            return jsonify({"success": False, "profile": ""}), 404
-
-        return jsonify({"success": True, "profile": profile.to_dict()}), 200
+        return jsonify({"success": view_response, "profile": profile}), status_code

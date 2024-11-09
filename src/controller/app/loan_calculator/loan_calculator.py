@@ -1,4 +1,3 @@
-# Libraries
 from flask import Blueprint, request, jsonify
 
 # Blueprint for the loan calculator
@@ -25,30 +24,22 @@ class LoanCalculatorController:
             interest_rate = float(interest_rate)
             years = int(years)
 
-            """
-            Calculate the monthly payment using the formula:
-            M = P[r(1 + r)^n] / [(1 + r)^n – 1]
-            where:
-            - M is the total monthly payment
-            - P is the principal loan amount
-            - r is the monthly interest rate
-            - n is the number of payments (months)
-            """
-
+            # Calculate monthly payment
             monthly_interest_rate = interest_rate / 100 / 12
             number_of_payments = years * 12
 
             if monthly_interest_rate == 0:  # No interest scenario
-                return principal / number_of_payments
+                monthly_payment = principal / number_of_payments
+            else:
+                monthly_payment = (principal * monthly_interest_rate * (1 + monthly_interest_rate) ** number_of_payments) / ((1 + monthly_interest_rate) ** number_of_payments - 1)
 
-            monthly_payment = (principal * monthly_interest_rate * (1 + monthly_interest_rate) ** number_of_payments) / ((1 + monthly_interest_rate) ** number_of_payments - 1)
+            # Calculate total payment
+            total_payment = monthly_payment * number_of_payments
 
             # Prepare and return response
             response = {
-                "principal": principal,
-                "interest_rate": interest_rate,
-                "years": years,
-                "monthly_payment": round(monthly_payment, 2)
+                "monthly_payment": round(monthly_payment, 2),
+                "total_payment": round(total_payment, 2)
             }
             return jsonify(response), 200
 

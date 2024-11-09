@@ -37,6 +37,7 @@ from .shortlist.view_shortlist import view_shortlist_blueprint
 from .suspension.check_user_suspended import check_user_suspended_blueprint
 from .views.get_views import get_views_blueprint
 from .views.increment_views import increment_views_blueprint
+from .loan_calculator.loan_calculator import loan_calculator_blueprint
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -131,3 +132,6 @@ flask_app.register_blueprint(view_reviewRating_blueprint)
 # Views
 flask_app.register_blueprint(increment_views_blueprint)
 flask_app.register_blueprint(get_views_blueprint)
+
+# Loan Calculator
+flask_app.register_blueprint(loan_calculator_blueprint)
