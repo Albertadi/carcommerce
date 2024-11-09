@@ -7,7 +7,7 @@ see_num_car_shortlist_blueprint = Blueprint('see_num_car_shortlist', __name__)
 
 class SeeNumCarShortlistController:
     @see_num_car_shortlist_blueprint.route('/api/shortlist/see_num_car_shortlist', methods=['GET'])
-    @permission_required('has_seller_permission')
+    @permission_required('has_sell_permission')
     def see_num_car_shortlist():
         try:
             # Get seller email from JWT token
