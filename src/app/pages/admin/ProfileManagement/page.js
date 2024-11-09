@@ -27,49 +27,10 @@ export default function ProfileManagement() {
   const [suspendDuration, setSuspendDuration] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
   const [suspendInvalidMessage, setSuspendInvalidMessage] = useState('');
-
+  const [nameSearchTerm, setNameSearchTerm] = useState("");
+  const [descriptionSearchTerm, setDescriptionSearchTerm] = useState("");
+  
   const [error, setError] = useState('');
-
-  // Fetch profiles from the backend API
-  useEffect(() => {
-    async function fetchProfiles() {
-      try {
-        if (searchTerm) {
-          const response = await axios.get(
-            "http://localhost:5000/api/profiles/view_profile",
-            {
-              headers: {
-                Authorization: `Bearer ${access_token}`,
-              },
-              params: {
-                name: searchTerm,
-              },
-            }
-          );
-          setProfiles([response.data.profile]);
-        } else {
-          const response = await axios.post(
-            "http://localhost:5000/api/profiles/search_profile",
-            { name: "", description: "" },
-            {
-              headers: {
-                Authorization: `Bearer ${access_token}`,
-              },
-            }
-          );
-          setProfiles(response.data.profile_list);
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          setShowLoginModal(true); // Show login modal if 401 error occurs
-        } else {
-          console.error("Error fetching profiles:", error);
-        }
-      }
-    }
-
-    fetchProfiles();
-  }, [searchTerm]);
 
   const handleShowSuspendModal = (profile) => {
     setSelectedUserForSuspension(profile);
@@ -83,10 +44,26 @@ export default function ProfileManagement() {
   };
 
 
-  const toggleProfileDetails = (profile) => {
-    setRowSelectedProfile(profile);
-    setIsRowModalOpen(true);
+  const toggleProfileDetails = async (profile) => {
+    try {
+      // Make an API call to fetch the profile details from the 'view_profile' endpoint
+      const response = await axios.get("http://localhost:5000/api/profiles/view_profile", {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+        params: {
+          name: profile.name,
+        },
+      });
+  
+      // Set the fetched profile details to `rowSelectedProfile`
+      setRowSelectedProfile(response.data.profile);
+      setIsRowModalOpen(true); // Open the modal
+    } catch (error) {
+      console.error("Error fetching profile details:", error);
+    }
   };
+  
 
   const addProfile = async () => {
     try {
@@ -192,35 +169,19 @@ export default function ProfileManagement() {
     }
   };
   
-  // Add fetchProfiles function outside of useEffect
   const fetchProfiles = async () => {
     try {
       setIsLoading(true);
-      if (searchTerm) {
-        const response = await axios.get(
-          "http://localhost:5000/api/profiles/view_profile",
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-            params: {
-              name: searchTerm,
-            },
-          }
-        );
-        setProfiles(response.data.profile ? [response.data.profile] : []);
-      } else {
-        const response = await axios.post(
-          "http://localhost:5000/api/profiles/search_profile",
-          { name: "", description: "" },
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          }
-        );
-        setProfiles(response.data.profile_list || []);
-      }
+      const response = await axios.post(
+        "http://localhost:5000/api/profiles/search_profile",
+        { name: nameSearchTerm, description: descriptionSearchTerm },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+      setProfiles(response.data.profile_list || []);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setShowLoginModal(true); // Show login modal if 401 error occurs
@@ -232,14 +193,15 @@ export default function ProfileManagement() {
         }, 3000);
       }
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
   
-  // Update your useEffect to use the fetchProfiles function
+  
   useEffect(() => {
     fetchProfiles();
-  }, [searchTerm, access_token]);
+  }, [nameSearchTerm, descriptionSearchTerm, access_token]);
+  
 
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -260,13 +222,23 @@ export default function ProfileManagement() {
       User Profiles
     </h1>
 
+    <div className="flex space-x-4 mb-4">
       <input
         type="text"
-        placeholder="Search profiles..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4 p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
+        placeholder="Search by name..."
+        value={nameSearchTerm}
+        onChange={(e) => setNameSearchTerm(e.target.value)}
+        className="p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
       />
+      <input
+        type="text"
+        placeholder="Search by description..."
+        value={descriptionSearchTerm}
+        onChange={(e) => setDescriptionSearchTerm(e.target.value)}
+        className="p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
+      />
+    </div>
+
 
 {isLoading ? (
   // Loading State Table

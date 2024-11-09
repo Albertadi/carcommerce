@@ -45,7 +45,7 @@ const ShortlistPage = () => {
     }
   }, [access_token]);
 
-  
+
   const filteredCars = shortlistedCars.filter(car => {
     if (!searchQuery) return true;
     

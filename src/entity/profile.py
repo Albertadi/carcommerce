@@ -50,6 +50,16 @@ class Profile(db.Model):
         
         profiles = query.all()
         return [profile.to_dict() for profile in profiles]  # Return dictionary representation
+    
+    @classmethod
+    def viewUserProfile(cls, name):
+        profile = Profile.queryUserProfile(name)
+
+        if profile is None:
+            return None, False, 404
+
+        return profile.to_dict(), True, 200
+
 
     @classmethod
     def createUserProfile(cls, name: str, description: str = "Placeholder",
