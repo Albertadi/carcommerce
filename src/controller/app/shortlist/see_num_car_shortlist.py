@@ -13,9 +13,12 @@ class SeeNumCarShortlistController:
             # Get seller email from JWT token
             seller_data = get_jwt_identity()
             seller_email = seller_data['email']
+            
+            # Get listing_id from query parameters (if provided)
+            listing_id = request.args.get('listing_id')
 
-            # Get total count from Shortlist entity
-            result = Shortlist.count_buyerlistings_onshortlist(seller_email)
+            # Get total count from Shortlist entity, with optional listing_id
+            result = Shortlist.count_buyerlistings_onshortlist(seller_email, listing_id)
             
             return jsonify(result), 200
 

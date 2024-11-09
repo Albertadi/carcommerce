@@ -164,15 +164,16 @@ class Shortlist(db.Model):
             }
     
     @classmethod
-    def count_buyerlistings_onshortlist(cls, seller_email: str) -> dict:
+    def count_buyerlistings_onshortlist(cls, seller_email: str, listing_id: Optional[str] = None) -> dict:
         """
-        Get total count of shortlists for a seller's listings.
+        Get total count of shortlists for a seller's listings, optionally filtered by listing ID.
         
         Args:
             seller_email: The seller's email
+            listing_id: (Optional) Specific listing ID to filter by
             
         Returns:
-            dict: Count of total shortlists for the seller with success/error status
+            dict: Count of total shortlists for the seller's listing(s) with success/error status
         """
         try:
             # Verify seller exists and has permissions
@@ -190,8 +191,14 @@ class Shortlist(db.Model):
                     'error': 'Invalid seller permissions'
                 }
 
-            # Count total shortlists where seller_email matches
-            total_shortlists = cls.query.filter_by(seller_email=seller_email).count()
+            # Build the query with seller_email and optional listing_id
+            query = cls.query.filter_by(seller_email=seller_email)
+            
+            if listing_id:
+                query = query.filter_by(listing_id=listing_id)
+            
+            # Get the count of shortlists based on the filters
+            total_shortlists = query.count()
                 
             return {
                 'success': True,
