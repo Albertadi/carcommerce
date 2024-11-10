@@ -29,6 +29,8 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState(null); // to hold user info like id and email
   const [duration, setDuration] = useState(''); // to hold the duration input
   const [suspendReason, setSuspendReason] = useState(""); // reason for suspend
+  const [showSuspendedInfoModal, setShowSuspendedInfoModal] = useState(false);
+  const [suspensionInfo, setSuspensionInfo] = useState(null);
 
   //for update state
   const [editData, setEditData] = useState({}); // To hold the edited user data
@@ -133,14 +135,43 @@ export default function UserManagement() {
   
 
   // Suspend function with fetchUsers call
-  const openSuspendModal = (user) => {
+  const openSuspendModal = async (user) => {
     setSelectedUser(user);
-    setShowSuspendModal(true);
+    try {
+      // Check if the user is currently suspended
+      const response = await axios.post(
+        'http://localhost:5000/api/suspension/check_user',
+        { email: user.email },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      const data = response.data;
+      if (data.success && data.is_suspended) {
+        // User is currently suspended, show suspension info modal
+        setSuspensionInfo(data.suspension_details);
+        setShowSuspendedInfoModal(true);
+      } else {
+        // User is not suspended, open the suspension creation modal
+        setShowSuspendModal(true);
+      }
+    } catch (error) {
+      console.error("Error checking suspension status:", error);
+    }
   };
 
   const closeSuspendModal = () => {
     setShowSuspendModal(false);
     setDuration('');
+    setSuspendReason('');
+  };
+
+  const closeSuspendedInfoModal = () => {
+    setShowSuspendedInfoModal(false);
+    setSuspensionInfo(null);
   };
 
   const handleSuspend = async () => {
@@ -170,14 +201,14 @@ export default function UserManagement() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/suspension/suspend_user/${selectedUser.id}`,
-        { email: selectedUser.email, duration },
+        'http://localhost:5000/api/suspension/suspend_user', 
+        { email: selectedUser.email, days: duration, reason: suspendReason },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
           },
         }
-      );
+      );      
 
       setSuccessMessage(`User ${selectedUser.email} has been suspended for ${duration} days.`);
       setTimeout(() => {
@@ -730,6 +761,42 @@ export default function UserManagement() {
           </div>
         </div>
       )}
+
+      {/* Suspended Info Modal */}
+      {showSuspendedInfoModal && suspensionInfo && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
+            <h2 className="text-xl font-bold mb-4">User Already Suspended</h2>
+            <div className="space-y-3">
+              <p className="flex justify-between border-b border-gray-600 pb-2">
+                <span className="font-medium">Email:</span>
+                <span>{selectedUser.email}</span>
+              </p>
+              <p className="flex justify-between border-b border-gray-600 pb-2">
+                <span className="font-medium">Suspended From:</span>
+                <span>{suspensionInfo.start_date}</span>
+              </p>
+              <p className="flex justify-between border-b border-gray-600 pb-2">
+                <span className="font-medium">Suspended Until:</span>
+                <span>{suspensionInfo.end_date}</span>
+              </p>
+              <p className="flex justify-between border-b border-gray-600 pb-2">
+                <span className="font-medium">Reason:</span>
+                <span>{suspensionInfo.reason}</span>
+              </p>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeSuspendedInfoModal}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Update Modal */}
       {showUpdateModal && (

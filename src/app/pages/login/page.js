@@ -10,13 +10,29 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [suspensionInfo, setSuspensionInfo] = useState(null);
   const { login, permissions } = useContext(AuthContext);
   const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+    setSuspensionInfo(null);
+
     try {
+      // Step 1: Check if the user is suspended
+      const suspensionResponse = await axios.post('http://localhost:5000/api/suspension/check_user', { email });
+      const suspensionData = suspensionResponse.data;
+
+      if (suspensionData.success && suspensionData.is_suspended) {
+        // If user is suspended, set the suspension information and stop the login process
+        setSuspensionInfo(suspensionData.suspension_details);
+        setError('Your account is suspended.');
+        return;
+      }
+
+      // Step 2: Proceed with login if not suspended
       const response = await axios.post('http://localhost:5000/api/login', { email, password });
       const { access_token } = response.data;
       if (response.data.success) {
@@ -97,8 +113,10 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
+              
+              {/* Display error message */}
               {error && (
-                <div className="bg-red-50 border-l-4 border-[#f75049] p-4 rounded">
+                <div className="bg-red-50 border-l-4 border-[#f75049] p-4 rounded mb-4">
                   <div className="flex">
                     <div className="flex-shrink-0">
                       <svg className="h-5 w-5 text-[#f75049]" viewBox="0 0 20 20" fill="currentColor">
@@ -107,6 +125,13 @@ export default function LoginPage() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm text-[#f75049]">{error}</p>
+                      {suspensionInfo && (
+                        <div className="mt-2 text-sm text-gray-700">
+                          <p>Suspended from: {suspensionInfo.start_date}</p>
+                          <p>Suspended until: {suspensionInfo.end_date}</p>
+                          <p>Reason: {suspensionInfo.reason}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
