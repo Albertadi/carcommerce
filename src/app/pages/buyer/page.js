@@ -22,6 +22,7 @@ export default function BuyerPage() {
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
+
   const buildSearchFilters = () => {
     const filters = {};
     if (searchInput) filters.search = searchInput;
@@ -245,7 +246,6 @@ export default function BuyerPage() {
             </div>
           ))}
         </div>
-
         {isLoading && (
           <div className="flex justify-center items-center mt-4">
             <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 rounded-full border-solid border-gray-300 border-t-[#f75049]"></div>
