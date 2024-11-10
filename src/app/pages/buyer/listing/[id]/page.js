@@ -2,14 +2,34 @@
 
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../authorization/AuthContext';
+import { useRouter, useParams } from 'next/navigation';
+import BuyerPage from '../../loanCalc/page';
 import axios from 'axios';
 
 const CarDetails = ({ params }) => {
   const { id } = params; // Get the dynamic route parameter
   const { access_token } = useContext(AuthContext);
+  const router = useRouter();
   const [carData, setCarData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoanCalc, setShowLoanCalc] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // Show loan calculator when user has scrolled 70% of the content
+      if (scrollPosition > (documentHeight - windowHeight) * 0.7) {
+        setShowLoanCalc(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchCarDetails = async () => {
@@ -57,7 +77,7 @@ const CarDetails = ({ params }) => {
   if (error) {
     return (
       <div className="min-h-screen bg-[#f0f0f7] flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-white p-6 rounded shadow-lg">
           <p className="text-red-500 text-xl">{error}</p>
         </div>
       </div>
@@ -67,7 +87,7 @@ const CarDetails = ({ params }) => {
   if (!carData) {
     return (
       <div className="min-h-screen bg-[#f0f0f7] flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-white p-6 rounded shadow-lg">
           <p className="text-gray-500 text-xl">No listing data available</p>
         </div>
       </div>
@@ -75,26 +95,41 @@ const CarDetails = ({ params }) => {
   }
 
   return (
-    <div className="bg-[#f0f0f7] min-h-screen py-10 px-6">
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-[#f0f0f7] min-h-screen py-10 px-6 relative">
+      {/* Main Listing Card */}
+      <div className="max-w-5xl mx-auto bg-white rounded shadow-lg overflow-hidden">
+
+      <div className="px-6 pt-6 pb-0">
+          <button
+            type="button"
+            onClick={() => router.push('/pages/buyer')}
+            className="px-6 py-2 bg-[#2570d4] font-rajdhaniSemiBold text-white rounded hover:bg-[#f0b537] transition-colors"
+          >
+            Back
+          </button>
+        </div>
+
         {/* Car Images Section */}
         <div className="p-6">
-          <img
-            src={carData.image_url ? `http://localhost:5000/uploads/${carData.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-            alt={`${carData.make} ${carData.model}`}
-            className="w-full h-96 object-cover rounded-lg"
-          />
+          <div className="bg-gray-200 rounded h-[500px] flex justify-center"> {/* Added fixed height */}
+            <img
+              src={carData.image_url ? `http://localhost:5000/uploads/${carData.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
+              alt={`${carData.make} ${carData.model}`}
+              className="h-full w-auto object-contain rounded px-4" // Using h-full while keeping object-contain
+              style={{ objectFit: 'contain', objectPosition: 'center center' }} // Explicit positioning
+            />
+          </div>
         </div>
 
         {/* Car Details Section */}
         <div className="px-6 py-4 border-t">
           <h2 className="text-3xl font-rajdhaniBold text-[#f75049]">
-            {`${carData.make} ${carData.model} (${carData.year})`}
+            {`${carData.year} ${carData.make} ${carData.model}`}
           </h2>
-          <p className="text-lg text-gray-600 mt-2">
+          <p className="text-lg text-gray-600 mt-2 font-rajdhaniSemiBold">
             {`${carData.mileage.toLocaleString()} km | ${carData.transmission}`}
           </p>
-          <p className="text-2xl font-bold text-[#f75049] mt-4">
+          <p className="text-2xl font-rajdhaniBold text-[#f75049] mt-2">
             ${carData.price.toLocaleString()}
           </p>
         </div>
@@ -105,38 +140,38 @@ const CarDetails = ({ params }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <p className="flex justify-between">
-                <span className="font-medium">Make:</span>
-                <span>{carData.make}</span>
+                <span className="font-rajdhaniBold">Make:</span>
+                <span className="font-rajdhaniSemiBold">{carData.make}</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">Model:</span>
-                <span>{carData.model}</span>
+                <span className="font-rajdhaniBold">Model:</span>
+                <span className="font-rajdhaniSemiBold">{carData.model}</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">Year:</span>
-                <span>{carData.year}</span>
+                <span className="font-rajdhaniBold">Year:</span>
+                <span className="font-rajdhaniSemiBold">{carData.year}</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">VIN:</span>
-                <span>{carData.vin}</span>
+                <span className="font-rajdhaniBold">VIN:</span>
+                <span className="font-rajdhaniSemiBold">{carData.vin}</span>
               </p>
             </div>
             <div className="space-y-3">
               <p className="flex justify-between">
-                <span className="font-medium">Mileage:</span>
-                <span>{carData.mileage.toLocaleString()} km</span>
+                <span className="font-rajdhaniBold">Mileage:</span>
+                <span className="font-rajdhaniSemiBold">{carData.mileage.toLocaleString()} km</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">Transmission:</span>
-                <span>{carData.transmission}</span>
+                <span className="font-rajdhaniBold">Transmission:</span>
+                <span className="font-rajdhaniSemiBold">{carData.transmission}</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">Fuel Type:</span>
-                <span>{carData.fuel_type}</span>
+                <span className="font-rajdhaniBold">Fuel Type:</span>
+                <span className="font-rajdhaniSemiBold">{carData.fuel_type}</span>
               </p>
               <p className="flex justify-between">
-                <span className="font-medium">Status:</span>
-                <span>{carData.is_sold ? 'Sold' : 'Available'}</span>
+                <span className="font-rajdhaniBold">Status:</span>
+                <span className="font-rajdhaniSemiBold">{carData.is_sold ? 'Sold' : 'Available'}</span>
               </p>
             </div>
           </div>
@@ -147,18 +182,31 @@ const CarDetails = ({ params }) => {
           <h3 className="text-2xl font-rajdhaniBold text-gray-800 mb-4">Contact Information</h3>
           <div className="space-y-3">
             <p className="flex justify-between">
-              <span className="font-medium">Seller Email:</span>
-              <span>{carData.seller_email}</span>
+              <span className="font-rajdhaniBold">Seller Email:</span>
+              <span className="font-rajdhaniSemiBold">{carData.seller_email}</span>
             </p>
             <p className="flex justify-between">
-              <span className="font-medium">Agent Email:</span>
-              <span>{carData.agent_email}</span>
+              <span className="font-rajdhaniBold">Agent Email:</span>
+              <span className="font-rajdhaniSemiBold">{carData.agent_email}</span>
             </p>
             <p className="flex justify-between">
-              <span className="font-medium">Listed Date:</span>
-              <span>{new Date(carData.listing_date).toLocaleDateString()}</span>
+              <span className="font-rajdhaniBold">Listed Date:</span>
+              <span className="font-rajdhaniSemiBold">{new Date(carData.listing_date).toLocaleDateString()}</span>
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Separate Loan Calculator Box */}
+      <div 
+        className={`max-w-5xl mx-auto mt-8 transition-all duration-700 ease-in-out transform 
+          ${showLoanCalc 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-20'
+          }`}
+      >
+        <div className="bg-white rounded shadow-lg">
+          <BuyerPage />
         </div>
       </div>
     </div>
