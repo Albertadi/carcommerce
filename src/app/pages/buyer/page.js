@@ -188,12 +188,11 @@ export default function BuyerPage() {
 
   const handleCarClick = async (id) => {
     if (!access_token) {
-      window.location.href = '/pages/login';
+      router.push('/pages/login');
       return;
     }
   
     try {
-      // First increment the views
       await axios.post(
         'http://localhost:5000/api/views/increment_views',
         { listing_id: id },
@@ -205,12 +204,12 @@ export default function BuyerPage() {
         }
       );
   
-      // Then navigate to the listing details
-      router.push(`/buyer/listing/${id}`);
+      // Update this line to include /pages in the path
+      router.push(`/pages/buyer/listing/${id}`);
     } catch (error) {
       console.error('Error:', error);
-      // Still navigate even if view increment fails
-      router.push(`/buyer/listing/${id}`);
+      // Update the fallback navigation as well
+      router.push(`/pages/buyer/listing/${id}`);
     }
   };
 

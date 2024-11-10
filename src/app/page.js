@@ -109,9 +109,9 @@ export default function HomePage() {
     <div className="bg-[#f0f0f7] font-rajdhaniSemiBold min-h-screen">
 
       {/* Hero Section */}
-      <div className="flex flex-col items-center justify-center text-center p-8 bg-orange-100">
-        <h1 className="text-4xl font-rajdhaniBold text-[#f75049]">WELCOME TO THE HOME PAGE</h1>
-        <p className="mt-2 text-lg text-[#f75049]">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
+      <div className="flex flex-col items-center justify-center text-center p-8 bg-[#f75049] h-64">
+        <h1 className="text-4xl font-rajdhaniBold text-white">WELCOME TO TECHQUEST</h1>
+        <p className="mt-2 text-lg text-white">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
       </div>
 
       {/* Search and Filter Section */}
@@ -167,11 +167,11 @@ export default function HomePage() {
                 className="w-full h-48 object-cover rounded cursor-pointer" 
                 onClick={() => handleCarClick(car.id)} // Handle car image click
               />
-              <h2 className="text-xl font-bold mt-2">{car.model} ({car.year})</h2>
-              <p className="text-lg text-[#f75049]">{car.price}</p>
+              <h2 className="text-xl font-rajdhaniBold mt-2">{car.year} {car.model}</h2>
+              <p className="text-lg font-rajdhaniSemiBold text-[#f75049]">{car.price}</p>
               <Link 
                 href="#" // Keep this link disabled or adjust based on your routing
-                className="text-blue-500 hover:underline" 
+                className="text-[#2570d4] font-rajdhaniSemiBold hover:underline" 
                 onClick={() => handleCarClick(car.id)} // View details on click
               >
                 View Details

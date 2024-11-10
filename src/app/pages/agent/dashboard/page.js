@@ -19,6 +19,15 @@ export default function Dashboard() {
         router.push('/');
       } else {
         setIsLoading(false); // Allow rendering if authorized
+        
+        // Check URL parameters for initial tab
+        if (typeof window !== 'undefined') {  // Check if we're in the browser
+          const urlParams = new URLSearchParams(window.location.search);
+          const tab = urlParams.get('tab');
+          if (tab === 'listings') {
+            setSelectedOption('option2');
+          }
+        }
       }
     } else if (!access_token) {
       // If there's no token, redirect immediately
@@ -92,6 +101,5 @@ export default function Dashboard() {
         )}
       </div>
     </div>
-
   );
 }

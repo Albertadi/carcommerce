@@ -201,6 +201,7 @@ export default function ListingsPage() {
     const handleUpdateListing = (listing) => {
         router.push(`../agent/updateListing/${listing.id}`);
     };
+    
 
     const closeModal = () => {
         setViewDetailsModal(false);

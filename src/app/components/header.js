@@ -49,19 +49,19 @@ export default function Header() {
 
   return (
     <div className="sticky top-0 bg-white h-16 shadow-xl w-full flex items-center z-10">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2">
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
-          <a onClick={() => handleClick("logo")} className="flex items-center cursor-pointer">
+          <a onClick={() => handleClick("logo")} className="flex items-center cursor-pointer -ml-20">
             <p className="text-5xl font-rajdhaniBold">
-              <span className="text-[#e2e2ef]">TECH</span>
+              <span className="text-[#D6D0D0]">TECH</span>
               <span className="text-[#f75049]">Quest</span>
             </p>
           </a>
 
           {/* Navbar toggle (for small screens) */}
           <button
-            className="block md:hidden text-gray-600 focus:outline-none"
+            className="block md:hidden text-[#0e0e17] focus:outline-none"
             onClick={toggleMenu}
           >
             <svg
@@ -90,7 +90,7 @@ export default function Header() {
             {access_token ? (
               <button
                 onClick={() => handleClick("account")} 
-                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
+                className="text-[#0e0e17] hover:text-[#f0b537] font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +113,7 @@ export default function Header() {
             {access_token ? (
               <button
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
+                className="text-[#0e0e17] hover:text-[#f0b537] font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +132,7 @@ export default function Header() {
             ) : (
               <button
                 onClick={handleLogin}
-                className="text-gray-600 hover:text-gray-800 font-rajdhaniBold text-lg flex items-center gap-1"
+                className="text-[#0e0e17] hover:text-[#f0b537] font-rajdhaniBold text-lg flex items-center gap-1"
               >
                 Login
               </button>
