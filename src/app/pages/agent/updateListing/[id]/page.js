@@ -20,7 +20,8 @@ export default function UpdateListing() {
     mileage: '',
     transmission: '',
     fuel_type: '',
-    seller_email: ''
+    seller_email: '',
+    is_sold: false
   });
   const [image, setImage] = useState(null);
   const [currentImageUrl, setCurrentImageUrl] = useState('');
@@ -31,11 +32,16 @@ export default function UpdateListing() {
         const response = await axios.post(
           'http://localhost:5000/api/listing/search_listing',
           { id: params.id },
-          { headers: { Authorization: `Bearer ${access_token}` } }
+          { 
+            headers: { 
+              Authorization: `Bearer ${access_token}`,
+              'Content-Type': 'application/json'
+            } 
+          }
         );
         
-        const listing = response.data.listing_list[0];
-        if (listing) {
+        if (response.data.listing_list && response.data.listing_list.length > 0) {
+          const listing = response.data.listing_list[0];
           setFormData({
             vin: listing.vin,
             make: listing.make,
@@ -45,7 +51,8 @@ export default function UpdateListing() {
             mileage: listing.mileage.toString(),
             transmission: listing.transmission,
             fuel_type: listing.fuel_type,
-            seller_email: listing.seller_email
+            seller_email: listing.seller_email,
+            is_sold: listing.is_sold
           });
           if (listing.image_url) {
             setCurrentImageUrl(`http://localhost:5000/uploads/${listing.image_url}`);
@@ -65,14 +72,14 @@ export default function UpdateListing() {
   }, [params.id, access_token]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
@@ -81,8 +88,31 @@ export default function UpdateListing() {
         setImage(null);
         return;
       }
-      setImage(file);
-      setCurrentImageUrl(URL.createObjectURL(file));
+      
+      // First upload the image
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const response = await axios.post(
+          'http://localhost:5000/api/listing/upload_image',
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        
+        if (response.data.image_url) {
+          setImage(response.data.image_url);
+          setCurrentImageUrl(URL.createObjectURL(file));
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image');
+      }
     }
   };
 
@@ -100,42 +130,52 @@ export default function UpdateListing() {
       return;
     }
 
-    if (isNaN(formData.price) || isNaN(formData.mileage)) {
+    // Validate numeric fields
+    if (isNaN(parseFloat(formData.price)) || isNaN(parseInt(formData.mileage))) {
       alert('Price and Mileage must be valid numbers.');
       return;
     }
 
-    const formSubmissionData = new FormData();
-    formSubmissionData.append('id', params.id);
-
-    Object.entries(formData).forEach(([key, value]) => {
-      formSubmissionData.append(key, value);
-    });
+    // Prepare data for API
+    const updateData = {
+      id: params.id,
+      vin: formData.vin,
+      make: formData.make,
+      model: formData.model,
+      year: parseInt(formData.year),
+      price: parseFloat(formData.price),
+      mileage: parseInt(formData.mileage),
+      transmission: formData.transmission,
+      fuel_type: formData.fuel_type,
+      is_sold: formData.is_sold,
+      seller_email: formData.seller_email
+    };
 
     if (image) {
-      formSubmissionData.append('image', image);
+      updateData.image_url = image;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/listing/update_listing', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-        body: formSubmissionData,
-      });
+      const response = await axios.post(
+        'http://localhost:5000/api/listing/update_listing',
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-      if (response.ok) {
+      if (response.data.success) {
         alert('Listing updated successfully!');
-        router.push('../viewListings');
+        router.push('/pages/agent/dashboard?tab=listings');  // Use absolute path
       } else {
-        const error = await response.json();
-        console.error('Error details:', error);
-        alert(`Error: ${error.message || 'An error occurred while updating the listing.'}`);
+        alert(`Error: ${response.data.message || 'Failed to update listing'}`);
       }
     } catch (error) {
       console.error('Failed to update listing:', error);
-      alert('An unexpected error occurred.');
+      alert(`Error: ${error.response?.data?.message || 'An unexpected error occurred'}`);
     }
   };
 
@@ -162,6 +202,15 @@ export default function UpdateListing() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 shadow-lg w-full max-w-2xl">
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => router.push('/pages/agent/dashboard?tab=listings')}
+            className="px-6 py-2 bg-[#2570d4] font-rajdhaniSemiBold text-white rounded hover:bg-[#f0b537] transition-colors"
+          >
+            Back
+          </button>
+        </div>
         <h2 className="text-2xl font-rajdhaniBold mb-6 text-center">Update Car Listing</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -201,8 +250,23 @@ export default function UpdateListing() {
             </div>
           </div>
 
-          {/* Form Section - Reuse the same form structure as createListing */}
+          {/* Form Section */}
           <form onSubmit={handleSubmit} className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Is Sold Checkbox */}
+            <div className="col-span-1 md:col-span-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="is_sold"
+                  checked={formData.is_sold}
+                  onChange={handleChange}
+                  className="form-checkbox h-5 w-5 text-[#f75049]"
+                />
+                <span className="font-rajdhaniSemiBold text-gray-700">Mark as Sold</span>
+              </label>
+            </div>
+
+            {/* Rest of the form fields remain the same as before */}
             {/* Year Field */}
             <div>
               <label className="block font-rajdhaniSemiBold text-gray-700">Year</label>
@@ -259,8 +323,8 @@ export default function UpdateListing() {
                 required
               >
                 <option className="font-rajdhaniSemiBold" value="">Select Transmission</option>
-                <option className="font-rajdhaniSemiBold" value="AUTOMATIC">AUTOMATIC</option>
                 <option className="font-rajdhaniSemiBold" value="MANUAL">MANUAL</option>
+                <option className="font-rajdhaniSemiBold" value="AUTOMATIC">AUTOMATIC</option>
               </select>
             </div>
 
