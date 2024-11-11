@@ -59,39 +59,39 @@ export default function AdminProfile() {
     }, [access_token]);
 
     return (
-        <div className="p-8 bg-white shadow-lg">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center space-x-2">
-                <UserIcon className="h-8 w-8 text-blue-500" />
+        <div className="p-8 bg-white shadow-lg rounded">
+            <h2 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6 flex items-center space-x-2">
+                <UserIcon className="h-8 w-8 text-[#2570d4]" />
                 <span>Admin Profile</span>
             </h2>
 
             {loading ? (
-                <p className="text-gray-500">Loading...</p>
+                <p className="text-[#0e0e17] font-rajdhaniBold">Loading...</p>
             ) : error ? (
-                <p className="text-red-500">{error}</p>
+                <p className="text-[#f75049]">{error}</p>
             ) : (
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4">
-                        <UserIcon className="h-6 w-6 text-gray-500" />
+                        <UserIcon className="h-6 w-6 text-[#0e0e17]" />
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700">Name</h3>
-                            <p className="text-gray-600">{firstName} {lastName}</p>
+                            <h3 className="text-lg font-rajdhaniBold text-[#0e0e17]">Name</h3>
+                            <p className="text-[#0e0e17] font-rajdhaniSemiBold">{firstName} {lastName}</p>
                         </div>
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                        <EnvelopeIcon className="h-6 w-6 text-gray-500" />
+                        <EnvelopeIcon className="h-6 w-6 text-[#0e0e17]" />
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700">Email</h3>
-                            <p className="text-gray-600">{email}</p>
+                            <h3 className="text-lg font-rajdhaniBold text-[#0e0e17]">Email</h3>
+                            <p className="text-[#0e0e17] font-rajdhaniSemiBold">{email}</p>
                         </div>
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                        <CakeIcon className="h-6 w-6 text-gray-500" />
+                        <CakeIcon className="h-6 w-6 text-[#0e0e17]" />
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700">Date of Birth</h3>
-                            <p className="text-gray-600">{dob}</p>
+                            <h3 className="text-lg font-semibold text-[#0e0e17]">Date of Birth</h3>
+                            <p className="text-[#0e0e17] font-rajdhaniSemiBold">{dob}</p>
                         </div>
                     </div>
                 </div>
