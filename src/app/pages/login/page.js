@@ -79,7 +79,7 @@ export default function LoginPage() {
             
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-1">
-                <label className="block text-[#f75049] text-sm font-rajdhaniBold pl-1">
+                <label className="text-xl block text-[#f75049] text-sm font-rajdhaniBold pl-1">
                   EMAIL
                 </label>
                 <div className="relative">
@@ -97,7 +97,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-[#f75049] text-sm font-rajdhaniBold pl-1">
+                <label className="text-xl block text-[#f75049] text-sm font-rajdhaniBold pl-1">
                   PASSWORD
                 </label>
                 <div className="relative">
@@ -140,11 +140,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3.5 bg-[#f75049] text-white rounded font-rajdhaniBold
-                         hover:bg-[#5ef6ff]
-                         focus:outline-none focus:ring-2 focus:ring-[#f75049] focus:ring-offset-2
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         font-rajdhaniSemiBold text-lg shadow-md"
+                className="w-full py-3.5 px-6 py-2 rounded bg-[#f75049] text-white font-rajdhaniSemiBold hover:bg-[#f75049]/75 focus:bg-[#f75049] active:bg-[#f75049]/100 transition-all duration-200 active:duration-50 focus:outline-none text-lg shadow-md"
               >
                 {isLoading ? (
                   <div className="flex items-center font-rajdhaniSemiBold justify-center">
