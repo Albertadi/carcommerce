@@ -206,11 +206,11 @@ export default function BuyerPage() {
       );
   
       // Then navigate to the listing details
-      router.push(`/buyer/listing/${id}`);
+      router.push(`/pages/buyer/listing/${id}`);
     } catch (error) {
       console.error('Error:', error);
       // Still navigate even if view increment fails
-      router.push(`/buyer/listing/${id}`);
+      router.push(`/pages/buyer/listing/${id}`);
     }
   };
 
