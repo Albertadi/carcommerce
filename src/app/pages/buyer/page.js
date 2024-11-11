@@ -1,11 +1,11 @@
 "use client"; // Mark as Client Component
 
 import { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../authorization/AuthContext'; // Corrected import path
-import Link from 'next/link';
+import { AuthContext } from '../authorization/AuthContext';
 import { useRouter } from "next/navigation";
-import axios from 'axios';
 import { Heart } from 'lucide-react';
+import Link from 'next/link';
+import axios from 'axios';
 
 export default function BuyerPage() {
   const { access_token } = useContext(AuthContext);
@@ -188,11 +188,12 @@ export default function BuyerPage() {
 
   const handleCarClick = async (id) => {
     if (!access_token) {
-      router.push('/pages/login');
+      window.location.href = '/pages/login';
       return;
     }
   
     try {
+      // First increment the views
       await axios.post(
         'http://localhost:5000/api/views/increment_views',
         { listing_id: id },
@@ -204,12 +205,12 @@ export default function BuyerPage() {
         }
       );
   
-      // Update this line to include /pages in the path
-      router.push(`/pages/buyer/listing/${id}`);
+      // Then navigate to the listing details
+      router.push(`/buyer/listing/${id}`);
     } catch (error) {
       console.error('Error:', error);
-      // Update the fallback navigation as well
-      router.push(`/pages/buyer/listing/${id}`);
+      // Still navigate even if view increment fails
+      router.push(`/buyer/listing/${id}`);
     }
   };
 

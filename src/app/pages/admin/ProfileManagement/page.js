@@ -209,49 +209,49 @@ export default function ProfileManagement() {
   };
 
   return (
-    <div className="flex flex-col items-center p-8 bg-gray-900 text-neon-red">
-    {/* Add the success message here, right after the opening div */}
-    {successMessage && (
-      <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50 transition-opacity duration-500">
-        {successMessage}
+    <div className="flex flex-col items-center p-8 bg-[#0e0e17] rounded">
+      {/* Add the success message here, right after the opening div */}
+      {successMessage && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50 transition-opacity duration-500">
+          {successMessage}
+        </div>
+      )}
+
+      <h1 className="text-4xl font-rajdhaniBold mb-5 uppercase text-white">
+        User Profiles
+      </h1>
+
+      <div className="flex space-x-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by Name"
+          value={nameSearchTerm}
+          onChange={(e) => setNameSearchTerm(e.target.value)}
+          className="p-2 border rounded bg-gray-800 text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30"
+        />
+        <input
+          type="text"
+          placeholder="Search by Description"
+          value={descriptionSearchTerm}
+          onChange={(e) => setDescriptionSearchTerm(e.target.value)}
+          className="p-2 border rounded bg-gray-800 text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30"
+        />
       </div>
-    )}
-
-    <h1 className="text-2xl font-extrabold mb-5 uppercase tracking-widest text-white">
-      User Profiles
-    </h1>
-
-    <div className="flex space-x-4 mb-4">
-      <input
-        type="text"
-        placeholder="Search by name..."
-        value={nameSearchTerm}
-        onChange={(e) => setNameSearchTerm(e.target.value)}
-        className="p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
-      />
-      <input
-        type="text"
-        placeholder="Search by description..."
-        value={descriptionSearchTerm}
-        onChange={(e) => setDescriptionSearchTerm(e.target.value)}
-        className="p-2 border rounded bg-gray-800 text-white placeholder-gray-400 border-gray-600"
-      />
-    </div>
-
+      
 
 {isLoading ? (
   // Loading State Table
   <div className="overflow-x-auto">
-    <table className="min-w-full bg-gray-800 border border-gray-600">
+    <table className="min-w-full bg-[#0b0b12] border-2 border-[#f75049]">
       <thead>
         <tr>
-          <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
-          <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
-          <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
-          <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
-          <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
-          <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
-          <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white">Profile Name</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white">Description</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white">Buy Permission</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white">Sell Permission</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white">Listing Permission</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-red-500">Suspend</th>
+          <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-green-500">Update</th>
         </tr>
       </thead>
       <tbody>
@@ -267,16 +267,16 @@ export default function ProfileManagement() {
   </div>
 ) : (
   <div className="overflow-x-auto">
-  <table className="min-w-full bg-gray-800 border border-gray-600">
+  <table className="min-w-full bg-[#0b0b12] border-2 border-[#f75049]">
     <thead>
       <tr>
-        <th className="py-2 px-4 border border-gray-600 text-white">Profile Name</th>
-        <th className="py-2 px-4 border border-gray-600 text-white">Description</th>
-        <th className="py-2 px-4 border border-gray-600 text-white">Buy Permission</th>
-        <th className="py-2 px-4 border border-gray-600 text-white">Sell Permission</th>
-        <th className="py-2 px-4 border border-gray-600 text-white">Listing Permission</th>
-        <th className="py-2 px-4 border border-gray-600 text-red-500">Suspend</th>
-        <th className="py-2 px-4 border border-gray-600 text-green-500">Update</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-white">Profile Name</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-white">Description</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-white">Buy Permission</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-white">Sell Permission</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-white">Listing Permission</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-red-500">Suspend</th>
+        <th className="py-2 px-4 border-2 border-[#f75049] text-green-500">Update</th>
       </tr>
     </thead>
     <tbody>
@@ -284,21 +284,21 @@ export default function ProfileManagement() {
     profiles.map((profile) => (
       <tr 
         key={profile.name} 
-        className="hover:bg-gray-700 cursor-pointer"
+        className="hover:bg-[#692728] cursor-pointer"
         onClick={() => toggleProfileDetails(profile)}
       >
-        <td className="py-2 px-4 border border-gray-600 text-white">{profile.name}</td>
-        <td className="py-2 px-4 border border-gray-600 text-white">{profile.description}</td>
-        <td className="py-2 px-4 border border-gray-600 text-white">
+        <td className="py-2 px-4 border-2 border-[#f75049] text-white">{profile.name}</td>
+        <td className="py-2 px-4 border-2 border-[#f75049] text-white">{profile.description}</td>
+        <td className="py-2 px-4 border-2 border-[#f75049] text-white">
           {profile.has_buy_permission ? "✓" : "✕"}
         </td>
-        <td className="py-2 px-4 border border-gray-600 text-white">
+        <td className="py-2 px-4 border-2 border-[#f75049] [#f75049] text-white">
           {profile.has_sell_permission ? "✓" : "✕"}
         </td>
-        <td className="py-2 px-4 border border-gray-600 text-white">
+        <td className="py-2 px-4 border-2 border-[#f75049] [#f75049] text-white">
           {profile.has_listing_permission ? "✓" : "✕"}
         </td>
-        <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+        <td className="py-2 px-2 border-2 border-[#f75049] [#f75049]" onClick={(e) => e.stopPropagation()}>
           {profile.name !== 'admin' && (
             <button
               onClick={() => handleShowSuspendModal(profile)}
@@ -308,7 +308,7 @@ export default function ProfileManagement() {
             </button>
           )}
         </td>
-        <td className="py-2 px-2 border border-gray-600" onClick={(e) => e.stopPropagation()}>
+        <td className="py-2 px-2 border-2 border-[#f75049]" onClick={(e) => e.stopPropagation()}>
           {profile.name !== 'admin' && (
             <button
               onClick={() => startEditing(profile)}
@@ -333,7 +333,7 @@ export default function ProfileManagement() {
 )}
       <button
         onClick={() => setShowModal(true)}
-        className="mt-5 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        className="mt-5 bg-[#1ded83] text-white px-4 py-2 rounded hover:bg-green-600"
       >
         Add Profile
       </button>
