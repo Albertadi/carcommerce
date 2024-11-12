@@ -33,6 +33,7 @@ export default function ListingsPage() {
     // Modal state for viewing details
     const [showViewDetails, setViewDetailsModal] = useState(false);
     const [selectedListing, setSelectedListing] = useState(null);
+    const [viewDetailsLoading, setViewDetailsLoading] = useState(false);
 
     // modal for delete
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -193,10 +194,36 @@ export default function ListingsPage() {
         return valid;
     };
     
-    const handleViewDetails = (listing) => {
-        setSelectedListing(listing);
-        setViewDetailsModal(true);
+    const handleViewDetails = async (listing) => {
+        setViewDetailsLoading(true); // Set loading before starting the fetch
+        setSelectedListing(null); // Clear previously selected listing
+        try {
+            const response = await axios.get(
+                'http://localhost:5000/api/listing/view_listing',
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                    params: {
+                        id: listing.id,
+                    },
+                }
+            );
+    
+            if (response.data && response.data.success) {
+                setSelectedListing(response.data.listing);
+                setViewDetailsModal(true);
+            } else {
+                setError('Failed to fetch listing details.');
+            }
+        } catch (error) {
+            console.error('Error fetching listing details:', error);
+            setError('Error fetching listing details.');
+        } finally {
+            setViewDetailsLoading(false); // Stop loading after fetch completes
+        }
     };
+    
 
     const handleUpdateListing = (listing) => {
         router.push(`../agent/updateListing/${listing.id}`);
@@ -255,9 +282,17 @@ export default function ListingsPage() {
     
     return (
         <div className="min-h-screen bg-gray-50">
+            {/* Full-screen loading overlay */}
+            {viewDetailsLoading && (
+                <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
+                    <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 rounded-full border-solid border-gray-300 border-t-[#f75049]"></div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="bg-white shadow-sm py-6">
                 <div className="max-w-7xl mx-auto px-6">
+
                     <h1 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6">My Listings</h1>
                     
                     {/* Search and Filter Bar */}
@@ -272,7 +307,7 @@ export default function ListingsPage() {
                                 />
                             </div>
                             <button
-                                onClick={() => setShowFilters(!showFilters)}
+                                onClick={() => {setShowFilters(!showFilters)}}
                                 className="font-rajdhaniSemiBold flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 gap-2 transition-colors duration-75"
                             >
                                 <Filter className="font-rajdhaniSemiBold h-5 w-5" />
