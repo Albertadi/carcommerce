@@ -428,7 +428,7 @@ export default function ProfileManagement() {
             name="name"
             value={editingProfile.name}
             onChange={handleEditChange}
-            className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
+            className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
           />
         </div>
         <div>
@@ -437,7 +437,7 @@ export default function ProfileManagement() {
             name="description"
             value={editingProfile.description}
             onChange={handleEditChange}
-            className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
+            className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
           />
         </div>
         <div className="space-y-3">
@@ -495,8 +495,8 @@ export default function ProfileManagement() {
     {/* Suspend Modal */}
 {showSuspendModal && selectedUserForSuspension && (
   <div className="fixed inset-0 flex items-center justify-center z-50">
-    <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96 border border-gray-700">
-      <h2 className="text-xl font-bold mb-4 text-white">
+    <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96">
+      <h2 className="text-xl font-rajdhaniBold mb-4 text-white">
         Suspend {selectedUserForSuspension.name} for how long?
       </h2>
       
@@ -518,7 +518,7 @@ export default function ProfileManagement() {
             }, 3000);
           }
         }}
-        className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+        className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
         placeholder="Enter duration in days"
       />
       
@@ -527,7 +527,7 @@ export default function ProfileManagement() {
         type="text"
         value={suspendReason}
         onChange={(e) => setSuspendReason(e.target.value)}
-        className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+        className="mt-3 w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
         placeholder="Enter suspension reason"
       />
       
@@ -537,10 +537,10 @@ export default function ProfileManagement() {
       )}
       
       {/* Action Buttons */}
-      <div className="flex justify-end space-x-3">
+      <div className="flex justify-center space-x-3 mt-5">
         <button
           onClick={handleShowSuspendModal}
-          className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          className="px-6 py-2 rounded bg-[#2570d4]/10 text-[#2570d4] font-rajdhaniSemiBold border-2 border-[#2570d4]/30 hover:border-[#2570d4] hover:bg-[#2570d4]/25 focus:border-[#2570d4] focus:bg-[#2570d4]/40 active:bg-[#2570d4]/70 active:border-[#2570d4] transition-all duration-200 active:duration-50 focus:outline-none"
         >
           Confirm
         </button>
@@ -552,7 +552,7 @@ export default function ProfileManagement() {
             setSuspendReason('');
             setSuspendInvalidMessage('');
           }}
-          className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniSemiBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
         >
           Cancel
         </button>
@@ -566,31 +566,31 @@ export default function ProfileManagement() {
     {/*Profile Details Modal*/}
     {isRowModalOpen && rowSelectedProfile && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-          <h2 className="text-xl font-bold mb-4">Profile Details</h2>
+        <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96">
+          <h2 className="text-xl font-rajdhaniBold mb-4">Profile Details</h2>
           <div className="space-y-3">
             <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Name:</span> 
-              <span>{rowSelectedProfile.name}</span>
+              <span className="font-rajdhaniSemiBold">Name:</span> 
+              <span className="font-rajdhaniMedium">{rowSelectedProfile.name}</span>
             </p>
             <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Description:</span> 
-              <span>{rowSelectedProfile.description}</span>
+              <span className="font-rajdhaniSemiBold">Description:</span> 
+              <span className="font-rajdhaniMedium">{rowSelectedProfile.description}</span>
             </p>
             <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Buy Permission:</span> 
+              <span className="font-rajdhaniSemiBold">Buy Permission:</span> 
               <span className={rowSelectedProfile.has_buy_permission ? "text-green-500" : "text-red-500"}>
                 {rowSelectedProfile.has_buy_permission ? "✓" : "✕"}
               </span>
             </p>
             <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Sell Permission:</span> 
+              <span className="font-rajdhaniSemiBold">Sell Permission:</span> 
               <span className={rowSelectedProfile.has_sell_permission ? "text-green-500" : "text-red-500"}>
                 {rowSelectedProfile.has_sell_permission ? "✓" : "✕"}
               </span>
             </p>
-            <p className="flex justify-between border-b border-gray-600 pb-2">
-              <span className="font-medium">Listing Permission:</span> 
+            <p className="flex justify-between pb-2">
+              <span className="font-rajdhaniSemiBold">Listing Permission:</span> 
               <span className={rowSelectedProfile.has_listing_permission ? "text-green-500" : "text-red-500"}>
                 {rowSelectedProfile.has_listing_permission ? "✓" : "✕"}
               </span>
@@ -599,7 +599,7 @@ export default function ProfileManagement() {
           <div className="mt-6 flex justify-end">
             <button 
               onClick={() => setIsRowModalOpen(false)} 
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+              className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
             >
               Close
             </button>
