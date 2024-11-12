@@ -604,7 +604,7 @@ export default function UserManagement() {
             className={`w-full py-3 rounded bg-[#2570d4]/10 text-[#2570d4] font-rajdhaniSemiBold border-2 border-[#2570d4]/30 hover:border-[#2570d4] hover:bg-[#2570d4]/25 focus:border-[#2570d4] focus:bg-[#2570d4]/40 active:bg-[#2570d4]/70 active:border-[#2570d4] transition-all duration-200 active:duration-50 focus:outline-none ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Adding...' : 'Create Account'}
+            {isLoading ? 'Loading...' : 'Create Account'}
           </button>
         </div>
       </div>
