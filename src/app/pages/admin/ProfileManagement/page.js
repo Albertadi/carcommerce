@@ -518,7 +518,7 @@ export default function ProfileManagement() {
             }, 3000);
           }
         }}
-        className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
+        className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
         placeholder="Enter duration in days"
       />
       
@@ -527,7 +527,7 @@ export default function ProfileManagement() {
         type="text"
         value={suspendReason}
         onChange={(e) => setSuspendReason(e.target.value)}
-        className="mt-3 w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-non"
+        className="mt-3 w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
         placeholder="Enter suspension reason"
       />
       

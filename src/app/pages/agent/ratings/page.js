@@ -50,15 +50,15 @@ const AgentRatingsPage = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 text-red-400">Your Agent Ratings</h1>
+      <h1 className="text-2xl font-rajdhaniBold mb-6 text-red-400">Your Agent Ratings</h1>
 
       {loading ? (
-        <p>Loading your ratings...</p>
+        <p className="font-rajdhaniMedium">Loading your ratings...</p>
       ) : (
         <div>
           {agentReviews && agentReviews.reviews && agentReviews.reviews.length > 0 ? (
             <>
-              <h2 className="text-xl font-semibold text-orange-500">
+              <h2 className="text-xl font-rajdhaniBold text-orange-500">
                 Average Rating: {agentReviews.averageRating || "No ratings yet"}
               </h2>
 
@@ -68,16 +68,16 @@ const AgentRatingsPage = () => {
                     <li key={index} className="flex items-center p-4 bg-gray-200 rounded-lg shadow-md">
                       <FaUserCircle className="text-red-700 text-5xl mr-4" />
                       <div className="flex-1">
-                        <p className="text-black font-semibold">
+                        <p className="text-black font-rajdhaniSemiBold">
                           {review.reviewerEmail || "Anonymous"}
                         </p>
-                        <p className="text-gray-700">
+                        <p className="text-gray-700 font-rajdhaniMedium">
                           {review.review || "No review text available"}
                         </p>
                       </div>
                       <div className="flex items-center ml-4">
                         <FaStar className="text-black text-xl" />
-                        <span className="text-red-600 text-lg ml-2">
+                        <span className="text-red-600 text-lg ml-2 font-rajdhaniSemiBold">
                           {review.rating || "No rating"}
                         </span>
                       </div>
@@ -87,7 +87,7 @@ const AgentRatingsPage = () => {
               </div>
             </>
           ) : (
-            <p className="text-gray-500">No reviews found for this agent.</p>
+            <p className="text-gray-500 font-rajdhaniMedium">No reviews found for this agent.</p>
           )}
         </div>
       )}
