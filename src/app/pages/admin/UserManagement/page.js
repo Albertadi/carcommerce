@@ -3,11 +3,13 @@
 import { useEffect, useState, useContext } from 'react';
 import { User, Mail, Lock, Calendar, UserCircle } from 'lucide-react';
 import { AuthContext } from '../../authorization/AuthContext';
+import { ReloginModal } from '../../../components/ReloginModal';
 import axios from 'axios';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]); // State to hold users
   const [profiles, setProfiles] = useState([]); // State to hold profiles for dropdown
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchTermFirstName, setSearchTermFirstName] = useState('');
   const [searchTermEmail, setSearchTermEmail] = useState('');
   const [searchTermProfile, setSearchTermProfile] = useState('');
@@ -468,6 +470,12 @@ export default function UserManagement() {
 
   return (
     <div className="min-h-screen bg-[#0e0e17] rounded p-6">
+
+      {/* Relogin modal */}
+      {showLoginModal && (
+        <ReloginModal onClose={() => setShowLoginModal(false)} />
+      )}
+
       {/* Error display */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">

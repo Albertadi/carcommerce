@@ -166,7 +166,7 @@ const ShortlistPage = () => {
         </div>
         <input
           type="text"
-          placeholder="Search by make, model, or year (e.g., Toyota, Camry, or 2020)"
+          placeholder="Search by make"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg 

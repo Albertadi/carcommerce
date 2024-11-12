@@ -5,6 +5,7 @@ import {jwtDecode} from "jwt-decode";
 import axios from 'axios';
 import { AuthContext } from '../../authorization/AuthContext';
 import { EnvelopeIcon, UserIcon, CakeIcon } from '@heroicons/react/24/outline';
+import { ReloginModal } from '../../../components/ReloginModal';
 
 export default function AdminProfile() {
     const { access_token } = useContext(AuthContext); // Access the JWT token from context
@@ -14,6 +15,7 @@ export default function AdminProfile() {
     const [dob, setDOB] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true); // New loading state
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     useEffect(() => {
         const fetchUserProfile = async (userEmail) => {
@@ -60,6 +62,12 @@ export default function AdminProfile() {
 
     return (
         <div className="p-8 bg-white shadow-lg rounded">
+            {/* Relogin modal */}
+            {showLoginModal && (
+                <ReloginModal onClose={() => setShowLoginModal(false)} />
+            )}
+
+
             <h2 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6 flex items-center space-x-2">
                 <UserIcon className="h-8 w-8 text-[#2570d4]" />
                 <span>Admin Profile</span>
