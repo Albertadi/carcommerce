@@ -152,36 +152,31 @@ const SellerRatingPage = () => {
 
   return (
     <div className="p-8">
-
-      {/* Success message display */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 font-rajdhaniMedium">
           {successMessage}
         </div>
       )}
 
-      {/* Invalid message display */}
       {invalidMessage && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 font-rajdhaniMedium">
           {invalidMessage}
         </div>
       )}
 
-
-      <h1 className="text-2xl font-bold mb-6 text-red-400">Review Agents</h1>
-      {/* Search Bar */}
+      <h1 className="text-2xl font-rajdhaniBold mb-6 text-red-400">Review Agents</h1>
       <div className="mb-4">
         <input
           type="text"
           placeholder="Search by first name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border rounded px-2 py-1 w-full text-black"
+          className="border rounded px-2 py-1 w-full text-black font-rajdhaniMedium"
         />
       </div>
-      {/* Loading State */}
+
       {loading ? (
-        <p>Loading agents...</p>
+        <p className="font-rajdhaniMedium">Loading agents...</p>
       ) : (
         <div className="space-y-4">
           {agents.length > 0 ? (
@@ -193,44 +188,40 @@ const SellerRatingPage = () => {
                 <div className="flex items-center">
                   <FaUserCircle className="text-red-700 text-5xl mr-4" />
                   <div className="flex-1">
-                    <p className="text-black font-semibold">
+                    <p className="text-black font-rajdhaniBold">
                       {agent.first_name} {agent.last_name}
                     </p>
                   </div>
                 </div>
 
-                {/* View All Ratings Button */}
                 <button
                   onClick={() => handleViewAllRatings(agent.email)}
-                  className="mt-2 mr-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="mt-2 mr-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 font-rajdhaniMedium"
                 >
                   View All Ratings
                 </button>
 
-                {/* Submit a New Rating Button */}
                 <button
                   onClick={() => handleSubmitNewRating(agent.email)}
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 font-rajdhaniMedium"
                 >
                   Submit a New Rating
                 </button>
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No agents found.</p>
+            <p className="text-gray-500 font-rajdhaniMedium">No agents found.</p>
           )}
         </div>
       )}
 
-      {/* Create Rating Modal */}
       {showCreateRatingModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[700px]">
-            <h2 className="text-xl font-semibold text-orange-500">
+            <h2 className="text-xl font-rajdhaniBold text-orange-500">
               Submit a New Rating
             </h2>
 
-            {/* Star Rating */}
             <div className="mt-4 flex justify-center">
               {[...Array(5)].map((_, index) => (
                 <span
@@ -247,28 +238,27 @@ const SellerRatingPage = () => {
               ))}
             </div>
 
-            {/* Review Textarea */}
             <div className="mt-4">
-              <label className="block font-medium">Review:</label>
+              <label className="block font-rajdhaniSemiBold">Review:</label>
               <textarea
                 value={newRating.review}
                 onChange={(e) =>
                   setNewRating({ ...newRating, review: e.target.value })
                 }
-                className="border rounded px-2 py-1 w-full text-black"
+                className="border rounded px-2 py-1 w-full text-black font-rajdhaniMedium"
               />
             </div>
 
             <div className="mt-4 flex justify-end space-x-4">
               <button
                 onClick={handleRatingSubmit}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 font-rajdhaniMedium"
               >
                 Submit Rating
               </button>
               <button
                 onClick={() => setShowCreateRatingModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 font-rajdhaniMedium"
               >
                 Cancel
               </button>
@@ -277,19 +267,17 @@ const SellerRatingPage = () => {
         </div>
       )}
 
-      {/* View Rating Modal */}
       {showReviewModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-xl font-semibold text-orange-500">
+            <h2 className="text-xl font-rajdhaniBold text-orange-500">
               Ratings for {selectedAgentReviews?.email}
             </h2>
 
-            <h3 className="mt-4 text-lg font-bold text-orange-500">
+            <h3 className="mt-4 text-lg font-rajdhaniBold text-orange-500">
               Average Rating: {selectedAgentReviews?.averageRating}
             </h3>
 
-            {/* Scrollable container for reviews */}
             <div className="mt-4 max-h-60 overflow-y-auto">
               <ul className="space-y-4">
                 {selectedAgentReviews?.reviews.map((review, index) => (
@@ -299,14 +287,14 @@ const SellerRatingPage = () => {
                   >
                     <FaUserCircle className="text-red-700 text-5xl mr-4" />
                     <div className="flex-1">
-                      <p className="text-black font-semibold">
+                      <p className="text-black font-rajdhaniSemiBold">
                         {review.reviewerEmail}
                       </p>
-                      <p className="text-gray-700">{review.review}</p>
+                      <p className="text-gray-700 font-rajdhaniMedium">{review.review}</p>
                     </div>
                     <div className="flex items-center ml-4">
                       <FaStar className="text-black text-xl" />
-                      <span className="text-red-600 text-lg ml-2">
+                      <span className="text-red-600 text-lg ml-2 font-rajdhaniSemiBold">
                         {review.rating}
                       </span>
                     </div>
@@ -317,7 +305,7 @@ const SellerRatingPage = () => {
 
             <button
               onClick={() => setShowReviewModal(false)}
-              className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 font-rajdhaniMedium"
             >
               Close
             </button>

@@ -30,25 +30,25 @@ export function ListingCard({
       {/* Details Section */}
       <div className="flex-1">
         {/* Title and Year */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          {make} {model} ({year})
+        <h3 className="text-xl font-rajdhaniBold text-gray-800 mb-2">
+          {year} {make} {model}
         </h3>
 
         {/* Mileage, Transmission, Fuel Type, and Price */}
         <div className="text-gray-600 space-y-1">
           <p className="flex items-center">
             <FaTachometerAlt className="mr-2 text-gray-500" /> 
-            <span className="font-semibold">Mileage:</span> {mileage?.toLocaleString()} km
+            <span className="font-rajdhaniBold">Mileage:</span> <span className="font-rajdhaniSemiBold">{mileage?.toLocaleString()} km</span>
           </p>
           <p className="flex items-center">
             <FaCar className="mr-2 text-gray-500" /> 
-            <span className="font-semibold">Transmission:</span> {transmission || 'N/A'}
+            <span className="font-rajdhaniBold">Transmission:</span> <span className="font-rajdhaniSemiBold">{transmission || 'N/A'}</span>
           </p>
           <p className="flex items-center">
             <FaGasPump className="mr-2 text-gray-500" /> 
-            <span className="font-semibold">Fuel Type:</span> {fuelType || 'N/A'}
+            <span className="font-rajdhaniBold">Fuel Type:</span> <span className="font-rajdhaniSemiBold">{fuelType || 'N/A'}</span>
           </p>
-          <p className="flex items-center text-red-600 text-lg font-semibold">
+          <p className="flex items-center text-red-600 text-lg font-rajdhaniBold">
             <FaTag className="mr-2" /> 
             ${price?.toLocaleString()}
           </p>
@@ -58,14 +58,14 @@ export function ListingCard({
         <div className="absolute bottom-4 right-4 flex space-x-2">
           <button
             onClick={onViewDetails}
-            className="bg-blue-500 text-white py-1 px-3 rounded-lg flex items-center hover:bg-blue-600"
+            className="bg-blue-500 text-white font-rajdhaniSemiBold py-1 px-3 rounded flex items-center hover:bg-blue-600"
           >
             <span>View Details</span>
           </button>
           {dashboardType === 'agent' && (
             <button
               onClick={onDelete}
-              className="bg-red-500 text-white py-1 px-3 rounded-lg flex items-center hover:bg-red-600"
+              className="bg-red-500 text-white py-1 px-3 rounded flex items-center hover:bg-red-600"
             >
               <span>Delete</span>
             </button>

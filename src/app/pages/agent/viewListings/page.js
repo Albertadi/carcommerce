@@ -258,7 +258,7 @@ export default function ListingsPage() {
             {/* Header */}
             <div className="bg-white shadow-sm py-6">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-6">My Listings</h1>
+                    <h1 className="text-3xl font-rajdhaniBold text-[#0e0e17] mb-6">My Listings</h1>
                     
                     {/* Search and Filter Bar */}
                     <div className="bg-white rounded shadow-sm p-4 border border-gray-100">
@@ -268,14 +268,14 @@ export default function ListingsPage() {
                                     value={make}
                                     onChange={handleInputChange(setMake, () => {}, 'make')}
                                     placeholder="Search by make or model..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-[#f75049] focus:border-[#f75049] text-gray-800"
+                                    className="font-rajdhaniMedium w-full px-4 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-[#f75049] focus:border-[#f75049] text-gray-800"
                                 />
                             </div>
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 gap-2 transition-colors duration-75"
+                                className="font-rajdhaniSemiBold flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 gap-2 transition-colors duration-75"
                             >
-                                <Filter className="h-5 w-5" />
+                                <Filter className="font-rajdhaniSemiBold h-5 w-5" />
                                 {showFilters ? 'Hide Filters' : 'Show Filters'}
                             </button>
                         </div>
@@ -285,13 +285,13 @@ export default function ListingsPage() {
                             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {/* Price Range */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+                                    <label className="block text-sm font-rajdhaniSemiBold text-xl text-gray-700 mb-1">Price Range</label>
                                     <div className="flex gap-2">
                                         <input
                                             value={minPrice}
                                             onChange={handleInputChange(setMinPrice, setPriceError, 'minPrice')}
                                             placeholder="Min"
-                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                            className={`w-full px-3 py-2 font-rajdhaniMedium border rounded-lg text-gray-800 ${
                                                 priceError.min ? 'border-[#f75049]' : 'border-gray-200'
                                             }`}
                                         />
@@ -299,7 +299,7 @@ export default function ListingsPage() {
                                             value={maxPrice}
                                             onChange={handleInputChange(setMaxPrice, setPriceError, 'maxPrice')}
                                             placeholder="Max"
-                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                            className={`w-full px-3 py-2 font-rajdhaniMedium border rounded-lg text-gray-800 ${
                                                 priceError.max ? 'border-[#f75049]' : 'border-gray-200'
                                             }`}
                                         />
@@ -313,13 +313,13 @@ export default function ListingsPage() {
     
                                 {/* Mileage Range */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Mileage Range</label>
+                                    <label className="block text-sm font-rajdhaniSemiBold text-xl text-gray-700 mb-1">Mileage Range</label>
                                     <div className="flex gap-2">
                                         <input
                                             value={minMileage}
                                             onChange={handleInputChange(setMinMileage, setMileageError, 'minMileage')}
                                             placeholder="Min"
-                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                            className={`w-full px-3 py-2 font-rajdhaniMedium border rounded-lg text-gray-800 ${
                                                 mileageError.min ? 'border-[#f75049]' : 'border-gray-200'
                                             }`}
                                         />
@@ -327,7 +327,7 @@ export default function ListingsPage() {
                                             value={maxMileage}
                                             onChange={handleInputChange(setMaxMileage, setMileageError, 'maxMileage')}
                                             placeholder="Max"
-                                            className={`w-full px-3 py-2 border rounded-lg text-gray-800 ${
+                                            className={`w-full px-3 py-2 font-rajdhaniMedium border rounded-lg text-gray-800 ${
                                                 mileageError.max ? 'border-[#f75049]' : 'border-gray-200'
                                             }`}
                                         />
@@ -341,23 +341,23 @@ export default function ListingsPage() {
     
                                 {/* Year */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                                    <label className="block text-sm font-rajdhaniSemiBold text-xl text-gray-700 mb-1">Year</label>
                                     <input
                                         value={year}
                                         onChange={handleInputChange(setYear, () => {}, 'year')}
                                         placeholder="Enter year"
-                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800"
+                                        className="w-full px-3 py-2 font-rajdhaniMedium border border-gray-200 rounded-lg text-gray-800"
                                     />
                                 </div>
     
                                 {/* Model */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                    <label className="block text-sm font-rajdhaniSemiBold text-xl text-gray-700 mb-1">Model</label>
                                     <input
                                         value={model}
                                         onChange={handleInputChange(setModel, () => {}, 'model')}
                                         placeholder="Enter model"
-                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800"
+                                        className="w-full px-3 py-2 font-rajdhaniMedium border border-gray-200 rounded-lg text-gray-800"
                                     />
                                 </div>
                             </div>
@@ -367,7 +367,7 @@ export default function ListingsPage() {
                             <div className="mt-4 flex justify-end">
                                 <button
                                     onClick={handleSearch}
-                                    className="px-6 py-2 bg-[#f75049] text-white rounded-lg hover:bg-red-600 transition-colors"
+                                    className="px-6 py-2 bg-[#f75049] font-rajdhaniSemiBold text-white rounded hover:bg-red-600 transition-colors"
                                 >
                                     Search Cars
                                 </button>
@@ -387,7 +387,7 @@ export default function ListingsPage() {
             )}
     
             {/* Listings Grid */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="font-rajdhaniBold max-w-7xl mx-auto px-6 py-8">
                 {isLoading ? (
                     <div className="flex justify-center items-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#f75049]"></div>
@@ -414,7 +414,7 @@ export default function ListingsPage() {
                                     <div className="relative">
                                         <img
                                             src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-                                            alt={`${listing.make} ${listing.model}`}
+                                            alt={`${listing.year} ${listing.make} ${listing.model}`}
                                             className="w-full h-52 object-cover"
                                         />
                                         <div className="absolute top-4 right-4">
@@ -431,7 +431,7 @@ export default function ListingsPage() {
                                     <div className="p-4">
                                         <div className="flex justify-between items-start mb-3">
                                             <h3 className="text-lg font-bold text-gray-900">
-                                                {listing.make} {listing.model}
+                                            {listing.year} {listing.make} {listing.model}
                                             </h3>
                                             <p className="text-xl font-bold text-[#f75049]">
                                                 ${listing.price.toLocaleString()}
@@ -439,19 +439,19 @@ export default function ListingsPage() {
                                         </div>
     
                                         <div className="space-y-2 mb-4">
-                                            <div className="flex items-center text-gray-600 text-sm">
+                                            <div className="flex items-center font-rajdhaniSemiBold text-gray-600 text-sm">
                                                 <Calendar className="h-4 w-4 mr-2" />
                                                 Year: {listing.year}
                                             </div>
-                                            <div className="flex items-center text-gray-600 text-sm">
+                                            <div className="flex items-center font-rajdhaniSemiBold text-gray-600 text-sm">
                                                 <Clock className="h-4 w-4 mr-2" />
                                                 Mileage: {listing.mileage.toLocaleString()} km
                                             </div>
-                                            <div className="flex items-center text-gray-600 text-sm">
+                                            <div className="flex items-center font-rajdhaniSemiBold text-gray-600 text-sm">
                                                 <Settings className="h-4 w-4 mr-2" />
                                                 {listing.transmission}
                                             </div>
-                                            <div className="flex items-center text-gray-600 text-sm">
+                                            <div className="flex items-center font-rajdhaniSemiBold text-gray-600 text-sm">
                                                 <Fuel className="h-4 w-4 mr-2" />
                                                 {listing.fuel_type}
                                             </div>
@@ -460,14 +460,14 @@ export default function ListingsPage() {
                                         <div className='grid grid-cols-2 gap-2'>
                                             <button
                                                 onClick={() => handleViewDetails(listing)}
-                                                className="w-full px-4 py-2 bg-[#f75049] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
+                                                className="w-full px-4 py-2 font-rajdhaniSemiBold bg-[#f75049] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
                                             >
                                                 View Details
                                             </button>
 
                                             <button
                                                 onClick={() => handleUpdateListing(listing)}
-                                                className="w-full px-4 py-2 bg-[#2570d4] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
+                                                className="w-full px-4 py-2 font-rajdhaniSemiBold bg-[#2570d4] text-white rounded hover:bg-[#f0b537] transition-colors duration-75"
                                             >
                                                 Update
                                             </button>

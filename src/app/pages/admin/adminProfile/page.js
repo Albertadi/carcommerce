@@ -90,7 +90,7 @@ export default function AdminProfile() {
                     <div className="flex items-center space-x-4">
                         <CakeIcon className="h-6 w-6 text-[#0e0e17]" />
                         <div>
-                            <h3 className="text-lg font-semibold text-[#0e0e17]">Date of Birth</h3>
+                            <h3 className="text-lg font-rajdhaniBold text-[#0e0e17]">Date of Birth</h3>
                             <p className="text-[#0e0e17] font-rajdhaniSemiBold">{dob}</p>
                         </div>
                     </div>

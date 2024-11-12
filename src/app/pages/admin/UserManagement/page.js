@@ -448,7 +448,7 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-500 p-6">
+    <div className="min-h-screen bg-[#0e0e17] rounded p-6">
       {/* Error display */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -457,23 +457,23 @@ export default function UserManagement() {
       )}
 
       {/* Success message display */}
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-            {successMessage}
-          </div>
-        )}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+          {successMessage}
+        </div>
+      )}
 
-        {/* Info message display */}
-        {invalidMessage && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {invalidMessage}
-          </div>
-        )}
+      {/* Info message display */}
+      {invalidMessage && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          {invalidMessage}
+        </div>
+      )}
 
       {/* Add new account section */}
-      <div className="h-100 bg-gradient-to-br from-gray-900 to-gray-800 p-8 flex items-center rounded-2xl justify-center">
-      <div className="w-full max-w-xl bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
-        <h2 className="text-4xl font-bold text-white text-center mb-8">
+      <div className="h-100 bg-[#0e0e17] p-8 flex items-center rounded justify-center">
+      <div className="w-full max-w-xl bg-[#0e0e17] rounded p-8 shadow-2xl">
+        <h2 className="text-4xl font-rajdhaniBold text-white text-center mb-8">
           Create New Account
         </h2>
         
@@ -487,7 +487,7 @@ export default function UserManagement() {
                 placeholder="First name"
                 value={firstname}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
                 disabled={isLoading}
               />
             </div>
@@ -498,7 +498,7 @@ export default function UserManagement() {
                 placeholder="Last name"
                 value={lastname}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
                 disabled={isLoading}
               />
             </div>
@@ -512,7 +512,7 @@ export default function UserManagement() {
               placeholder="YYYY-MM-DD"
               value={dob}
               onChange={handleDobChange}
-              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               disabled={isLoading}
             />
           </div>
@@ -525,7 +525,7 @@ export default function UserManagement() {
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               disabled={isLoading}
             />
           </div>
@@ -538,7 +538,7 @@ export default function UserManagement() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-gray-700/50 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               disabled={isLoading}
             />
           </div>
@@ -549,17 +549,17 @@ export default function UserManagement() {
             <select 
               value={userProfile}
               onChange={(e) => setUserProfile(e.target.value)}
-              className="w-full bg-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 appearance-none cursor-pointer"
+              className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               disabled={isLoading}
               style={{
-                background: 'rgb(31, 41, 55)',
+                background: 'rgb(11, 11, 18)',
                 borderRadius: '0.5rem'
               }}
             >
-              <option value="" className="bg-gray-300 text-gray-900">Select User Profile</option>
-              <option value="buyer" className="bg-gray-300 text-gray-900">Buyer</option>
-              <option value="seller" className="bg-gray-300 text-gray-900">Seller</option>
-              <option value="used car agent" className="bg-gray-300 text-gray-900">Used Car Agent</option>
+              <option value="" className="bg-[#0b0b12] text-white">Select User Profile</option>
+              <option value="buyer" className="bg-[#0b0b12] text-white">Buyer</option>
+              <option value="seller" className="bg-[#0b0b12] text-white">Seller</option>
+              <option value="used car agent" className="bg-[#0b0b12] text-white">Used Car Agent</option>
             </select>
             <style jsx>{`
               select option:checked {
@@ -576,7 +576,7 @@ export default function UserManagement() {
           {/* Submit Button */}
           <button
             onClick={handleAddUser}
-            className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-[1.02] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full py-3 rounded bg-[#2570d4]/10 text-[#2570d4] font-rajdhaniSemiBold border-2 border-[#2570d4]/30 hover:border-[#2570d4] hover:bg-[#2570d4]/25 focus:border-[#2570d4] focus:bg-[#2570d4]/40 active:bg-[#2570d4]/70 active:border-[#2570d4] transition-all duration-200 active:duration-50 focus:outline-none ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
             {isLoading ? 'Adding...' : 'Create Account'}
@@ -585,210 +585,265 @@ export default function UserManagement() {
       </div>
     </div>
 
-      {/* User List section */}
-      <h2 className="text-4xl p-8 text-center font-bold mb-6 text-white">User List</h2>
-
-      {/* search section */}
-      <div className="flex justify-center mb-4 gap-4">
-        <div className="w-1/4">
-          <input
-            type="text"
-            placeholder="Search first name"
-            value={searchTermFirstName}
-            onChange={handleSearchFirstName}
-            className="border p-2 rounded w-full focus:outline-none text-black"
-          />
-        </div>
-        <div className="w-1/4">
-          <input
-            type="text"
-            placeholder="Search email"
-            value={searchTermEmail}
-            onChange={handleSearchEmail}
-            className="border p-2 rounded w-full focus:outline-none text-black"
-          />
-        </div>
-        <div className="w-1/4">
-          <input
-            type="text"
-            placeholder="Search profile"
-            value={searchTermProfile}
-            onChange={handleSearchProfile}
-            className="border p-2 rounded w-full focus:outline-none text-black"
-          />
-        </div>
+      {/* Search section with updated styling */}
+      <h2 className="text-4xl p-8 text-center font-rajdhaniBold mb-6 text-white">User List</h2>
+      <div className="flex justify-center mb-4">
+        <input
+          type="text"
+          placeholder="Search First Name"
+          value={searchTermFirstName}
+          onChange={handleSearchFirstName}
+          className="p-2 rounded bg-[#0b0b12] text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none mr-2"
+        />
+        <input
+          type="text"
+          placeholder="Search Email"
+          value={searchTermEmail}
+          onChange={handleSearchEmail}
+          className="p-2 rounded bg-[#0b0b12] text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none mr-2"
+        />
+        <input
+          type="text"
+          placeholder="Search Profile"
+          value={searchTermProfile}
+          onChange={handleSearchProfile}
+          className="p-2 rounded bg-[#0b0b12] text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+        />
       </div>
 
-
+      {/* Updated table styling */}
       {isLoading ? (
         <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-800 border border-gray-600">
-              <thead>
+          <table className="min-w-full bg-[#231218] border-2 border-[#f75049]">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-red-500" style={{ width: '10%' }}>SUSPEND</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-green-500" style={{ width: '10%' }}>UPDATE</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>First Name</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>Last Name</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>DOB</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '20%' }}>Email</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '20%' }}>User Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan="7" className="py-16 text-center">
+                  <div className="flex justify-center items-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-[#0b0b12] border-2 border-[#f75049]">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-red-500" style={{ width: '10%' }}>SUSPEND</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-green-500" style={{ width: '10%' }}>UPDATE</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>First Name</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>Last Name</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '15%' }}>DOB</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '20%' }}>Email</th>
+                <th className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniBold text-white" style={{ width: '20%' }}>User Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-[#692728] cursor-pointer" onClick={() => toggleUserDetails(user)}>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">
+                      {user.email !== 'admin@admin.com' && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openSuspendModal(user); }}
+                          className="bg-[#f75049] text-white p-2 w-full text-lg rounded flex items-center justify-center"
+                        >
+                          🛇
+                        </button>
+                      )}
+                    </td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">
+                      {user.email !== 'admin@admin.com' && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openUpdateModal(user); }}
+                          className="bg-[#1ded83] text-white p-2 w-full text-lg rounded flex items-center justify-center"
+                        >
+                          ✎
+                        </button>
+                      )}
+                    </td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">{user.first_name}</td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">{user.last_name}</td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">{user.dob}</td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">{user.email}</td>
+                    <td className="py-2 px-4 border-2 border-[#f75049] font-rajdhaniSemiBold text-[#e2e2ef]">{user.user_profile}</td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
-                  <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
-                  <th className="py-2 px-4 border border-gray-600 text-green-500" style={{ width: '10%' }}>UPDATE</th> 
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>DOB</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>Email</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>User Profile</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Single row with loading animation */}
-                <tr>
-                  <td colSpan="7" className="py-16 text-center">
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-500"></div>
-                    </div>
+                  <td colSpan="7" className="py-2 px-4 border-2 border-[#f75049] text-center font-rajdhaniBold text-[#f75049]">
+                    No users found.
                   </td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
-            ) : (
-              // Loaded table
-            <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-800 border border-gray-600">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border border-gray-600 text-red-500" style={{ width: '10%' }}>SUSPEND</th>
-                  <th className="py-2 px-4 border border-gray-600 text-green-500" style={{ width: '10%' }}>UPDATE</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>First Name</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>Last Name</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '15%' }}>DOB</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>Email</th>
-                  <th className="py-2 px-4 border border-gray-600 text-white" style={{ width: '20%' }}>User Profile</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.length > 0 ? (
-                  users.map((user) => (
-                                                                                    /*hover at any row to see the modal details*/
-                    <tr key={user.id} className="hover:bg-gray-700 cursor-pointer" onClick={() => toggleUserDetails(user)}> 
-                      
-                      <td className="py-2 px-4 border border-gray-600">
-                        {user.email !== 'admin@admin.com' && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); openSuspendModal(user); }}  
-                            className="bg-red-500 text-white p-2 w-full text-lg rounded"
-                            disabled={isLoading}
-                          >
-                            🛇
-                          </button>
-                        )}
-                      </td>
-                      <td className="py-2 px-4 border border-gray-600">
-                        {user.email !== 'admin@admin.com' && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); openUpdateModal(user); }}
-                            className="bg-green-500 text-white p-2 w-full text-lg rounded"
-                          >
-                            ✎
-                          </button>
-                        )}
-                      </td>
-                      <td className="py-2 px-4 border border-gray-600 text-white">{user.first_name}</td>
-                      <td className="py-2 px-4 border border-gray-600 text-white">{user.last_name}</td>
-                      <td className="py-2 px-4 border border-gray-600 text-white">{user.dob}</td>
-                      <td className="py-2 px-4 border border-gray-600 text-white">{user.email}</td>
-                      <td className="py-2 px-4 border border-gray-600 text-white">{user.user_profile}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="py-2 px-4 border border-gray-600 text-center text-white">No users found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
-      
-       {/* Suspend Modal */}
-       {showSuspendModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-gray-700 p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Suspend {selectedUser.email} for how long?</h2>
 
-            {/* Duration Input */}
-            <input
-              type="number"
-              min="1"
-              value={duration || ""}  // Shows an empty field instead of 0 when cleared
-              onChange={(e) => {
-                const value = Number(e.target.value);
+      {/* Update Modal with new styling */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96">
+            <h2 className="text-xl font-rajdhaniBold mb-4 text-white">Update {selectedUser.email}</h2>
             
-                if (value > 0) {  
-                  setDuration(value);
-                  setInvalidMessage(""); // Clear the invalid message if input is valid
-                } else {
-                  setDuration(""); // Clear the input if the value is invalid (less than 1)
-                  setInvalidMessage("Please fill in the duration.");
-                  setTimeout(() => {
-                    setInvalidMessage(''); // Clear the message after 3 seconds
-                  }, 3000);
-                }
-              }}
-              className="border p-2 w-full mb-4 text-black"
-              placeholder="Enter duration in days"
-            />
+            <div className="mb-4">
+              <label className="block text-white mb-1">First Name</label>
+              <input
+                type="text"
+                value={editData.first_name}
+                onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
+                className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              />
+            </div>
 
-            {/* Reason Input */}
-            <input
-              type="text"
-              value={suspendReason}
-              onChange={(e) => setSuspendReason(e.target.value)}
-              className="border p-2 w-full mb-4 text-black"
-              placeholder="Enter suspension reason"
-            />
-            {!suspendReason && <p className="text-red-500">{invalidMessage}</p>} {/* Display invalid message for reason */}
+            <div className="mb-4">
+              <label className="block text-white mb-1">Last Name</label>
+              <input
+                type="text"
+                value={editData.last_name}
+                onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
+                className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              />
+            </div>
 
-            <div className="flex justify-end">
+            <div className="mb-4">
+              <label className="block text-white mb-1">DOB</label>
+              <input
+                type="date"
+                value={editData.dob}
+                onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
+                className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-white mb-1">User Profile</label>
+              <select
+                value={editData.user_profile}
+                onChange={(e) => setEditData({ ...editData, user_profile: e.target.value })}
+                className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              >
+                <option value="">Select User Profile</option>
+                <option value="buyer">Buyer</option>
+                <option value="seller">Seller</option>
+                <option value="used car agent">Used Car Agent</option>
+              </select>
+            </div>
+
+            <div className="flex justify-center space-x-3 mt-6">
               <button
-                onClick={handleSuspend}
-                className="bg-green-500 text-white p-2 rounded mr-2"
+                onClick={handleUpdateConfirm}
+                className="px-6 py-2 rounded bg-[#2570d4]/10 text-[#2570d4] font-rajdhaniSemiBold border-2 border-[#2570d4]/30 hover:border-[#2570d4] hover:bg-[#2570d4]/25 focus:border-[#2570d4] focus:bg-[#2570d4]/40 active:bg-[#2570d4]/70 active:border-[#2570d4] transition-all duration-200 active:duration-50 focus:outline-none"
               >
                 Confirm
               </button>
               <button
-                onClick={closeSuspendModal}
-                className="bg-red-500 text-white p-2 rounded"
+                onClick={closeUpdateModal}
+                className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniSemiBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               >
                 Cancel
               </button>
             </div>
           </div>
+          <div className="absolute inset-0 bg-black bg-opacity-50 -z-10"></div>
         </div>
       )}
 
-      {/* Suspended Info Modal */}
+      {/* Suspend Modal with new styling */}
+      {showSuspendModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96">
+            <h2 className="text-xl font-rajdhaniBold mb-4 text-white">Suspend {selectedUser.email} for how long?</h2>
+
+            <input
+              type="number"
+              min="1"
+              value={duration || ""}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value > 0) {
+                  setDuration(value);
+                  setInvalidMessage("");
+                } else {
+                  setDuration("");
+                  setInvalidMessage("Please fill in the duration.");
+                  setTimeout(() => {
+                    setInvalidMessage('');
+                  }, 3000);
+                }
+              }}
+              className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none mb-4"
+              placeholder="Enter duration in days"
+            />
+
+            <input
+              type="text"
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              className="w-full p-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium placeholder-gray-400 border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none mb-4"
+              placeholder="Enter suspension reason"
+            />
+
+            <div className="flex justify-center space-x-3 mt-6">
+              <button
+                onClick={handleSuspend}
+                className="px-6 py-2 rounded bg-[#2570d4]/10 text-[#2570d4] font-rajdhaniSemiBold border-2 border-[#2570d4]/30 hover:border-[#2570d4] hover:bg-[#2570d4]/25 focus:border-[#2570d4] focus:bg-[#2570d4]/40 active:bg-[#2570d4]/70 active:border-[#2570d4] transition-all duration-200 active:duration-50 focus:outline-none"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={closeSuspendModal}
+                className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniSemiBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-black bg-opacity-50 -z-10"></div>
+        </div>
+      )}
+
+      {/* Suspended Info Modal with new styling */}
       {showSuspendedInfoModal && suspensionInfo && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-            <h2 className="text-xl font-bold mb-4">User Already Suspended</h2>
+          <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96 text-white">
+            <h2 className="text-xl font-rajdhaniBold mb-4">User Already Suspended</h2>
             <div className="space-y-3">
-              <p className="flex justify-between border-b border-gray-600 pb-2">
-                <span className="font-medium">Email:</span>
-                <span>{selectedUser.email}</span>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Email:</span>
+                <span className="font-rajdhaniMedium">{selectedUser.email}</span>
               </p>
-              <p className="flex justify-between border-b border-gray-600 pb-2">
-                <span className="font-medium">Suspended From:</span>
-                <span>{suspensionInfo.start_date}</span>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Suspended From:</span>
+                <span className="font-rajdhaniMedium">{suspensionInfo.start_date}</span>
               </p>
-              <p className="flex justify-between border-b border-gray-600 pb-2">
-                <span className="font-medium">Suspended Until:</span>
-                <span>{suspensionInfo.end_date}</span>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Suspended Until:</span>
+                <span className="font-rajdhaniMedium">{suspensionInfo.end_date}</span>
               </p>
-              <p className="flex justify-between border-b border-gray-600 pb-2">
-                <span className="font-medium">Reason:</span>
-                <span>{suspensionInfo.reason}</span>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Reason:</span>
+                <span className="font-rajdhaniMedium">{suspensionInfo.reason}</span>
               </p>
             </div>
             <div className="mt-6 flex justify-end">
               <button
                 onClick={closeSuspendedInfoModal}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+                className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniSemiBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               >
                 Close
               </button>
@@ -797,109 +852,44 @@ export default function UserManagement() {
         </div>
       )}
 
-
-      {/* Update Modal */}
-      {showUpdateModal && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-gray-700 p-6 rounded-lg w-1/3">
-          <h2 className="text-xl font-bold mb-4">Update {selectedUser.email}</h2>
-          
-          <div className="mb-4">
-            <label className="block text-white mb-1">First Name</label>
-            <input
-              type="text"
-              value={editData.first_name}
-              onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-white mb-1">Last Name</label>
-            <input
-              type="text"
-              value={editData.last_name}
-              onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-white mb-1">DOB</label>
-            <input
-              type="date"
-              value={editData.dob}
-              onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-white mb-1">User Profile</label>
-            <select
-              value={editData.user_profile}
-              onChange={(e) => setEditData({ ...editData, user_profile: e.target.value })}
-              className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"
-            >
-              <option value="">Select User Profile</option>
-              <option value="buyer">Buyer</option>
-              <option value="seller">Seller</option>
-              <option value="used car agent">Used Car Agent</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <button onClick={handleUpdateConfirm} className="bg-green-500 text-white p-2 rounded">
-              Confirm
-            </button>
-            <button onClick={closeUpdateModal} className="bg-red-500 text-white p-2 rounded">
-              Cancel
-            </button>
+      {/* User Details Modal with new styling */}
+      {isRowModalOpen && rowSelectedUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-[#0e0e17] border-2 border-[#f75049] p-8 rounded shadow-xl w-96 text-white">
+            <h2 className="text-xl font-rajdhaniBold mb-4">User Details</h2>
+            <div className="space-y-3">
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">First Name:</span>
+                <span className="font-rajdhaniMedium">{rowSelectedUser.first_name}</span>
+              </p>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Last Name:</span>
+                <span className="font-rajdhaniMedium">{rowSelectedUser.last_name}</span>
+              </p>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Email:</span>
+                <span className="font-rajdhaniMedium">{rowSelectedUser.email}</span>
+              </p>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">Date of Birth:</span>
+                <span className="font-rajdhaniMedium">{rowSelectedUser.dob}</span>
+              </p>
+              <p className="flex justify-between border-b border-[#f75049]/30 pb-2">
+                <span className="font-rajdhaniSemiBold">User Profile:</span>
+                <span className="font-rajdhaniMedium">{rowSelectedUser.user_profile}</span>
+              </p>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setIsRowModalOpen(false)}
+                className="px-6 py-2 rounded bg-[#f75049]/10 text-[#f75049] font-rajdhaniSemiBold border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#f75049]/25 focus:border-[#f75049] focus:bg-[#f75049]/40 active:bg-[#f75049]/70 active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-
-    {/*User Details Modal*/}
-    {isRowModalOpen && rowSelectedUser && (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-gray-700 p-6 rounded-lg w-1/3 text-white">
-        <h2 className="text-xl font-bold mb-4">User Details</h2>
-        <div className="space-y-3">
-          <p className="flex justify-between border-b border-gray-600 pb-2">
-            <span className="font-medium">First Name:</span>
-            <span>{rowSelectedUser.first_name}</span>
-          </p>
-          <p className="flex justify-between border-b border-gray-600 pb-2">
-            <span className="font-medium">Last Name:</span>
-            <span>{rowSelectedUser.last_name}</span>
-          </p>
-          <p className="flex justify-between border-b border-gray-600 pb-2">
-            <span className="font-medium">Email:</span>
-            <span>{rowSelectedUser.email}</span>
-          </p>
-          <p className="flex justify-between border-b border-gray-600 pb-2">
-            <span className="font-medium">Date of Birth:</span>
-            <span>{rowSelectedUser.dob}</span>
-          </p>
-          <p className="flex justify-between border-b border-gray-600 pb-2">
-            <span className="font-medium">User Profile:</span>
-            <span>{rowSelectedUser.user_profile}</span>
-          </p>
-        </div>
-        <div className="mt-6 flex justify-end">
-          <button 
-            onClick={() => setIsRowModalOpen(false)} 
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-
-
+      )}
     </div>
   );
 }

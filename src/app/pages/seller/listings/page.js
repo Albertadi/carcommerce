@@ -121,9 +121,9 @@ export default function ListingsPage() {
 
     const AnalyticsModal = () => (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="bg-white rounded p-6 max-w-md w-full mx-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Listing Analytics</h2>
+                    <h2 className="text-xl font-rajdhaniBold text-gray-800">Listing Analytics</h2>
                     <button 
                         onClick={() => setShowAnalyticsModal(false)}
                         className="text-gray-500 hover:text-gray-700"
@@ -140,7 +140,7 @@ export default function ListingsPage() {
                         return (
                             <div key={listingItem.id} className="py-3 border-b last:border-0">
                                 <div className="space-y-3">
-                                    <p className="font-medium text-gray-800">
+                                    <p className="font-rajdhaniSemiBold text-gray-800">
                                         {listingItem.make} {listingItem.model} ({listingItem.year})
                                     </p>
                                     
@@ -148,13 +148,13 @@ export default function ListingsPage() {
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
                                             <Eye size={16} className="text-blue-500" />
-                                            <span className="text-sm text-gray-600">
+                                            <span className="text-sm text-gray-600 font-rajdhaniMedium">
                                                 {viewCount} views
                                             </span>
                                         </div>
-                                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                                        <div className="w-24 bg-gray-200 rounded h-2">
                                             <div 
-                                                className="bg-blue-500 rounded-full h-2" 
+                                                className="bg-blue-500 rounded h-2" 
                                                 style={{ 
                                                     width: `${Math.min((viewCount / Math.max(...Object.values(viewCounts), 1)) * 100, 100)}%` 
                                                 }}
@@ -166,13 +166,13 @@ export default function ListingsPage() {
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
                                             <BarChart2 size={16} className="text-red-500" />
-                                            <span className="text-sm text-gray-600">
+                                            <span className="text-sm text-gray-600 font-rajdhaniMedium">
                                                 {shortlistCount} shortlists
                                             </span>
                                         </div>
-                                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                                        <div className="w-24 bg-gray-200 rounded h-2">
                                             <div 
-                                                className="bg-red-500 rounded-full h-2" 
+                                                className="bg-red-500 rounded h-2" 
                                                 style={{ 
                                                     width: `${Math.min((shortlistCount / Math.max(...Object.values(shortlistCounts), 1)) * 100, 100)}%` 
                                                 }}
@@ -182,7 +182,7 @@ export default function ListingsPage() {
 
                                     {/* Conversion Rate */}
                                     {viewCount > 0 && (
-                                        <div className="text-sm text-gray-600">
+                                        <div className="text-sm text-gray-600 font-rajdhaniMedium">
                                             Shortlist Rate: {((shortlistCount / viewCount) * 100).toFixed(1)}%
                                         </div>
                                     )}
@@ -198,10 +198,10 @@ export default function ListingsPage() {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Car Listings</h1>
+                <h1 className="text-3xl text-[#0e0e17] font-rajdhaniBold">Car Listings</h1>
                 <button
                     onClick={() => setShowAnalyticsModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors font-rajdhaniMedium"
                 >
                     <BarChart2 size={20} />
                     <span>View Analytics</span>
@@ -215,13 +215,13 @@ export default function ListingsPage() {
             {showAnalyticsModal && <AnalyticsModal />}
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 font-rajdhaniMedium">
                     {error}
                 </div>
             )}
 
             {isLoading ? (
-                <div className="text-center text-gray-500">Loading...</div>
+                <div className="text-center text-gray-500 font-rajdhaniMedium">Loading...</div>
             ) : (
                 <div className="grid gap-4">
                     {listings.length > 0 ? (
@@ -243,11 +243,11 @@ export default function ListingsPage() {
                                     dashboardType={"seller"}
                                     analyticsBadge={
                                         <div className="ml-2 inline-flex items-center gap-2">
-                                            <span className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded flex items-center gap-1">
+                                            <span className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded flex items-center gap-1 font-rajdhaniMedium">
                                                 <Eye size={14} />
                                                 {viewCount} views
                                             </span>
-                                            <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded flex items-center gap-1">
+                                            <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded flex items-center gap-1 font-rajdhaniMedium">
                                                 <BarChart2 size={14} />
                                                 {shortlistCount} shortlists
                                             </span>
@@ -257,7 +257,7 @@ export default function ListingsPage() {
                             );
                         })
                     ) : (
-                        <p className="text-gray-500">No listings found.</p>
+                        <p className="text-gray-500 font-rajdhaniMedium">No listings found.</p>
                     )}
                 </div>
             )}

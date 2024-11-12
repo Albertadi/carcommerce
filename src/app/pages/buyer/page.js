@@ -206,19 +206,19 @@ export default function BuyerPage() {
       );
   
       // Then navigate to the listing details
-      router.push(`/buyer/listing/${id}`);
+      router.push(`/pages/buyer/listing/${id}`);
     } catch (error) {
       console.error('Error:', error);
       // Still navigate even if view increment fails
-      router.push(`/buyer/listing/${id}`);
+      router.push(`/pages/buyer/listing/${id}`);
     }
   };
 
   return (
     <div className="bg-[#f0f0f7] font-rajdhaniSemiBold min-h-screen">
-      <div className="flex flex-col items-center justify-center text-center p-8 bg-orange-100">
-        <h1 className="text-4xl font-rajdhaniBold text-[#f75049]">WELCOME TO THE BUYER PAGE</h1>
-        <p className="mt-2 text-lg text-[#f75049]">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
+      <div className="flex flex-col items-center justify-center text-center p-8 bg-[#f75049] h-64">
+        <h1 className="text-4xl font-rajdhaniBold text-white">WELCOME TO THE BUYER PAGE</h1>
+        <p className="mt-2 text-lg text-white">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
       </div>
       {/* Success message display */}
         {successMessage && (
@@ -302,8 +302,8 @@ export default function BuyerPage() {
               />
 
               <div className="p-4">
-                <h3 className="text-lg text-black font-bold">{car.make} {car.model} ({car.year})</h3>
-                <div className="mt-2 text-sm text-gray-500">
+                <h3 className="text-lg text-black font-rajdhaniBold">{car.year} {car.make} {car.model}</h3>
+                <div className="mt-2 text-sm font-rajdhaniSemiBold text-lg text-gray-500">
                   Price: ${car.price.toLocaleString()}
                   <br />
                   Mileage: {car.mileage.toLocaleString()} km
