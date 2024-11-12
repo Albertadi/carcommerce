@@ -30,7 +30,7 @@ export default function BuyerPage() {
     if (searchInput) filters.search = searchInput;
     if (selectedFilters.Price) filters.price = selectedFilters.Price;
     if (selectedFilters.Mileage) filters.mileage = selectedFilters.Mileage;
-    if (selectedFilters.year) filters.year = selectedFilters.year;
+    if (selectedFilters.Year) filters.year = selectedFilters.year;
     if (selectedFilters.Availability) filters.availability = selectedFilters.Availability;
     return filters;
   };
@@ -113,7 +113,7 @@ export default function BuyerPage() {
   const filterData = {
     Mileage: ["Under 20,000 km", "20,000 - 50,000 km", "50,000 - 100,000 km", "Over 100,000 km"],
     Price: ["Under $10,000", "$10,000 - $20,000", "$20,000 - $30,000", "Over $30,000"],
-    year: [...yearOptions, "Older"],
+    Year: [...yearOptions, "Older"],
     Availability: ["Available", "Sold Out"],
   };
 

@@ -5,63 +5,11 @@ import { useRouter } from "next/navigation";
 import { CarFront, Heart, Star } from "lucide-react";
 import Ratings from "../ratings/page";
 import Shortlist from "../shortlist/page";
+import BuyerProfile from "../buyerProfile/page";
 import { AuthContext } from "../../authorization/AuthContext";
 import axios from 'axios';
 
-// Simple ListingsView component
-function ListingsView() {
-  const { access_token } = useContext(AuthContext);
-  const [listings, setListings] = useState([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const response = await axios.post(
-          'http://localhost:5000/api/listing/search_listing',
-          {},
-          {
-            headers: { Authorization: `Bearer ${access_token}` }
-          }
-        );
-        if (Array.isArray(response.data.listing_list)) {
-          setListings(response.data.listing_list);
-        }
-      } catch (error) {
-        console.error('Error fetching listings:', error);
-      }
-    };
-
-    fetchListings();
-  }, [access_token]);
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {listings.map((listing) => (
-        <div 
-          key={listing.id} 
-          className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-          onClick={() => router.push(`/pages/buyer/listing/${listing.id}`)}
-        >
-          <img
-            src={listing.image_url ? `http://localhost:5000/uploads/${listing.image_url}` : 'https://dummyimage.com/600x400/000/fff&text=Car'}
-            alt={`${listing.make} ${listing.model}`}
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {listing.make} {listing.model} ({listing.year})
-            </h3>
-            <p className="text-gray-600">${listing.price.toLocaleString()}</p>
-            <p className="text-gray-600">{listing.mileage.toLocaleString()} km</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function Dashboard() {
+export default function BuyerDashboard() {
   const { access_token, permissions } = useContext(AuthContext); 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +26,7 @@ export default function Dashboard() {
     }
   }, [access_token, permissions, router]);
 
-  const [selectedOption, setSelectedOption] = useState("listings");
+  const [selectedOption, setSelectedOption] = useState("profile");
   const handleOptionClick = (option) => {
     setSelectedOption(option);
   };
@@ -89,8 +37,8 @@ export default function Dashboard() {
 
   const menuItems = [
     {
-      id: 'listings',
-      label: 'Car Listings',
+      id: 'profile',
+      label: 'My Profile',
       icon: CarFront
     },
     {
@@ -139,7 +87,7 @@ export default function Dashboard() {
       {/* Right Column: Content */}
       <div className="w-3/4 p-6 overflow-y-auto h-full bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {selectedOption === "listings" && <ListingsView />}
+          {selectedOption === "profile" && <BuyerProfile />}
           {selectedOption === "shortlist" && <Shortlist />}
           {selectedOption === "ratings" && <Ratings />}
         </div>

@@ -49,7 +49,7 @@ const AgentRatingsPage = () => {
   }, [access_token]); // Dependency array, it will run when `access_token` changes
 
   return (
-    <div className="p-8">
+    <div className="bg-white min-h-screen shadow-sm py-6 p-8">
       <h1 className="text-2xl font-rajdhaniBold mb-6 text-red-400">Your Agent Ratings</h1>
 
       {loading ? (

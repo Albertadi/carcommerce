@@ -46,7 +46,7 @@ export default function ListingsPage() {
     const buildSearchFilters = () => ({
         make,
         model,
-        year: year ? parseInt(year) : undefined,
+        year: year ? parseInt(year.replace(/,/g, '')) : undefined,
         min_price: minPrice ? parseFloat(minPrice.replace(/,/g, '')) : undefined,
         max_price: maxPrice ? parseFloat(maxPrice.replace(/,/g, '')) : undefined,
         min_mileage: minMileage ? parseInt(minMileage.replace(/,/g, '')) : undefined,
@@ -267,7 +267,7 @@ export default function ListingsPage() {
                                 <input
                                     value={make}
                                     onChange={handleInputChange(setMake, () => {}, 'make')}
-                                    placeholder="Search by make or model..."
+                                    placeholder="Search by make"
                                     className="font-rajdhaniMedium w-full px-4 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-[#f75049] focus:border-[#f75049] text-gray-800"
                                 />
                             </div>
@@ -277,6 +277,12 @@ export default function ListingsPage() {
                             >
                                 <Filter className="font-rajdhaniSemiBold h-5 w-5" />
                                 {showFilters ? 'Hide Filters' : 'Show Filters'}
+                            </button>
+                            <button
+                                onClick={handleSearch}
+                                className="px-6 py-2 bg-[#f75049] font-rajdhaniSemiBold text-white rounded hover:bg-red-600 transition-colors"
+                            >
+                                Search Cars
                             </button>
                         </div>
     
@@ -360,17 +366,6 @@ export default function ListingsPage() {
                                         className="w-full px-3 py-2 font-rajdhaniMedium border border-gray-200 rounded-lg text-gray-800"
                                     />
                                 </div>
-                            </div>
-                        )}
-    
-                        {showFilters && (
-                            <div className="mt-4 flex justify-end">
-                                <button
-                                    onClick={handleSearch}
-                                    className="px-6 py-2 bg-[#f75049] font-rajdhaniSemiBold text-white rounded hover:bg-red-600 transition-colors"
-                                >
-                                    Search Cars
-                                </button>
                             </div>
                         )}
                     </div>
