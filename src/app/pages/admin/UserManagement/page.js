@@ -7,6 +7,7 @@ import axios from 'axios';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]); // State to hold users
+  const [profiles, setProfiles] = useState([]); // State to hold profiles for dropdown
   const [searchTermFirstName, setSearchTermFirstName] = useState('');
   const [searchTermEmail, setSearchTermEmail] = useState('');
   const [searchTermProfile, setSearchTermProfile] = useState('');
@@ -74,9 +75,27 @@ export default function UserManagement() {
     }
   };
 
+  const fetchProfiles = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/profiles/search_profile',
+        {}, // Empty object if no filtering criteria are required
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+      setProfiles(response.data.profile_list); // Update the profiles state with API data
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+    }
+  };
+
   // Call fetchUsers initially when the component mounts
   useEffect(() => {
     fetchUsers();
+    fetchProfiles();
   }, [access_token]); // Only runs on token change or initial mount
 
 // Debounced search to avoid excessive API calls
@@ -543,23 +562,21 @@ export default function UserManagement() {
             />
           </div>
 
-          {/* User Profile */}
+          {/* User Profile Dropdown */}
           <div className="relative">
             <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <select 
+            <select
               value={userProfile}
               onChange={(e) => setUserProfile(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded bg-[#0b0b12] text-lg text-white font-rajdhaniMedium border-2 border-[#f75049]/30 hover:border-[#f75049] hover:bg-[#231218] focus:border-[#f75049] focus:bg-[#692728] active:bg-[#a43836] active:border-[#f75049] transition-all duration-200 active:duration-50 focus:outline-none"
               disabled={isLoading}
-              style={{
-                background: 'rgb(11, 11, 18)',
-                borderRadius: '0.5rem'
-              }}
             >
               <option value="" className="bg-[#0b0b12] text-white">Select User Profile</option>
-              <option value="buyer" className="bg-[#0b0b12] text-white">Buyer</option>
-              <option value="seller" className="bg-[#0b0b12] text-white">Seller</option>
-              <option value="used car agent" className="bg-[#0b0b12] text-white">Used Car Agent</option>
+              {profiles.map((profile) => (
+                <option key={profile.id} value={profile.name} className="bg-[#0b0b12] text-white">
+                  {profile.name}
+                </option>
+              ))}
             </select>
             <style jsx>{`
               select option:checked {

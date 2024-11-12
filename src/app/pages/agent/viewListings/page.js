@@ -512,10 +512,6 @@ export default function ListingsPage() {
                             <p className="flex justify-between border-b pb-2">
                                 <span className="font-medium">Fuel Type:</span> {selectedListing.fuel_type}
                             </p>
-                            <div className="pt-2">
-                                <p className="font-medium mb-2">Description:</p>
-                                <p className="text-gray-600">{selectedListing.description}</p>
-                            </div>
                         </div>
                     </div>
                 </div>

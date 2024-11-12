@@ -53,24 +53,6 @@ export function ListingCard({
             ${price?.toLocaleString()}
           </p>
         </div>
-
-        {/* Action Buttons */}
-        <div className="absolute bottom-4 right-4 flex space-x-2">
-          <button
-            onClick={onViewDetails}
-            className="bg-blue-500 text-white font-rajdhaniSemiBold py-1 px-3 rounded flex items-center hover:bg-blue-600"
-          >
-            <span>View Details</span>
-          </button>
-          {dashboardType === 'agent' && (
-            <button
-              onClick={onDelete}
-              className="bg-red-500 text-white py-1 px-3 rounded flex items-center hover:bg-red-600"
-            >
-              <span>Delete</span>
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
