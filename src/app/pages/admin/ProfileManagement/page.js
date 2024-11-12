@@ -221,7 +221,7 @@ export default function ProfileManagement() {
       const response = await axios.post(
         'http://localhost:5000/api/suspension/suspend_profile',
         {
-          profile: selectedProfileForSuspension.name, // Use the profile name from selectedProfileForSuspension
+          profile: selectedProfileForSuspension.name, 
           days: suspendDuration,
           reason: suspendReason,
         },
