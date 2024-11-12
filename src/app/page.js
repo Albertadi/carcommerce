@@ -111,7 +111,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center text-center p-8 bg-[#f75049] h-64">
         <h1 className="text-4xl font-rajdhaniBold text-white">WELCOME TO TECHQUEST</h1>
-        <p className="mt-2 text-lg text-white">Drive an EV for Free! Sell us your car and drive home any of our electric vehicles for a 7-day test drive!</p>
+        <p className="mt-2 text-lg text-white">Explore Your Dream Car with Real-Time Analytics and Exclusive Listings</p>
       </div>
 
       {/* Search and Filter Section */}

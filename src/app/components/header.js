@@ -53,7 +53,7 @@ export default function Header() {
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
           <a onClick={() => handleClick("logo")} className="flex items-center cursor-pointer -ml-20">
-            <p className="text-5xl font-rajdhaniBold">
+            <p className="text-5xl font-rajdhaniBold pl-10">
               <span className="text-[#D6D0D0]">TECH</span>
               <span className="text-[#f75049]">Quest</span>
             </p>
