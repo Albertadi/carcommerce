@@ -9,10 +9,10 @@ const SellerRatingPage = () => {
 
   const [agents, setAgents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
   const [selectedAgentReviews, setSelectedAgentReviews] = useState(null);
   const [showCreateRatingModal, setShowCreateRatingModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [newRating, setNewRating] = useState({
     rating: 0,
     review: "",
@@ -39,10 +39,10 @@ const SellerRatingPage = () => {
           }
         );
         setAgents(response.data.account_list); // Assuming 'account_list' contains agents
-        setLoading(false);
+        setIsLoading(false)
       } catch (error) {
         console.error("Error fetching agents:", error);
-        setLoading(false);
+        setIsLoading(false)
       }
     };
 
@@ -51,6 +51,7 @@ const SellerRatingPage = () => {
 
   // Fetch reviews and average rating for a specific agent
   const handleViewAllRatings = async (agentEmail) => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `http://localhost:5000/api/reviewRating/${agentEmail}`,
@@ -106,7 +107,10 @@ const SellerRatingPage = () => {
           averageRating: "Error fetching reviews",
         });
         setShowReviewModal(true);
+
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -151,7 +155,10 @@ const SellerRatingPage = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="bg-white min-h-screen shadow-sm py-6 p-8">
+
+
+
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 font-rajdhaniMedium">
           {successMessage}
@@ -175,7 +182,13 @@ const SellerRatingPage = () => {
         />
       </div>
 
-      {loading ? (
+      {isLoading && (
+        <div className="flex justify-center items-center mt-4">
+          <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 rounded-full border-solid border-gray-300 border-t-[#f75049]"></div>
+        </div>
+      )}
+
+      {isLoading ? (
         <p className="font-rajdhaniMedium">Loading agents...</p>
       ) : (
         <div className="space-y-4">

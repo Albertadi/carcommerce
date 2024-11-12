@@ -150,7 +150,7 @@ const SellerRatingPage = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="bg-white min-h-screen shadow-sm py-6 p-8">
 
       {/* Success Message */}
       {successMessage && (
