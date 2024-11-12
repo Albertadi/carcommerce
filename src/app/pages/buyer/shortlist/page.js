@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Heart, Search } from 'lucide-react';
 import { AuthContext } from '../../authorization/AuthContext';
+import { useRouter } from "next/navigation";
 import axios from 'axios';
 
 const ShortlistPage = () => {
@@ -12,6 +13,7 @@ const ShortlistPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [invalidMessage, setInvalidMessage] = useState('');
+  const router = useRouter();
 
   const fetchShortlist = async (search = '') => {
     try {
@@ -47,6 +49,34 @@ const ShortlistPage = () => {
       }, 3000);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCarClick = async (id) => {
+    if (!access_token) {
+      window.location.href = '/pages/login';
+      return;
+    }
+  
+    try {
+      // First increment the views
+      await axios.post(
+        'http://localhost:5000/api/views/increment_views',
+        { listing_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      // Then navigate to the listing details
+      router.push(`/pages/buyer/listing/${id}`);
+    } catch (error) {
+      console.error('Error:', error);
+      // Still navigate even if view increment fails
+      router.push(`/pages/buyer/listing/${id}`);
     }
   };
 
@@ -105,7 +135,8 @@ const ShortlistPage = () => {
           return (
             <div 
               key={item.listing_id} 
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+              onClick={(() => handleCarClick(car.id))}
             >
               <div className="relative">
                 <img 

@@ -6,6 +6,7 @@ import React from 'react';
 
 export default function CreateListing() {
   const { access_token } = useContext(AuthContext);
+  const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
   const [formData, setFormData] = useState({
     vin: '',
@@ -79,7 +80,11 @@ export default function CreateListing() {
       });
 
       if (response.ok) {
-        alert('Listing created successfully!');
+        setSuccessMessage('Listing created successfully!!!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000)
+
         setFormData({
           vin: '',
           make: '',
@@ -109,6 +114,12 @@ export default function CreateListing() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {/* Add the success message here, right after the opening div */}
+      {successMessage && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50 transition-opacity duration-500">
+          {successMessage}
+        </div>
+      )}
       <div className="bg-white p-8 shadow-lg w-full max-w-2xl">
         <h2 className="text-2xl font-rajdhaniBold mb-6 text-center">Create Car Listing</h2>
 
