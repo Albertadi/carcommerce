@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-export default function BuyerPage() {
+export default function LoanCalculator() {
   const [principal, setPrincipal] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [years, setYears] = useState('');

@@ -3,7 +3,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../authorization/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
-import BuyerPage from '../../loanCalc/page';
+import LoanCalculator from '../../loanCalc/page';
 import axios from 'axios';
 
 const CarDetails = ({ params }) => {
@@ -206,7 +206,7 @@ const CarDetails = ({ params }) => {
           }`}
       >
         <div className="bg-white rounded shadow-lg">
-          <BuyerPage />
+          <LoanCalculator />
         </div>
       </div>
     </div>
