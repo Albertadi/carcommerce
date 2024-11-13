@@ -129,6 +129,13 @@ export default function BuyerPage() {
     toggleDropdownVisibility(filterCategory);
   };
 
+  const handleClearFilters = () => {
+    setSelectedFilters({});
+    setSearchInput('');
+    setFilteredCarListings(carListings); // Reset to all listings
+    setDropdownVisibility({});
+  };
+
   const toggleDropdownVisibility = (filterCategory) => {
     setDropdownVisibility((prevVisibility) => {
       const newVisibility = { ...prevVisibility };
@@ -234,13 +241,21 @@ export default function BuyerPage() {
           </div>
         )}
       <div className="flex flex-col items-center mt-8 px-4">
-        <input
-          type="text"
-          placeholder="What car are you searching for?"
-          className="w-full max-w-lg p-2 mb-4 border border-gray-300 rounded text-black"
-          value={searchInput}
-          onChange={handleSearchChange}
-        />
+        <div className="flex w-full max-w-lg space-x-2 pb-4">
+          <input
+            type="text"
+            placeholder="What car are you searching for?"
+            className="flex-1 p-2 border border-gray-300 rounded text-black"
+            value={searchInput}
+            onChange={handleSearchChange}
+          />
+          <button 
+            className="bg-gray-300 px-4 py-1 rounded text-gray-700 hover:bg-gray-400 transition duration-150"
+            onClick={handleClearFilters}
+          >
+            Clear Filters
+          </button>
+        </div>
         <div className="flex space-x-2">
           {Object.keys(filterData).map((filter) => (
             <div key={filter} className="relative group">

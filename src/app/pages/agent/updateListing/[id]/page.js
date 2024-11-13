@@ -29,19 +29,19 @@ export default function UpdateListing() {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const response = await axios.post(
-          'http://localhost:5000/api/listing/search_listing',
-          { id: params.id },
-          { 
-            headers: { 
+        // Use the view_listing endpoint with GET method
+        const response = await axios.get(
+          `http://localhost:5000/api/listing/view_listing?id=${params.id}`,
+          {
+            headers: {
               Authorization: `Bearer ${access_token}`,
-              'Content-Type': 'application/json'
-            } 
+            },
           }
         );
-        
-        if (response.data.listing_list && response.data.listing_list.length > 0) {
-          const listing = response.data.listing_list[0];
+
+        // Check if listing data is returned
+        if (response.data.success && response.data.listing) {
+          const listing = response.data.listing;
           setFormData({
             vin: listing.vin,
             make: listing.make,
@@ -52,11 +52,13 @@ export default function UpdateListing() {
             transmission: listing.transmission,
             fuel_type: listing.fuel_type,
             seller_email: listing.seller_email,
-            is_sold: listing.is_sold
+            is_sold: listing.is_sold,
           });
           if (listing.image_url) {
             setCurrentImageUrl(`http://localhost:5000/uploads/${listing.image_url}`);
           }
+        } else {
+          setError(response.data.message || 'Listing not found');
         }
       } catch (error) {
         setError('Failed to fetch listing details');
