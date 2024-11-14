@@ -9,7 +9,7 @@ from sqlalchemy import func
 view_reviewRating_blueprint = Blueprint('view_reviewRating', __name__)
 
 class ViewReviewRatingController():
-    @view_reviewRating_blueprint.route('/api/reviewRating/<agent_email>', methods=['GET'])
+    @view_reviewRating_blueprint.route('/api/reviewRating/view_reviewRating/<agent_email>', methods=['GET'])
     def view_review(agent_email):
 
         reviews_list, avg_rating, status_code = ReviewRating.viewReviewRating(agent_email)

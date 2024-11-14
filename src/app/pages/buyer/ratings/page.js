@@ -4,7 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../../authorization/AuthContext";
 import { FaStar, FaUserCircle } from "react-icons/fa";
 
-const SellerRatingPage = () => {
+const BuyerRatingPage = () => {
   const { access_token } = useContext(AuthContext);
 
   const [agents, setAgents] = useState([]);
@@ -13,6 +13,7 @@ const SellerRatingPage = () => {
   const [selectedAgentReviews, setSelectedAgentReviews] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [newRating, setNewRating] = useState({
     rating: 0,
     review: "",
@@ -40,7 +41,7 @@ const SellerRatingPage = () => {
         setAgents(response.data.account_list); // Assuming 'account_list' contains agents
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching agents:", error);
+        setErrorMessage("Error fetching agents:", error);
         setLoading(false);
       }
     };
@@ -52,16 +53,13 @@ const SellerRatingPage = () => {
   const handleViewAllRatings = async (agentEmail) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/reviewRating/${agentEmail}`,
+        `http://localhost:5000/api/reviewRating/view_reviewRating/${agentEmail}`,
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
           },
         }
       );
-  
-      // Log the full response to inspect its structure
-      console.log("Response Data:", response.data);
   
       const reviews = response.data.average_rating; // Here we get the reviews as an array of review objects
       let averageRating = response.data.reviews;  // This holds the average rating value
@@ -97,7 +95,7 @@ const SellerRatingPage = () => {
         });
         setShowReviewModal(true);
       } else {
-        console.error("Error fetching reviews:", error);
+        setErrorMessage("Error fetching reviews:", error);
         // Optional: Show a generic error message to the user
         setSelectedAgentReviews({
           email: agentEmail,
@@ -139,7 +137,7 @@ const SellerRatingPage = () => {
         setTimeout(() => setSuccessMessage(""), 7000);
       }
     } catch (error) {
-      console.error("Error submitting rating:", error);
+      setErrorMessage("Error submitting rating:", error);
       setSuccessMessage(""); // Hide success message if error occurs
     }
   };
@@ -319,4 +317,4 @@ const SellerRatingPage = () => {
   );
 };
 
-export default SellerRatingPage;
+export default BuyerRatingPage;

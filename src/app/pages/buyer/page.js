@@ -95,7 +95,6 @@ export default function BuyerPage() {
         setErrorMessage('Failed to load car listings. Please try again later.');
       }
     } catch (error) {
-      console.error('Error fetching listings:', error);
       setErrorMessage(error.response?.data?.error || 'An error occurred while fetching car listings.');
     } finally {
       setIsLoading(false);
